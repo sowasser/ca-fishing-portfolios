@@ -1,6 +1,7 @@
 # Exploring overall California landings & fishery participation data for 
 # 1992-2014, downloaded from the California Natural Resources Agency:
 # https://data.cnra.ca.gov/dataset/human-uses-and-socioeconomic-dimensions-ca-north-coast-mpa-baseline-study-1992-2014
+# Specifically: "Commercial Fishing - All Fisheries Summary - 1992-2014"
 
 library(reshape2)
 library(ggplot2)

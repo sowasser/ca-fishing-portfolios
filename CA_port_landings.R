@@ -28,15 +28,15 @@ pl_stable$fishery <- as.factor(pl_stable$fishery)
 pl_stable$port <- as.factor(pl_stable$port)
 pl_stable$gear <- as.factor(pl_stable$gear)
 
-# Find mean for each species, ignoring gear type
+# Find total for each species, ignoring gear type
 pl_species <- group_by(pl_stable, year, port, fishery) %>% 
-  summarize(revenue = mean(ex.vessel_revenue))
+  summarize(revenue = sum(ex.vessel_revenue))
 
-# Create crazy graph
+# Create crazy graph with all species
 all_ports <- ggplot(pl_species, aes(x = year, y = revenue, color = fishery)) + 
   theme_bw() +
   geom_line() +  
-  ylab(" ") + xlab(" ") +
+  ylab("revenue") + xlab(" ") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port, scale="free", ncol = 5)
 
@@ -46,6 +46,25 @@ ggsave(filename="Figures/all_ports.pdf", plot=all_ports,
 # Combine fishery & gear columns together to maintain all differences in fishery
 pl_fishgear <- pl_stable %>% unite(fishgear, fishery, gear, sep = " - ")
 pl_fishgear$fishgear <- as.factor(pl_fishgear$fishgear)
+
+# Keep only top 5 highest revenue species per port per year
+pl_highest <- pl_fishgear %>% 
+  arrange(year, port, desc(ex.vessel_revenue)) %>% 
+  group_by(year, port) %>%
+  slice(1:3)
+
+pl_highest <- as.data.frame(pl_highest)
+
+# Plot top 5 revenue-producing species per port per year
+top_revenue <- ggplot(pl_highest, aes(x = year, y = ex.vessel_revenue, color = fishgear)) + 
+  theme_bw() +
+  geom_line() +  
+  ylab("revenue") + xlab(" ") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~port, scale="free", ncol = 5)
+
+ggsave(filename="Figures/top_revenue.pdf", plot=top_revenue,
+       width=600, height=500, units="mm", dpi=300)
 
 # Workflow for Dungeness Crab -------------------------------------------------
 # Select only the dungeness crab data

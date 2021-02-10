@@ -85,7 +85,6 @@ total_revenue <- ggplot(pl_revenue, aes(x = year, y = revenue)) +
 ggsave(filename="Figures/total_revenue.pdf", plot=total_revenue,
        width=600, height=500, units="mm", dpi=300)
 
-
 # Count of fisheries (species and gear) per port per year
 pl_count <- count(pl_fishgear, year, port)
 
@@ -104,12 +103,16 @@ ggsave(filename="Figures/fisheries_number.pdf", plot=fisheries_number,
 crab_all <- port_landings %>% filter(fishery == "DUNGENESS CRAB")
 crab <- crab_all %>% drop_na()
 
-# NB: when finding the means, this aggregates different gear types.
-# Find means by year
-crab_yr_mean <- group_by(crab, year) %>% summarize(m = mean(ex.vessel_revenue))
+crab_revenue <- ggplot(crab, aes(x = year, y = ex.vessel_revenue, color = gear)) + 
+  theme_bw() +
+  scale_color_viridis(discrete=TRUE) + #color of points from viridis
+  geom_line(size=1.5) +  
+  ylab("revenue") + xlab(" ") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~port, ncol = 5)
 
-# Find means by year & port
-crab_yr_port_mean <- group_by(crab, year, port) %>% summarize(m = mean(ex.vessel_revenue))
+ggsave(filename="Figures/crab_revenue.pdf", plot=crab_revenue,
+       width=600, height=500, units="mm", dpi=300)
 
 
 # Workflow for salmon closure -------------------------------------------------

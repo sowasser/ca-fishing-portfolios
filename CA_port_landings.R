@@ -17,7 +17,7 @@ species <- levels(factor(port_landings$fishery))  # list of species
 stable_years <- port_landings %>% filter(between(year, 2009, 2014))
 
 
-# All ports timeseries --------------------------------------------------------
+# Timeseries of fisheries by port ---------------------------------------------
 pl <- port_landings %>% drop_na()  # remove NAs
 pl <- pl[order(pl$year, pl$port, -pl$ex.vessel_revenue), ]  # order by revenue
 pl_stable <- pl %>% filter(between(year, 2009, 2014))  # osolate stable period
@@ -66,6 +66,36 @@ top_revenue <- ggplot(pl_highest, aes(x = year, y = ex.vessel_revenue, color = f
 ggsave(filename="Figures/top_revenue.pdf", plot=top_revenue,
        width=600, height=500, units="mm", dpi=300)
 
+
+# General timeseries by port --------------------------------------------------
+# Total revenue per port per year
+pl_revenue <- group_by(pl, year, port) %>% summarize(revenue = sum(ex.vessel_revenue))
+pl_revenue <- pl_revenue %>% filter(port != "OTHER CA PORTS1")  # remove empty port category
+
+total_revenue <- ggplot(pl_revenue, aes(x = year, y = revenue)) + 
+  theme_bw() +
+  geom_line(size=1.5) +  
+  ylab("overall revenue") + xlab(" ") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~port, ncol = 5)
+
+ggsave(filename="Figures/total_revenue.pdf", plot=total_revenue,
+       width=600, height=500, units="mm", dpi=300)
+
+
+# Count of fisheries (species and gear) per port per year
+pl_count <- count(pl_fishgear, year, port)
+
+fisheries_number <- ggplot(pl_count, aes(x = year, y = n)) + 
+  theme_bw() +
+  geom_line(size=1.5) +  
+  ylab("number of fisheries") + xlab(" ") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~port, ncol = 5)
+
+ggsave(filename="Figures/fisheries_number.pdf", plot=fisheries_number,
+       width=600, height=500, units="mm", dpi=300)
+
 # Workflow for Dungeness Crab -------------------------------------------------
 # Select only the dungeness crab data
 crab_all <- port_landings %>% filter(fishery == "DUNGENESS CRAB")
@@ -73,10 +103,10 @@ crab <- crab_all %>% drop_na()
 
 # NB: when finding the means, this aggregates different gear types.
 # Find means by year
-crab_yr_mean <- group_by(crab, year) %>% summarize(m= mean(ex.vessel_revenue))
+crab_yr_mean <- group_by(crab, year) %>% summarize(m = mean(ex.vessel_revenue))
 
 # Find means by year & port
-crab_yr_port_mean <- group_by(crab, year, port) %>% summarize(m= mean(ex.vessel_revenue))
+crab_yr_port_mean <- group_by(crab, year, port) %>% summarize(m = mean(ex.vessel_revenue))
 
 
 # Workflow for salmon closure -------------------------------------------------
@@ -95,5 +125,3 @@ stable_sal_ports <- filter(stable_years, port %in% salmon_ports)
 
 # Find count of number of fisheries for salmon-catching ports by year
 sal_port_count <- count(sal_port_data, year, port)
-
-# Find revenue 

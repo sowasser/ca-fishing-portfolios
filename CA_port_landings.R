@@ -8,6 +8,7 @@ library(dplyr)
 library(tidyr)
 library(reshape2)
 library(ggplot2)
+library(viridis)
 
 port_landings <- read.csv("Data/port_landings_92-14.csv")
 
@@ -35,6 +36,7 @@ pl_species <- group_by(pl_stable, year, port, fishery) %>%
 # Create crazy graph with all species
 all_ports <- ggplot(pl_species, aes(x = year, y = revenue, color = fishery)) + 
   theme_bw() +
+  scale_color_viridis(discrete=TRUE) + #color of points from viridis
   geom_line() +  
   ylab("revenue") + xlab(" ") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
@@ -58,6 +60,7 @@ pl_highest <- as.data.frame(pl_highest)
 # Plot top 5 revenue-producing species per port per year
 top_revenue <- ggplot(pl_highest, aes(x = year, y = ex.vessel_revenue, color = fishgear)) + 
   theme_bw() +
+  scale_color_viridis(discrete=TRUE) + #color of points from viridis
   geom_line() +  
   ylab("revenue") + xlab(" ") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +

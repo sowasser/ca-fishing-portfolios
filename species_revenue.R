@@ -6,7 +6,6 @@
 library(dplyr)
 library(ggplot2)
 library(viridis)
-library(purrr)
 
 port_landings <- read.csv("Data/port_landings_92-14.csv")
 

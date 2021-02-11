@@ -10,9 +10,8 @@ library(reshape2)
 library(ggplot2)
 library(viridis)
 
+# Read in all landings data
 port_landings <- read.csv("Data/port_landings_92-14.csv")
-
-species <- levels(factor(port_landings$fishery))  # list of species
 
 # Isolate stable period: 2009-2014
 stable_years <- port_landings %>% filter(between(year, 2009, 2014))
@@ -96,22 +95,6 @@ fisheries_number <- ggplot(pl_count, aes(x = year, y = n)) +
   facet_wrap(~port, ncol = 5)
 
 ggsave(filename="Figures/fisheries_number.pdf", plot=fisheries_number,
-       width=600, height=500, units="mm", dpi=300)
-
-# Workflow for Dungeness Crab -------------------------------------------------
-# Select only the dungeness crab data
-crab_all <- port_landings %>% filter(fishery == "DUNGENESS CRAB")
-crab <- crab_all %>% drop_na()
-
-crab_revenue <- ggplot(crab, aes(x = year, y = ex.vessel_revenue, color = gear)) + 
-  theme_bw() +
-  scale_color_viridis(discrete=TRUE) + #color of points from viridis
-  geom_line(size=1.5) +  
-  ylab("revenue") + xlab(" ") +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  facet_wrap(~port, ncol = 5)
-
-ggsave(filename="Figures/crab_revenue.pdf", plot=crab_revenue,
        width=600, height=500, units="mm", dpi=300)
 
 

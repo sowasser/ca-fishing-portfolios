@@ -6,6 +6,7 @@
 library(dplyr)
 library(ggplot2)
 library(viridis)
+library(purrr)
 
 port_landings <- read.csv("Data/port_landings_92-14.csv")
 
@@ -29,6 +30,7 @@ species_timeseries <- function(species) {
          plot=plt, width=600, height=500, units="mm", dpi=300)
 }
 
-
 # Function call for each species ----------------------------------------------
-species_timeseries("SALMON")
+for (s in species) {
+  species_timeseries(s)
+}

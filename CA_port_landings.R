@@ -68,6 +68,39 @@ top_revenue <- ggplot(pl_highest, aes(x = year, y = ex.vessel_revenue, color = f
 ggsave(filename="Figures/top_revenue.pdf", plot=top_revenue,
        width=600, height=500, units="mm", dpi=300)
 
+# Most revenue-producing species per port per year
+pl_max <- pl_fishgear %>% 
+  arrange(year, port, desc(ex.vessel_revenue)) %>% 
+  group_by(year, port) %>%
+  slice(1:1)
+
+pl_max <- as.data.frame(pl_max)
+pl_max$year <- as.factor(pl_max$year)
+
+max_revenue <- ggplot(pl_max, aes(y = ex.vessel_revenue, x = year, fill = fishgear)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  ylab("revenue") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~port) 
+
+ggsave(filename="Figures/max_revenue.pdf", max_revenue,
+       width=600, height=500, units="mm", dpi=300)
+
+# Most revenue-producing species per year
+pl_max_yr <- pl_fishgear %>% 
+  arrange(year, desc(ex.vessel_revenue)) %>% 
+  group_by(year) %>%
+  slice(1:1)
+
+max_revenue_yr <- ggplot(pl_max_yr, aes(y = ex.vessel_revenue, x = year, fill = fishgear)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  ylab("revenue") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+ggsave(filename="Figures/max_revenue_yr.pdf", max_revenue_yr,
+       width=200, height=100, units="mm", dpi=300)
 
 # General timeseries by port --------------------------------------------------
 # Total revenue per port per year

@@ -12,11 +12,11 @@ port_landings <- read.csv("Data/port_landings_92-14.csv")
 species <- levels(factor(port_landings$fishery))  # list of species
 
 # Function for fishery timeseries by port -------------------------------------
-species_timeseries <- function(species, short_name, plot_name) {
-  short_name <- port_landings %>% filter(fishery == species)
-  short_name <- short_name %>% drop_na()
+species_timeseries <- function(species) {
+  df <- port_landings %>% filter(fishery == species)
+  df <- df %>% drop_na()
   
-  plot_name <- ggplot(short_name, aes(x = year, y = ex.vessel_revenue, color = gear)) +
+  plt <- ggplot(df, aes(x = year, y = ex.vessel_revenue, color = gear)) +
     theme_bw() +
     scale_color_viridis(discrete=TRUE) + #color of points from viridis
     geom_line(size=1.5) +  
@@ -26,9 +26,9 @@ species_timeseries <- function(species, short_name, plot_name) {
     facet_wrap(~port, ncol = 5)
   
   ggsave(filename=paste("Figures/Species revenue/", species, "_revenue.pdf", sep=""), 
-         plot=plot_name, width=600, height=500, units="mm", dpi=300)
+         plot=plt, width=600, height=500, units="mm", dpi=300)
 }
 
 
 # Function call for each species ----------------------------------------------
-species_timeseries("SALMON", salmon, salmon_revenue)
+species_timeseries("SALMON")

@@ -42,3 +42,19 @@ revenue_count <- ggplot(rev_count, aes(x = count, y = revenue, color = port)) +
 
 ggsave(filename="Figures/revenue_count.pdf", plot=revenue_count,
        width=600, height=500, units="mm", dpi=300)
+
+# Which fish are fished together - co-occurrence of fishery by port & year -----
+# Subset original port_landings dataframe
+pl_occurrence <- subset.data.frame(port_landings, 
+                                   select = c("year", "port", "fishery", 
+                                              "ex.vessel_revenue"))
+# Combine multiple gear types together
+pl_occurrence <- group_by(pl_occurrence, year, port, fishery) %>%
+  summarize(revenue = sum(ex.vessel_revenue))
+
+# Convert revenue to ordinal data (1 for some revenue, 0 for NAs)
+pl_occurrence$revenue[is.na(pl_occurrence$revenue)] <- 0  # replace NAs with 0
+# Replace any value over 0 with 1
+pl_occurrence2 <- pl_occurrence %>% mutate_if(is.numeric, ~1 * (. > 0))
+
+

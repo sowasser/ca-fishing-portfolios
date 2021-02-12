@@ -4,8 +4,10 @@
 # https://data.cnra.ca.gov/dataset/human-uses-and-socioeconomic-dimensions-ca-north-coast-mpa-baseline-study-1992-2014
 
 library(dplyr)
+library(reshape2)
 library(ggplot2)
 library(viridis)
+library(corrplot)
 
 port_landings <- read.csv("Data/port_landings_92-14.csv")
 
@@ -33,3 +35,14 @@ species_timeseries <- function(species) {
 for (s in species) {
   species_timeseries(s)
 }
+
+# Correlation matrix for all fisheries by year & port -------------------------
+fish_sums <- group_by(port_landings, year, port, fishery) %>% 
+  summarize(revenue = sum(ex.vessel_revenue))
+fish_sums <- fish_sums %>% drop_na()
+fish_sums2 <-  group_by(fish_sums, year, fishery) %>% 
+  summarize(revenue = sum(revenue))
+fish_sums3 <- dcast(fish_sums2, year ~ fishery)
+
+fish_cor <- cor(fish_sums3[2:37])
+corrplot(fish_cor, type="upper", tl.col = "black")

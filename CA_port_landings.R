@@ -127,21 +127,3 @@ fisheries_number <- ggplot(pl_count, aes(x = year, y = n)) +
 
 ggsave(filename="Figures/fisheries_number.pdf", plot=fisheries_number,
        width=600, height=500, units="mm", dpi=300)
-
-
-# Workflow for salmon closure -------------------------------------------------
-# Select salmon data
-salmon_all <- port_landings %>% filter(fishery == "SALMON")
-salmon_ports <- levels(factor(salmon_all$port))  # ports where salmon was fished
-
-# Select all data for ports where salmon was fished at some point
-sal_port_data <- filter(port_landings, port %in% salmon_ports)
-sal_port_data <- sal_port_data %>% drop_na()
-
-# Stable salmon port years 
-stable_sal_ports <- filter(stable_years, port %in% salmon_ports)
-
-# Remove NAs, salmon, and find mean revenue per year per port for stable years
-
-# Find count of number of fisheries for salmon-catching ports by year
-sal_port_count <- count(sal_port_data, year, port)

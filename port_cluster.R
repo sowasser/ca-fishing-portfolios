@@ -8,6 +8,8 @@ library(dplyr)
 library(cluster)
 library(factoextra)
 library(ggplot2)
+library(reshape2)
+library(cooccur)
 
 port_landings <- read.csv("Data/port_landings_92-14.csv")
 
@@ -43,7 +45,9 @@ revenue_count <- ggplot(rev_count, aes(x = count, y = revenue, color = port)) +
 ggsave(filename="Figures/revenue_count.pdf", plot=revenue_count,
        width=600, height=500, units="mm", dpi=300)
 
+
 # Which fish are fished together - co-occurrence of fishery by port & year -----
+# Tutorial here - https://medium.com/analytics-vidhya/how-to-create-co-occurrence-networks-with-the-r-packages-cooccur-and-visnetwork-f6e1ceb1c523
 # Subset original port_landings dataframe
 pl_occurrence <- subset.data.frame(port_landings, 
                                    select = c("year", "port", "fishery", 
@@ -52,9 +56,21 @@ pl_occurrence <- subset.data.frame(port_landings,
 pl_occurrence <- group_by(pl_occurrence, year, port, fishery) %>%
   summarize(revenue = sum(ex.vessel_revenue))
 
-# Convert revenue to ordinal data (1 for some revenue, 0 for NAs)
-pl_occurrence$revenue[is.na(pl_occurrence$revenue)] <- 0  # replace NAs with 0
-# Replace any value over 0 with 1
-pl_occurrence2 <- pl_occurrence %>% mutate_if(is.numeric, ~1 * (. > 0))
+# Select data for a specific year
+occur_2014 <- pl_occurrence %>% filter(year == 2014)
+# Comvert to condensed shape
+o2014 <- dcast(occur_2014, fishery ~ port)
 
+# Convert revenue to ordinal data (1 for some revenue, 0 for NAs)
+o2014[is.na(o2014)] <- 0  # replace NAs with 0
+# Replace any value over 0 with 1
+o2014 <- o2014 %>% mutate_if(is.numeric, ~1 * (. > 0))
+
+# Set up data for cooccur - make fisheries the row names
+co2014 <- o2014
+row.names(co2014) <- co2014[, 1]
+co2014 <- co2014[, -1]
+
+# Run co-occurrence function & print output
+co <- print(cooccur(co2014, spp_names = TRUE))
 

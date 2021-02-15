@@ -69,19 +69,23 @@ co_occur <- function(yr) {
   occur <- occur[, -1]  # remove species name column
   
   # Run co-occurrence with the species name listed in output
-  co <- print(cooccur(occur, spp_names = TRUE))
-  co_results <- co$results
-  co2 <- cbind(rep(yr, length(co_results$sp1)), co_results)
-  colnames(co2)[1] <- "year"
-  co3 <- as.data.frame(co2)
-  return(co3)
+  co <- cooccur(occur, spp_names = TRUE)
+  co_results <- co$results  # isolate results from cooccurr object
+  co_results <- as.data.frame(co_results)
+  co2 <- cbind(rep(yr, length(co_results$sp1)), co_results) # combine with year
+  colnames(co2)[1] <- "year"  # rename year column
+  return(co2)  # TODO: figure out how to make this actually come out of the function!
 }
 
 # Test function on one year
-co_occur(2014)
+co2014 <- co_occur(2014)
 
+# Call function for all years & merge into one dataframe
+co_all <- list()  # empty list
 
-# Call function for all years
-for (y in yr) {
-  co_occur(y)
+for (y in years) {
+  data <- co_occur(y)
+  co_all[[y]] <- data
 }
+
+co_all <- bind_cols(co_all)

@@ -56,21 +56,32 @@ pl_occurrence <- subset.data.frame(port_landings,
 pl_occurrence <- group_by(pl_occurrence, year, port, fishery) %>%
   summarize(revenue = sum(ex.vessel_revenue))
 
-# Select data for a specific year
-occur_2014 <- pl_occurrence %>% filter(year == 2014)
-# Comvert to condensed shape
-o2014 <- dcast(occur_2014, fishery ~ port)
+# Function for species co-occurrence for each year in series
+years <- 1992:2014 
 
-# Convert revenue to ordinal data (1 for some revenue, 0 for NAs)
-o2014[is.na(o2014)] <- 0  # replace NAs with 0
-# Replace any value over 0 with 1
-o2014 <- o2014 %>% mutate_if(is.numeric, ~1 * (. > 0))
+co_occur <- function(yr) {
+  occur <- pl_occurrence %>% filter(year == yr)  # select year
+  
+  occur <- dcast(occur, fishery ~ port)  # re-arrange to wide format
+  occur[is.na(occur)] <- 0  # replace all NAs with 0 (no occurrence)
+  occur <- occur %>% mutate_if(is.numeric, ~1 * (. > 0))  # replace all values > 0 with 1
+  row.names(occur) <- occur[, 1]  # make species name (1st column) the row names
+  occur <- occur[, -1]  # remove species name column
+  
+  # Run co-occurrence with the species name listed in output
+  co <- print(cooccur(occur, spp_names = TRUE))
+  co_results <- co$results
+  co2 <- cbind(rep(yr, length(co_results$sp1)), co_results)
+  colnames(co2)[1] <- "year"
+  co3 <- as.data.frame(co2)
+  return(co3)
+}
 
-# Set up data for cooccur - make fisheries the row names
-co2014 <- o2014
-row.names(co2014) <- co2014[, 1]
-co2014 <- co2014[, -1]
+# Test function on one year
+co_occur(2014)
 
-# Run co-occurrence function & print output
-co <- print(cooccur(co2014, spp_names = TRUE))
 
+# Call function for all years
+for (y in yr) {
+  co_occur(y)
+}

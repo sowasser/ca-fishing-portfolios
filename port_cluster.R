@@ -46,7 +46,7 @@ ggsave(filename="Figures/revenue_count.pdf", plot=revenue_count,
        width=600, height=500, units="mm", dpi=300)
 
 
-# Which fish are fished together - co-occurrence of fishery by port & year -----
+# Which fish are fished together - co-occurrence of fishery by port  ----------
 # Tutorial here - https://medium.com/analytics-vidhya/how-to-create-co-occurrence-networks-with-the-r-packages-cooccur-and-visnetwork-f6e1ceb1c523
 # Subset original port_landings dataframe
 pl_occurrence <- subset.data.frame(port_landings, 
@@ -56,6 +56,22 @@ pl_occurrence <- subset.data.frame(port_landings,
 pl_occurrence <- group_by(pl_occurrence, year, port, fishery) %>%
   summarize(revenue = sum(ex.vessel_revenue))
 
+# Co-occurrence for all years together
+occur <- dcast(pl_occurrence, fishery ~ port)  # re-arrange to wide format
+occur <- occur %>% mutate_if(is.numeric, ~1 * (. > 0))  # replace all values > 0 with 1
+row.names(occur) <- occur[, 1]  # make species name (1st column) the row names
+occur <- occur[, -1]  # remove species name column
+
+co <- cooccur(occur, spp_names = TRUE)  # run co-occurrence 
+co_results <- co$results  # isolate results from cooccurr object
+co_results <- as.data.frame(co_results)
+
+# Subset of co-occurrence output where the probability of co-occurrence is at a
+# frequency greater than the observed frequency
+prob_occur <- co_results %>% filter(p_gt >= 0.95)
+
+
+# Co-occurrence for each year -------------------------------------------------
 # Function for species co-occurrence for each year in series
 years <- 1992:2014 
 
@@ -74,18 +90,20 @@ co_occur <- function(yr) {
   co_results <- as.data.frame(co_results)
   co2 <- cbind(rep(yr, length(co_results$sp1)), co_results) # combine with year
   colnames(co2)[1] <- "year"  # rename year column
-  return(co2)  # TODO: figure out how to make this actually come out of the function!
+  return(co2)  
 }
 
-# Test function on one year
-co2014 <- co_occur(2014)
-
 # Call function for all years & merge into one dataframe
-co_all <- list()  # empty list
+co_years <- list()  # empty list
 
 for (y in years) {
   data <- co_occur(y)
   co_all[[y]] <- data
 }
 
-co_all <- bind_cols(co_all)
+co_years <- bind_cols(co_years)
+
+# Subset of co-occurrence output where the probability of co-occurrence is at a
+# frequency greater than the observed frequency
+prob_occur_years <- co_years %>% filter(p_gt >= 0.95)
+

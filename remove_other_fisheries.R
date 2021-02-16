@@ -6,21 +6,20 @@
 library(dplyr)
 
 # Read in initial data-set
-original <- read.csv("Data/port_landings_92-14.csv")
+pl <- read.csv("Data/port_landings_92-14.csv")
 
-# List of fisheries to not include
-exclude <- c("MISC", "OTHER", "OTHER CRAB", "OTHER FLATFISH", 
-             "OTHER GROUNDFISH", "OTHER OFFSHORE PELAGICS", "OTHER-misc")
+# Remove fisheries that won't be used in the analysis
+pl <- pl %>% filter(fishery != "MISC")
+pl <- pl %>% filter(fishery != "OTHER")
+pl <- pl %>% filter(fishery != "OTHER CRAB")
+pl <- pl %>% filter(fishery != "OTHER FLATFISH")
+pl <- pl %>% filter(fishery != "OTHER GROUNDFISH")
+pl <- pl %>% filter(fishery != "OTHER OFFSHORE PELAGICS")
+pl <- pl %>% filter(fishery != "OTHER-misc")
 
-# Remove fisheries in the list - run function through a for-loop w/ all species
-exclude_species <- function(fish) {
-  df <- original %>% filter(fishery != fish)
-}
-
-for (e in exclude) {
-  port_landings <- exclude_species(e)
-}
-
-# Check the list of remaining species
-species <- levels(factor(port_landings$fishery))  # list of species
+# Check to make sure all "other" or "misc" fisheries have been removed
+species <- levels(factor(pl$fishery))  # list of species
 print(species)
+
+# Write new .csv file without rownames creating their own column
+write.csv(pl, file = "Data/port_landings_updated.csv", row.names = FALSE)

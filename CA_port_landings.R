@@ -11,7 +11,7 @@ library(ggplot2)
 library(viridis)
 
 # Read in all landings data
-port_landings <- read.csv("Data/port_landings_92-14.csv")
+port_landings <- read.csv("Data/port_landings_updated.csv")
 
 # Isolate stable period: 2009-2014
 stable_years <- port_landings %>% filter(between(year, 2009, 2014))

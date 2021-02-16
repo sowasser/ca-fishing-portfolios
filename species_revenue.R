@@ -9,7 +9,7 @@ library(ggplot2)
 library(viridis)
 library(corrplot)
 
-port_landings <- read.csv("Data/port_landings_92-14.csv")
+port_landings <- read.csv("Data/port_landings_updated.csv")
 
 species <- levels(factor(port_landings$fishery))  # list of species
 

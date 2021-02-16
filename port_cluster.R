@@ -11,7 +11,7 @@ library(ggplot2)
 library(reshape2)
 library(cooccur)
 
-port_landings <- read.csv("Data/port_landings_92-14.csv")
+port_landings <- read.csv("Data/port_landings_updated.csv")
 
 # Find sum of revenue per fish species per port per year ----------------------
 fish_sums <- group_by(port_landings, year, port, fishery) %>% 

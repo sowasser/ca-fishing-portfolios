@@ -56,8 +56,15 @@ pl_occurrence <- subset.data.frame(port_landings,
 pl_occurrence <- group_by(pl_occurrence, year, port, fishery) %>%
   summarize(revenue = sum(ex.vessel_revenue))
 
+# Limit to fisheries of interest (higher revenue)
+target_species <- c("CALIFORNIA HALIBUT", "LOBSTER", "MARKET SQUID", 
+                    "DUNGENESS CRAB", "ALBACORE TUNA", "SPOT PRAWN", 
+                    "COASTAL PELAGICS", "SALMON", "RED URCHIN", "SABLEFISH",
+                    "SHELF-SLOPE ROCKFISH", "SWORDFISH", "THORNYHEAD")
+pl_occur_subset <- filter(pl_occurrence, fishery %in% target_species)
+
 # Co-occurrence for all years together
-occur <- dcast(pl_occurrence, fishery ~ port)  # re-arrange to wide format
+occur <- dcast(pl_occur_subset, fishery ~ port)  # re-arrange to wide format
 occur <- occur %>% mutate_if(is.numeric, ~1 * (. > 0))  # replace all values > 0 with 1
 row.names(occur) <- occur[, 1]  # make species name (1st column) the row names
 occur <- occur[, -1]  # remove species name column

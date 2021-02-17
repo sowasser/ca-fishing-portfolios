@@ -1,0 +1,71 @@
+# Script for appending species timings to the California landings data, 
+# organized by port from 1992-2014, downloaded from the California Natural 
+# Resources Agency:
+# https://data.cnra.ca.gov/dataset/human-uses-and-socioeconomic-dimensions-ca-north-coast-mpa-baseline-study-1992-2014
+
+library(tidyverse)
+library(lubridate)
+library(scales)
+
+port_landings <- read.csv("Data/port_landings_updated.csv")
+
+
+# Gantt chart for species of interest -----------------------------------------
+tasks <- tribble(
+  ~Start,       ~End,         ~Project,          ~Task,
+  "2020-07-01", "2020-08-31", "Seasonal", "Albacore tuna",
+  "2020-06-16", "2020-03-14", "Seasonal", "California halibut",
+  "2020-01-01", "2020-10-31", "Seasonal", "Coastal pelagics",
+  "2019-12-01", "2020-07-15", "Seasonal", "Dungeness Crab",
+  "2019-10-01", "2020-03-15", "Seasonal", "Lobster",
+  "2019-09-01", "2020-03-30", "Seasonal", "Market squid",
+  "2019-11-15", "2020-11-14", "Year-round", "Red urchin",
+  "2019-11-15", "2020-11-14", "Year-round", "Sablefish",
+  "2020-05-01", "2020-10-31", "Seasonal", "Salmon",
+  "2019-11-15", "2020-11-14", "Year-round", "Shelf-slope rockfish",
+  "2020-02-20", "2020-09-01", "Seasonal", "Spot prawn",
+  "2019-11-15", "2020-11-14", "Year-round", "Swordfish",
+  "2019-11-15", "2020-11-14", "Year-round", "Thornyhead",
+)
+
+# Convert data too long for ggplot
+tasks.long <- tasks %>%
+  mutate(Start = ymd(Start),
+         End = ymd(End)) %>%
+  gather(date.type, task.date, -c(Project, Task)) %>%
+  arrange(date.type, task.date) %>%
+  mutate(Task = factor(Task, levels=rev(unique(Task)), ordered=TRUE))
+
+# Custom theme for making a clean Gantt chart
+theme_gantt <- function(base_size=11) {
+  ret <- theme_bw()
+  theme(panel.background = element_rect(fill="#ffffff", colour=NA),
+        axis.title.x=element_text(vjust=-0.2), 
+        axis.title.y=element_text(vjust=1.5),
+        title=element_text(vjust=1.2),
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        axis.line=element_blank(),
+        axis.ticks=element_blank(),
+        legend.position="bottom", 
+        axis.title=element_text(size=rel(0.8)),
+        strip.text=element_text(size=rel(1)),
+        strip.background=element_rect(fill="#ffffff", colour=NA),
+        panel.spacing.y=unit(1.5, "lines"),
+        legend.key = element_blank())
+  
+  ret
+}
+
+# Build plot
+timeline <- ggplot(tasks.long, aes(x=Task, y=task.date, colour=Project)) + 
+  geom_line(size=6) + 
+  guides(colour=guide_legend(title=NULL)) +
+  labs(x=NULL, y=NULL) + coord_flip() +
+  scale_y_date(date_breaks="1 month", labels=date_format("%b")) +  # Change how the dates on x-axis display
+  theme_gantt() + theme(axis.text.x=element_text(angle=45, hjust=1)) 
+timeline
+
+# TODO: Change units to make plot display well.
+ggsave(timeline, filename = "Figures/fisheries_gantt.png", 
+       width = 250, height = 120, units = "mm", 
+       dpi = 300, bg = "transparent")

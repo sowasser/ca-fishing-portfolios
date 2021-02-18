@@ -70,8 +70,11 @@ row.names(occur) <- occur[, 1]  # make species name (1st column) the row names
 occur <- occur[, -1]  # remove species name column
 
 co <- cooccur(occur, spp_names = TRUE)  # run co-occurrence 
-co_results <- co$results  # isolate results from cooccurr object
-co_results <- as.data.frame(co_results)
+co_results <- prob.table(co)  # islole results 
+
+occur_matrix <- plot(co)  # create a species co-occurrence matrix plot
+occur_matrix
+# TODO: figure out how to customize this ggplot object
 
 # Subset of co-occurrence output where the probability of co-occurrence is at a
 # frequency greater than the observed frequency

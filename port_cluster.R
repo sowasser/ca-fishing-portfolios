@@ -76,6 +76,9 @@ occur_matrix <- plot(co)  # create a species co-occurrence matrix plot
 occur_matrix
 # TODO: figure out how to customize this ggplot object
 
+ggsave(filename="Figures/occurrence_matrix.pdf", plot=occur_matrix, 
+       width=200, height=200, units="mm", dpi=300)
+
 # Subset of co-occurrence output where the probability of co-occurrence is at a
 # frequency greater than the observed frequency
 prob_occur <- co_results %>% filter(p_gt >= 0.95)

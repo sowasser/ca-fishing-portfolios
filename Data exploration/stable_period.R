@@ -24,5 +24,5 @@ fish_revenue_sum <- ggplot(fish_sums2, aes(x = year, y = revenue)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~fishery, ncol = 6)
 
-ggsave(filename=paste("Figures/Stable period/allfisheries_revenue_stable.pdf", sep=""), 
+ggsave(filename="Figures/Stable period/allfisheries_revenue_stable.pdf", 
        plot=fish_revenue_sum, width=600, height=500, units="mm", dpi=300)

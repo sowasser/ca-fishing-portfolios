@@ -3,6 +3,7 @@
 # Resources Agency:
 # https://data.cnra.ca.gov/dataset/human-uses-and-socioeconomic-dimensions-ca-north-coast-mpa-baseline-study-1992-2014
 
+library(plyr)
 library(tidyverse)
 library(lubridate)
 library(scales)
@@ -40,7 +41,20 @@ closes_count <- c(259, 119, 320, 364, 242, 364, 106, 364, 120, 106, 364, 351,
                   364, 364, 364, 364, 364, 350, 364, 364, 364, 364, 290, 166,
                   364, 364, 127, 106)
 
+# Combine into one dataframe to double check timings
 seasons <- as.data.frame(cbind(species, opens, closes, opens_count, closes_count))
+
+# Isolate the list of fisheries from all of the data to be replaced with the
+# start and end dates (saved as new lists). 
+fishery <- port_landings$fishery
+
+start_day <- mapvalues(fishery, from = species, to = opens_count)
+end_day <- mapvalues(fishery, from = species, to = closes_count)
+# TODO: mapvalues is from plyr & a method from dplyr or elsewhere would be better
+
+# Combine with original port landings data & export as .csv
+pl_timings <- cbind(port_landings, start_day, end_day)
+write.csv(pl_timings, file = "Data/port_landings_timings.csv", row.names = FALSE)
 
 # Gantt chart for species of interest -----------------------------------------
 tasks <- tribble(

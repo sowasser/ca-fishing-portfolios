@@ -31,7 +31,16 @@ closes <- c("August", "March 14", "October", "Year-round", "July 15",
             "Year-round", "Year-round", "Year-round", "September", "April 30",
             "Year-round", "Year-round", "March 22", "March")
 
-seasons <- as.data.frame(cbind(species, opens, closes))
+# Number of days after Nov 15 - start of a new year for this project
+# Calculations done here: https://www.timeanddate.com/date/duration.html?y1=2020&m1=11&d1=15&y2=2021&m2=3&d2=1
+opens_count <- c(228, 213, 47, 1, 1, 1, 16, 1, 320, 290, 1, 198, 1, 1, 1, 1, 1,
+                 167, 1, 1, 1, 1, 105, 259, 1, 1, 228, 198)
+
+closes_count <- c(259, 119, 320, 364, 242, 364, 106, 364, 120, 106, 364, 351, 
+                  364, 364, 364, 364, 364, 350, 364, 364, 364, 364, 290, 166,
+                  364, 364, 127, 106)
+
+seasons <- as.data.frame(cbind(species, opens, closes, opens_count, closes_count))
 
 # Gantt chart for species of interest -----------------------------------------
 tasks <- tribble(

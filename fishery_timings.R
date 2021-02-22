@@ -10,6 +10,29 @@ library(scales)
 port_landings <- read.csv("Data/port_landings_updated.csv")
 
 
+# Add season timings to the dataset -------------------------------------------
+# Remove "smeltlike fish", where no season data are available
+port_landings <- port_landings %>% filter(fishery != "SMELTLIKE FISH")
+
+species <- levels(factor(port_landings$fishery))  # list of species
+print(species)
+
+opens <- c("July", "June 16", "January", "Year-round", "November 15", 
+           "Year-round", "December", "Year-round", "early October", 
+           "September", "Year-round", "June", "Year-round", "Year-round", 
+           "Year-round", "Year-round", "Year-round", "May 1", "Year-round", 
+           "Year-round", "Year-round", "Year-round", "late February", 
+           "August 1", "Year-round", "Year-round", "July 1", "June")
+
+closes <- c("August", "March 14", "October", "Year-round", "July 15", 
+            "Year-round", "March", "Year-round", "mid-March", "March",
+            "Year-round", "November", "Year-round", "Year-round", "Year-round",
+            "Year-round", "Year-round", "October 31", "Year-round", 
+            "Year-round", "Year-round", "Year-round", "September", "April 30",
+            "Year-round", "Year-round", "March 22", "March")
+
+seasons <- as.data.frame(cbind(species, opens, closes))
+
 # Gantt chart for species of interest -----------------------------------------
 tasks <- tribble(
   ~Start,       ~End,         ~Project,          ~Task,

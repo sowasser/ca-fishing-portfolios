@@ -1,0 +1,17 @@
+---
+title: "Annual trends in California fisheries from 1992-2014"
+author: "Sophia Wassermann"
+date: "3/1/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data source
+
+These data were downloaded from the [California Department of Natural Resources, Characterization of Human Uses and the Socioenonomic Dimensions, California North Coast MPA Baseline Study, 1992 to 2014][1].
+
+
+[1]: https://data.cnra.ca.gov/dataset/human-uses-and-socioeconomic-dimensions-ca-north-coast-mpa-baseline-study-1992-2014

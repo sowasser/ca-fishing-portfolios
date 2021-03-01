@@ -141,4 +141,36 @@ fish_revenue_sum <- ggplot(fish_sums2, aes(x = year, y = revenue)) +
 fish_revenue_sum
 ```
 
+\newpage
+
+Overall, for each year, the most valuable fishery was most often market squid (12 years), followed by dungeness crab (8 years), herring roe (2 years), and shrimp/prawn (1 year).
+
+``` {r, include=FALSE}
+# Code for overall most revenue-producing species per year, from CA_port_landings.R
+library(dplyr)
+library(tidyr)
+library(reshape2)
+library(ggplot2)
+library(viridis)
+
+# Read in all landings data
+port_landings <- read.csv("Data/port_landings_updated.csv")
+
+pl_max_yr <- pl %>% 
+  arrange(year, desc(ex.vessel_revenue)) %>% 
+  group_by(year) %>%
+  slice(1:1)
+
+max_revenue_yr <- ggplot(pl_max_yr, aes(y = ex.vessel_revenue, x = year, fill = fishery)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  ylab("revenue") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  scale_fill_viridis(discrete=TRUE)
+```
+
+```{r max_revenue_yr, fig.width = 6, fig.height = 3.5, fig.align = "center", echo=FALSE}
+max_revenue_yr
+```
+
 [1]: https://data.cnra.ca.gov/dataset/human-uses-and-socioeconomic-dimensions-ca-north-coast-mpa-baseline-study-1992-2014

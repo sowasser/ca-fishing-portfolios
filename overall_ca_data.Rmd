@@ -173,7 +173,7 @@ max_revenue_yr
 
 
 ## Fisheries timings and co-occurrence
-Diverse fisheries portfolios can be complimentary (composed of species fished at different times of the year) or substitutional (fished at opposing times of the year). To begin to explore how fishers in California build their portfolios, below is a Gantt chart of the open seasons (or peak times) for the most valuable fisheries. The data were gathered largely from the [California Sea Grant Seafood Profiles][2], with additional data for coastal pelagics from the [CA Department of Fish and Wildlife 2019 California Coastal Pelagic Species Fishery dataset][3].
+Diverse fisheries portfolios can be complimentary (composed of species fished at opposing times of the year) or substitutional (fished at similar times of the year). To begin to explore how fishers in California build their portfolios, below is a Gantt chart of the open seasons (or peak times) for the most valuable fisheries. The data were gathered largely from the [California Sea Grant Seafood Profiles][2], with additional data for coastal pelagics from the [CA Department of Fish and Wildlife 2019 California Coastal Pelagic Species Fishery dataset][3].
 
 ```{r, include=FALSE}
 # Code for Gantt chart of fisheries timings, from fishery_timings.R
@@ -289,6 +289,55 @@ timeline
 ```{r timeline, fig.width = 9, fig.height = 3.5, fig.align = "center", echo=FALSE}
 timeline
 ```
+
+\newpage
+
+To determine which species are often fished together, a fisheries species co-occurrence matrix was produced using ```cooccur```
+
+```{r, include=FALSE}
+# Code for the fisheries co-occurrence matrix, from port_cluster.R
+
+detach(package:plyr, unload=TRUE) # unload plyr so dplyr will work
+library(dplyr)
+library(cluster)
+library(factoextra)
+library(ggplot2)
+library(reshape2)
+library(cooccur)
+
+port_landings <- read.csv("Data/port_landings_updated.csv")
+                          
+# Subset original port_landings dataframe
+pl_occurrence <- subset.data.frame(port_landings, 
+                                   select = c("year", "port", "fishery", 
+                                              "ex.vessel_revenue"))
+# Combine multiple gear types together
+pl_occurrence <- group_by(pl_occurrence, year, port, fishery) %>%
+  summarize(revenue = sum(ex.vessel_revenue))
+
+# Limit to fisheries of interest (higher revenue)
+target_species <- c("CALIFORNIA HALIBUT", "LOBSTER", "MARKET SQUID", 
+                    "DUNGENESS CRAB", "ALBACORE TUNA", "SPOT PRAWN", 
+                    "COASTAL PELAGICS", "SALMON", "RED URCHIN", "SABLEFISH",
+                    "SHELF-SLOPE ROCKFISH", "SWORDFISH", "THORNYHEAD")
+pl_occur_subset <- filter(pl_occurrence, fishery %in% target_species)
+
+# Co-occurrence for all years together
+occur <- dcast(pl_occur_subset, fishery ~ port)  # re-arrange to wide format
+occur <- occur %>% mutate_if(is.numeric, ~1 * (. > 0))  # replace all values > 0 with 1
+row.names(occur) <- occur[, 1]  # make species name (1st column) the row names
+occur <- occur[, -1]  # remove species name column
+
+co <- cooccur(occur, spp_names = TRUE)  # run co-occurrence 
+co_results <- prob.table(co)  # islole results 
+
+occur_matrix <- plot(co)  # create a species co-occurrence matrix plot
+```
+
+```{r occur_matrix, fig.width = 7, fig.height = 7, fig.align = "center", echo=FALSE}
+occur_matrix
+```
+
 [1]: https://data.cnra.ca.gov/dataset/human-uses-and-socioeconomic-dimensions-ca-north-coast-mpa-baseline-study-1992-2014
 [2]: https://caseagrant.ucsd.edu/seafood-profiles/ 
 [3]: https://nrm.dfg.ca.gov/

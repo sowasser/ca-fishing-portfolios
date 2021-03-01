@@ -34,7 +34,7 @@ years <- c("92", "93", "94", "95", "96", "97", "98", "99", "00", "01", "02",
 
 summary_plot <- ggplot(summary_long, aes(x = year, y = value)) + 
   theme_bw() +
-  geom_line(size = 1.5) +  
+  geom_line(size = 1) +  
   ylab(" ") + 
   scale_x_continuous(labels=years, breaks=ca_summary$year) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
@@ -99,7 +99,7 @@ pl_count <- count(pl_fishgear, year, port)
 
 fisheries_number <- ggplot(pl_count, aes(x = year, y = n)) + 
   theme_bw() +
-  geom_line(size=1.5) +  
+  geom_line(size=1) +  
   ylab("number of fisheries") + xlab(" ") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port, ncol = 5)
@@ -131,7 +131,7 @@ fish_sums2 <-  group_by(fish_sums, year, fishery) %>%
 
 fish_revenue_sum <- ggplot(fish_sums2, aes(x = year, y = revenue)) +
   theme_bw() +
-  geom_line(size=1.5) +  
+  geom_line(size=1) +  
   ylab("revenue") + xlab(" ") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~fishery, ncol = 6)

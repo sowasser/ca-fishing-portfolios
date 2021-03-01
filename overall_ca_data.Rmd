@@ -15,7 +15,7 @@ These data were downloaded from the [California Department of Natural Resources,
 
 
 ## Overall timeseries
-Looking at the timeseries for the number of fishers, total revenue, and pounds landed from 1992-2014, there is a general declining trend in fishers and pounds landed. Revenue is highly variable over the timeseries, with a large increase in 2012 and 2014.
+Aggregated across all ports, the timeseries for the number of fishers, total revenue, and pounds landed from 1992-2014 shows a general declining trend in fishers and pounds landed. Revenue is highly variable over the timeseries, with a large increase in 2012 and 2014.
 
 ```{r, include=FALSE}
 # Code for a summary of the timeseries data for all of CA, pulled from all_ca_summary.R
@@ -41,9 +41,73 @@ summary_plot <- ggplot(summary_long, aes(x = year, y = value)) +
   facet_wrap(~variable, scale="free", ncol = 1)
 ```
 
-```{r show_figure, fig.width = 4.5, fig.height = 5.5, fig.align = "center", echo=FALSE}
+```{r summary_plot, fig.width = 4.5, fig.height = 5.5, fig.align = "center", echo=FALSE}
 summary_plot
 ```
 
+## Timeseries data by port
+There is high variability in the amount of revenue collected for each port in the dataset, with the same increase towards the end of the timeseries (as seen in the general data above) for a few ports, namely the Bodega Bay Area Ports, Monterey Area Ports, the Princeton-Half Moon Area Ports, and the Ventura ports.
+
+```{r, include=FALSE}
+# Code for total revenue per port graph, from CA_port_landings.R
+library(dplyr)
+library(tidyr)
+library(reshape2)
+library(ggplot2)
+
+# Read in all landings data
+port_landings <- read.csv("Data/port_landings_updated.csv")
+
+pl <- port_landings %>% drop_na()  # remove NAs
+pl <- pl[order(pl$year, pl$port, -pl$ex.vessel_revenue), ]  # order by revenue
+
+# Total revenue per port per year
+pl_revenue <- group_by(pl, year, port) %>% summarize(revenue = sum(ex.vessel_revenue))
+pl_revenue <- pl_revenue %>% filter(port != "OTHER CA PORTS")  # remove empty port category
+
+total_revenue <- ggplot(pl_revenue, aes(x = year, y = revenue)) + 
+  theme_bw() +
+  geom_line(size=1) +  
+  ylab("overall revenue") + xlab(" ") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~port, ncol = 5)
+```
+
+```{r total_revenue, fig.width = 12, fig.height = 12, fig.align = "center", echo=FALSE}
+total_revenue
+```
+
+\newpage
+
+The number of fisheries engaged in by port shows a much more consistent, downward trend, or a relatively flat trend. Each fishery here is defined as a species and gear combination.
+
+```{r, include=FALSE}
+# Count of fisheries (species and gear) per port per year
+library(dplyr)
+library(tidyr)
+library(reshape2)
+library(ggplot2)
+
+# Read in all landings data
+port_landings <- read.csv("Data/port_landings_updated.csv")
+
+pl_fishgear <- pl %>% unite(fishgear, fishery, gear, sep = " - ")
+pl_fishgear$fishgear <- as.factor(pl_fishgear$fishgear)
+pl_fishgear <- pl_fishgear %>% filter(port != "OTHER CA PORTS")
+
+pl_count <- count(pl_fishgear, year, port)
+
+fisheries_number <- ggplot(pl_count, aes(x = year, y = n)) + 
+  theme_bw() +
+  geom_line(size=1.5) +  
+  ylab("number of fisheries") + xlab(" ") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~port, ncol = 5)
+```
+
+
+```{r fisheries_number, fig.width = 12, fig.height = 12, fig.align = "center", echo=FALSE}
+fisheries_number
+```
 
 [1]: https://data.cnra.ca.gov/dataset/human-uses-and-socioeconomic-dimensions-ca-north-coast-mpa-baseline-study-1992-2014

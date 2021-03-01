@@ -41,7 +41,7 @@ summary_plot <- ggplot(summary_long, aes(x = year, y = value)) +
   facet_wrap(~variable, scale="free", ncol = 1)
 ```
 
-```{r show_figure, fig.width = 4.5, fig.height = 5.5, echo=FALSE}
+```{r show_figure, fig.width = 4.5, fig.height = 5.5, fig.align = "center", echo=FALSE}
 summary_plot
 ```
 

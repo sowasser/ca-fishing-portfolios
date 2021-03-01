@@ -14,4 +14,36 @@ knitr::opts_chunk$set(echo = TRUE)
 These data were downloaded from the [California Department of Natural Resources, Characterization of Human Uses and the Socioenonomic Dimensions, California North Coast MPA Baseline Study, 1992 to 2014][1].
 
 
+## Overall timeseries
+Looking at the timeseries for the number of fishers, total revenue, and pounds landed from 1992-2014, there is a general declining trend in fishers and pounds landed. Revenue is highly variable over the timeseries, with a large increase in 2012 and 2014.
+
+```{r, include=FALSE}
+# Code for a summary of the timeseries data for all of CA, pulled from all_ca_summary.R
+library(reshape2)
+library(ggplot2)
+
+ca_summary <- read.csv("Data/ca_summary_92-14.csv")
+
+# Overall trends across timeseries --------------------------------------------
+summary_long <- melt(ca_summary, id="year")  # convert to long form for faceted graph
+summary_long$year <- as.numeric(summary_long$year)
+
+# Create list to use as year labels in graph
+years <- c("92", "93", "94", "95", "96", "97", "98", "99", "00", "01", "02", 
+           "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14")
+
+summary_plot <- ggplot(summary_long, aes(x = year, y = value)) + 
+  theme_bw() +
+  geom_line(size = 1.5) +  
+  ylab(" ") + 
+  scale_x_continuous(labels=years, breaks=ca_summary$year) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~variable, scale="free", ncol = 1)
+```
+
+```{r show_figure, fig.width = 4.5, fig.height = 5.5, echo=FALSE}
+summary_plot
+```
+
+
 [1]: https://data.cnra.ca.gov/dataset/human-uses-and-socioeconomic-dimensions-ca-north-coast-mpa-baseline-study-1992-2014

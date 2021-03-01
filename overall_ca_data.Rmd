@@ -45,7 +45,7 @@ summary_plot <- ggplot(summary_long, aes(x = year, y = value)) +
 summary_plot
 ```
 
-## Timeseries data by port
+## Timeseries by port
 There is high variability in the amount of revenue collected for each port in the dataset, with the same increase towards the end of the timeseries (as seen in the general data above) for a few ports, namely the Bodega Bay Area Ports, Monterey Area Ports, the Princeton-Half Moon Area Ports, and the Ventura ports.
 
 ```{r, include=FALSE}
@@ -82,7 +82,7 @@ total_revenue
 The number of fisheries engaged in by port shows a much more consistent, downward trend, or a relatively flat trend. Each fishery here is defined as a species and gear combination.
 
 ```{r, include=FALSE}
-# Count of fisheries (species and gear) per port per year
+# Code for numer of fisheries per port graph, from CA_port_landings.R
 library(dplyr)
 library(tidyr)
 library(reshape2)
@@ -108,6 +108,37 @@ fisheries_number <- ggplot(pl_count, aes(x = year, y = n)) +
 
 ```{r fisheries_number, fig.width = 12, fig.height = 12, fig.align = "center", echo=FALSE}
 fisheries_number
+```
+
+\newpage
+
+## Timeseries by fishery species
+The timeseries of revenue for each species (here all gear types combined) demonstrate both what are the most revenue-producing species (dungeness crab, lobster, squid, red urchin, salmon) and the general trends in each species from 1992-2014. Notably, there has not been a significant fishery for species such as herring roe since the late 1990s, along with a large decline in red urchin around the same period. Market squid, on the other hand, has increased over the timeseries, as has dungeness crab, though revenue is highly variable. 
+
+```{r, include=FALSE}
+# Code for plot of revenue by fisheries species, from species_revenue.R
+library(dplyr)
+library(reshape2)
+library(ggplot2)
+
+port_landings <- read.csv("Data/port_landings_updated.csv")
+
+fish_sums <- group_by(port_landings, year, port, fishery) %>% 
+  summarize(revenue = sum(ex.vessel_revenue))
+fish_sums <- fish_sums %>% drop_na()
+fish_sums2 <-  group_by(fish_sums, year, fishery) %>% 
+  summarize(revenue = sum(revenue))
+
+fish_revenue_sum <- ggplot(fish_sums2, aes(x = year, y = revenue)) +
+  theme_bw() +
+  geom_line(size=1.5) +  
+  ylab("revenue") + xlab(" ") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~fishery, ncol = 6)
+```
+
+```{r fish_revenue_sum, fig.width = 12, fig.height = 10, fig.align = "center", echo=FALSE}
+fish_revenue_sum
 ```
 
 [1]: https://data.cnra.ca.gov/dataset/human-uses-and-socioeconomic-dimensions-ca-north-coast-mpa-baseline-study-1992-2014

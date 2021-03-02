@@ -3,8 +3,13 @@
 .RData
 .Ruserdata
 
+# Ignore data inputs (.csv, .pdf) and outputs (.pdf, Figures folder)
 *.csv
 
 *.pdf
 
 Figures/
+
+# Ignore virtual environment & other automated Python files
+venv/
+.idea/

@@ -13,17 +13,17 @@ import pandas as pd
 # table8 = tabula.read_pdf("DFW pdf data/Table8_2019_ADA.pdf", pages="all")
 # all = pd.concat(table8)
 
-# Convert pdf into csv
-# tabula.convert_into("DFW pdf data/Table8_2019_ADA.pdf",
+# # Convert one pdf into csv
+# tabula.convert_into_by_batch("DFW pdf data/monthly2000.pdf",
 #                     "DFW pdf data/table8.csv",
-#                     pages=[1, 2, 3, 4, 5, 6, 7, 8],
-#                     output_format="csv",
+#                     pages="all",
 #                     stream=True,
-#                     area=(10, 0, 100, 100), relative_area=True)
+#                     area=(10, 0, 100, 100), relative_area=True,
+#                     output_format="csv")
 
-tabula.convert_into("DFW pdf data/Table 8.pdf",
-                    "DFW pdf data/table8.csv",
-                    pages=[1, 2, 3, 4, 5, 7],
-                    output_format="csv",
-                    stream=True,
-                    area=(10, 0, 100, 100), relative_area=True)
+# Convert all pdfs in one directory into .csv
+tabula.convert_into_by_batch("DFW pdf data/pdfs",
+                             pages="all",
+                             stream=True,
+                             area=(10, 0, 100, 100), relative_area=True,
+                             output_format="csv")

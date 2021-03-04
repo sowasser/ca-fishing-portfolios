@@ -1,5 +1,6 @@
-# Script for analyzing monthly landings data from the California Department of
-# Natural Resources, accessed here: https://wildlife.ca.gov/Fishing/Commercial/Landings
+# Script for reading in, manipulating, and writing a new .csv file for the pdf 
+# data downloadedfrom the California Department of Natural Resources, accessed 
+# here: https://wildlife.ca.gov/Fishing/Commercial/Landings
 
 library(stringr)
 

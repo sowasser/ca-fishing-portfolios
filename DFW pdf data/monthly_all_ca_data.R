@@ -59,11 +59,24 @@ m18[, "year"] <- rep(2018, length(m18$Species))
 m19[, "year"] <- rep(2019, length(m19$Species))
 
 # Write new .csv files with these changes
-dfs <- list(m00, m01, m02, m03, m04, m05, m06, m07, m08, m09, m10,
-        m11, m12, m13, m14, m15, m16, m17, m18, m19)
-
-for(d in dfs) {
-  for(n in names) {
-    write.csv(d, file=paste("Data/DFW all CA/m", n, ".csv", sep = ""), row.names = FALSE)
-  }
-}
+# TODO: figure out how to do this iteratively/functionally
+write.csv(m00, "Data/DFW all CA/m00.csv", row.names = FALSE)
+write.csv(m01, "Data/DFW all CA/m01.csv", row.names = FALSE)
+write.csv(m02, "Data/DFW all CA/m02.csv", row.names = FALSE)
+write.csv(m03, "Data/DFW all CA/m03.csv", row.names = FALSE)
+write.csv(m04, "Data/DFW all CA/m04.csv", row.names = FALSE)
+write.csv(m05, "Data/DFW all CA/m05.csv", row.names = FALSE)
+write.csv(m06, "Data/DFW all CA/m06.csv", row.names = FALSE)
+write.csv(m07, "Data/DFW all CA/m07.csv", row.names = FALSE)
+write.csv(m08, "Data/DFW all CA/m08.csv", row.names = FALSE)
+write.csv(m09, "Data/DFW all CA/m09.csv", row.names = FALSE)
+write.csv(m10, "Data/DFW all CA/m10.csv", row.names = FALSE)
+write.csv(m11, "Data/DFW all CA/m11.csv", row.names = FALSE)
+write.csv(m12, "Data/DFW all CA/m12.csv", row.names = FALSE)
+write.csv(m13, "Data/DFW all CA/m13.csv", row.names = FALSE)
+write.csv(m14, "Data/DFW all CA/m14.csv", row.names = FALSE)
+write.csv(m15, "Data/DFW all CA/m15.csv", row.names = FALSE)
+write.csv(m16, "Data/DFW all CA/m16.csv", row.names = FALSE)
+write.csv(m17, "Data/DFW all CA/m17.csv", row.names = FALSE)
+write.csv(m18, "Data/DFW all CA/m18.csv", row.names = FALSE)
+write.csv(m19, "Data/DFW all CA/m19.csv", row.names = FALSE)

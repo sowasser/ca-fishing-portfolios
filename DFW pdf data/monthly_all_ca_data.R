@@ -7,9 +7,9 @@ library(stringr)
 names <- c("00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
            "11", "12", "13", "14", "15", "16", "17", "18", "19")
 
-for(i in names) {
-  name <- paste("m", i, sep = "")
-  assign(name, read.csv(paste("DFW pdf data/updated/month", i, ".csv", sep = "")))
+for(n in names) {
+  name <- paste("m", n, sep = "")
+  assign(name, read.csv(paste("DFW pdf data/updated/month", n, ".csv", sep = "")))
 }
 
 # Remove weird periods from the species name list
@@ -59,7 +59,11 @@ m18[, "year"] <- rep(2018, length(m18$Species))
 m19[, "year"] <- rep(2019, length(m19$Species))
 
 # Write new .csv files with these changes
-for(i in names) {
-  name <- paste("m", i, sep = "")
-  write.csv(name, (paste("Data/DFW all CA final/m", i, ".csv", sep = "")))
+dfs <- list(m00, m01, m02, m03, m04, m05, m06, m07, m08, m09, m10,
+        m11, m12, m13, m14, m15, m16, m17, m18, m19)
+
+for(d in dfs) {
+  for(n in names) {
+    write.csv(d, file=paste("Data/DFW all CA/m", n, ".csv", sep = ""), row.names = FALSE)
+  }
 }

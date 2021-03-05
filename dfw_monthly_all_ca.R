@@ -6,6 +6,7 @@
 library(stringr)
 library(dplyr)
 library(reshape2)
+library(ggplot2)
 
 # Read in each file with a unique name matching the year ----------------------
 names <- c("00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
@@ -87,7 +88,6 @@ pelagics <- pelagics[, c(2:14, 1)]  # Make year last column
 pelagics <- cbind(rep("Pelagics coastal", length(pelagics$year)), pelagics)
 colnames(pelagics) <- columns
 
-
 # Create dataframe of all species of interest
 soi <- rbind(halibut, crab, lobster, squid, albacore, prawn, urchin, sablefish,
              rockfish, swordfish, thornyhead, pelagics)
@@ -103,3 +103,28 @@ soi_stable$Species <- str_trim(soi_stable$Species, side = "both")  # Remove extr
 soi_means <- soi_stable %>% 
   group_by(Species) %>% 
   summarize(across(January:Landings, mean))
+
+# Update species names
+species <- c("dungeness crab", "halibut", "lobster", "coastal pelagics", 
+             "spot prawn", "shelf-slope rockfish", "sablefish", "red urchin",
+             "market squid", "swordfish", "thornyhead", "albacore tuna")
+soi_means2 <- cbind(species, soi_means[, -1])
+
+soi_means2 <- soi_means[, -14]  # Remove total landings
+
+# Update data for plotting
+colnames(soi_means2) <- c("species", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+soi_means_long <- melt(soi_means2, id_vars = "species")
+colnames(soi_means_long) <- c("species", "month", "landings")
+
+# Plot monthly means for stable period
+monthly_stable <- ggplot(soi_means_long, aes(y = landings, x = month)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  ylab("mean landings (lbs)") + xlab("mean across 2009-2014") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~species, ncol = 4, scale = "free")
+
+ggsave(filename="Figures/Monthly data/monthly_landings_stable.pdf", monthly_stable,
+       width=400, height=250, units="mm", dpi=300)

@@ -112,9 +112,12 @@ soi_means2 <- cbind(species, soi_means[, -1])
 
 soi_means2 <- soi_means[, -14]  # Remove total landings
 
-# Update data for plotting
+# Update data for plotting ----------------------------------------------------
 colnames(soi_means2) <- c("species", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+# Change column order to match other analyses - year starting in Nov
+soi_means2 <- soi_means2[, c(1, 12, 13, 2:11)] 
 soi_means_long <- melt(soi_means2, id_vars = "species")
 colnames(soi_means_long) <- c("species", "month", "landings")
 

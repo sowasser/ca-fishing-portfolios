@@ -22,7 +22,7 @@ import pandas as pd
 #                     output_format="csv")
 
 # Convert all pdfs in one directory into .csv
-tabula.convert_into_by_batch("source",
+tabula.convert_into_by_batch("source/all_CA",
                              pages="all",
                              stream=True,
                              area=(10, 0, 100, 100), relative_area=True,

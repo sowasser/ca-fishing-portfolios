@@ -22,7 +22,63 @@ import pandas as pd
 #                     output_format="csv")
 
 # Convert all pdfs in one directory into .csv
-tabula.convert_into_by_batch("source/all_CA",
+# # All of California
+# tabula.convert_into_by_batch("source/all_CA",
+#                              pages="all",
+#                              stream=True,
+#                              area=(10, 0, 100, 100), relative_area=True,
+#                              output_format="csv")
+
+# For each of the fisheries areas
+tabula.convert_into_by_batch("source/areas/Bodega Bay",
+                             pages="all",
+                             stream=True,
+                             area=(10, 0, 100, 100), relative_area=True,
+                             output_format="csv")
+
+tabula.convert_into_by_batch("source/areas/Eureka",
+                             pages="all",
+                             stream=True,
+                             area=(10, 0, 100, 100), relative_area=True,
+                             output_format="csv")
+
+tabula.convert_into_by_batch("source/areas/Fort Bragg",
+                             pages="all",
+                             stream=True,
+                             area=(10, 0, 100, 100), relative_area=True,
+                             output_format="csv")
+
+tabula.convert_into_by_batch("source/areas/Los Angeles",
+                             pages="all",
+                             stream=True,
+                             area=(10, 0, 100, 100), relative_area=True,
+                             output_format="csv")
+
+tabula.convert_into_by_batch("source/areas/Monterey",
+                             pages="all",
+                             stream=True,
+                             area=(10, 0, 100, 100), relative_area=True,
+                             output_format="csv")
+
+tabula.convert_into_by_batch("source/areas/Morro Bay",
+                             pages="all",
+                             stream=True,
+                             area=(10, 0, 100, 100), relative_area=True,
+                             output_format="csv")
+
+tabula.convert_into_by_batch("source/areas/San Diego",
+                             pages="all",
+                             stream=True,
+                             area=(10, 0, 100, 100), relative_area=True,
+                             output_format="csv")
+
+tabula.convert_into_by_batch("source/areas/San Francisco",
+                             pages="all",
+                             stream=True,
+                             area=(10, 0, 100, 100), relative_area=True,
+                             output_format="csv")
+
+tabula.convert_into_by_batch("source/areas/Santa Barbara",
                              pages="all",
                              stream=True,
                              area=(10, 0, 100, 100), relative_area=True,

@@ -35,7 +35,21 @@ read_and_clean <- function(area) {
   return(df_final)
 }
 
+# For debugging messed up .csv files ------------------------------------------
+debug_csv <- function(area) {
+  # Just read in the files to check for number of columns, etc.
+  files <- list.files(path = paste("DFW pdf data/updated/areas/", area, "/", sep = ""), 
+                      pattern = "*.csv")
+  df <- lapply(files, function(x) 
+    read.csv(paste("DFW pdf data/updated/areas/", area, "/", x, sep = "")))
+  return(df)
+}
+
+df <- debug_csv("Eureka")
+
 # Apply function to each of the areas & write new .csv file -------------------
 bodega_bay <- read_and_clean("Bodega Bay")
 write.csv(bodega_bay, "Data/DFW areas/bodega_bay.csv", row.names = FALSE)
 
+eureka <- read_and_clean("Eureka")
+write.csv(eureka, "Data/DFW areas/eureka.csv", row.names = FALSE)

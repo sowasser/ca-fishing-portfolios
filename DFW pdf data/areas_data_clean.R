@@ -28,7 +28,8 @@ years <- c(2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
 
 bb_years <- map2(bb_clean, years, ~cbind(.x, year = .y))
 
-# Combine all dataframes together into one for the area & write new .csv
+# Combine all dfs together into one, add column with area name, write new .csv
 bodega_bay <- bind_rows(bb_years)
+bodega_bay[, "area"] <- rep("Bodega Bay", length(bodega_bay$Species))
 
 write.csv(bodega_bay, "Data/DFW areas/bodega_bay.csv", row.names = FALSE)

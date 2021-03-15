@@ -10,7 +10,7 @@ library(tidyverse)
 # First need to define the years of the data to be added later
 # TODO: add 2015-2017 when pdf download issue is fixed
 years <- c(2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 
-           2011, 2012, 2013, 2014, 2018, 2019)
+           2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019)
 
 read_and_clean <- function(area) {
   # Read in and clean all of the files for an area. Process:
@@ -45,7 +45,7 @@ debug_csv <- function(area) {
   return(df)
 }
 
-df <- debug_csv("Santa Barbara")
+df <- debug_csv("Bodega Bay")
 
 # Apply function to each of the areas & write new .csv file -------------------
 bb <- read_and_clean("Bodega Bay")

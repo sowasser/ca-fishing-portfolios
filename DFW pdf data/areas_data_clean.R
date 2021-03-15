@@ -45,11 +45,35 @@ debug_csv <- function(area) {
   return(df)
 }
 
-df <- debug_csv("Eureka")
+df <- debug_csv("Santa Barbara")
 
 # Apply function to each of the areas & write new .csv file -------------------
-bodega_bay <- read_and_clean("Bodega Bay")
-write.csv(bodega_bay, "Data/DFW areas/bodega_bay.csv", row.names = FALSE)
+bb <- read_and_clean("Bodega Bay")
+write.csv(bb, "Data/DFW areas/bodega_bay.csv", row.names = FALSE)
 
-eureka <- read_and_clean("Eureka")
-write.csv(eureka, "Data/DFW areas/eureka.csv", row.names = FALSE)
+e <- read_and_clean("Eureka")
+write.csv(e, "Data/DFW areas/eureka.csv", row.names = FALSE)
+
+fb <- read_and_clean("Fort Bragg")
+write.csv(fb, "Data/DFW areas/fort_bragg.csv", row.names = FALSE)
+
+la <- read_and_clean("Los Angeles")
+write.csv(la, "Data/DFW areas/los_angeles.csv", row.names = FALSE)
+
+m <- read_and_clean("Monterey")
+write.csv(m, "Data/DFW areas/monterey.csv", row.names = FALSE)
+
+mb <- read_and_clean("Morro Bay")
+write.csv(mb, "Data/DFW areas/morro_bay.csv", row.names = FALSE)
+
+sd <- read_and_clean("San Diego")
+write.csv(sd, "Data/DFW areas/san_diego.csv", row.names = FALSE)
+
+sf <- read_and_clean("San Francisco")
+write.csv(sf, "Data/DFW areas/san_francisco.csv", row.names = FALSE)
+
+sb <- read_and_clean("Santa Barbara")
+write.csv(sb, "Data/DFW areas/santa_barbara.csv", row.names = FALSE)
+
+all <- rbind(bb, e, fb, la, m, mb, sd, sf, sb)
+write.csv(all, "Data/DFW areas/all_areas.csv", row.names = FALSE)

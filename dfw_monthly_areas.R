@@ -10,6 +10,10 @@ library(ggplot2)
 # Import dataset of all areas
 all_areas <- read.csv("Data/DFW areas/all_areas.csv")
 
+# Column names for the initial columns of the overall dataframe
+initial_cols <- c("Species", "January", "February", "March", "April", "May", "June",
+                  "July", "August", "September", "October", "November", "December", 
+                  "Landings", "year", "area")
 
 # Islolate species of interest ------------------------------------------------
 halibut <- all_areas %>% filter(str_detect(Species, "Halibut California")) %>% bind_rows
@@ -29,10 +33,7 @@ rockfish <- rockfish[, -1] %>%  # remove species column
   summarize(across(January:Landings, sum))  # find sum
 rockfish <- rockfish[, c(3:15, 2, 1)]  # Move year & area columns to the end
 rockfish <- cbind(rep("Rockfish", length(rockfish$year)), rockfish)
-columns <- c("Species", "January", "February", "March", "April", "May", "June",
-             "July", "August", "September", "October", "November", "December", 
-             "Landings", "year", "area")
-colnames(rockfish) <- columns
+colnames(rockfish) <- initial_cols
 
 # Combine all thornyhead groups together
 thornyhead <- all_areas %>% filter(str_detect(Species, "Thornyhead")) %>% bind_rows
@@ -41,10 +42,17 @@ thornyhead <- thornyhead[, -1] %>%  # remove species column
   summarize(across(January:Landings, sum))  # find sum
 thornyhead <- thornyhead[, c(3:15, 2, 1)]  # Move year & area columns to the end
 thornyhead <- cbind(rep("Thornyhead", length(thornyhead$year)), thornyhead)
-columns <- c("Species", "January", "February", "March", "April", "May", "June",
-             "July", "August", "September", "October", "November", "December", 
-             "Landings", "year", "area")
-colnames(thornyhead) <- columns
+colnames(thornyhead) <- initial_cols
+
+# Combine all salmon together
+salmon <- all_areas %>% filter(str_detect(Species, "Salmon")) %>% bind_rows
+salmon <- salmon %>% filter(!str_detect(Species, "Roe"))  # Remove salmon roe fishery
+salmon <- salmon[, -1] %>%  # remove species column
+  group_by(area, year) %>%  # group by area & year
+  summarize(across(January:Landings, sum))  # find sum
+salmon <- salmon[, c(3:15, 2, 1)]  # Move year & area columns to the end
+salmon <- cbind(rep("Salmon", length(salmon$year)), salmon)
+colnames(salmon) <- initial_cols
 
 # Combine coastal pelagic species gathered from NOAA fisheries
 sardine <- all_areas %>% filter(str_detect(Species, "Sardine")) %>% bind_rows
@@ -57,11 +65,11 @@ pelagics <- pelagics %>% group_by(area, year) %>%  # group by area & year
   summarize(across(January:Landings, sum))  #find sum
 pelagics <- pelagics[, c(3:15, 2, 1)]  # Move year & area columns to the end
 pelagics <- cbind(rep("Pelagics coastal", length(pelagics$year)), pelagics)
-colnames(pelagics) <- columns
+colnames(pelagics) <- iniital_cols
 
 # Create dataframe of all species of interest
 all_soi <- rbind(halibut, crab, lobster, squid, albacore, prawn, urchin, sablefish,
-                 rockfish, swordfish, thornyhead, pelagics)
+                 rockfish, swordfish, thornyhead, salmon, pelagics)
 
 
 # Monthly averages over the stable period of species of interest --------------
@@ -79,8 +87,9 @@ all_soi_means <- all_soi_stable %>%
 all_soi_means <- all_soi_means[, -15]  # Remove total landings
 
 # Update data for plotting ----------------------------------------------------
-colnames(all_soi_means) <- c("species", "area", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+plot_cols <- c("species", "area", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+colnames(all_soi_means) <- plot_cols
 
 # Change column order to match other analyses - year starting in Nov
 all_soi_means <- all_soi_means[, c(1, 2, 13, 14, 3:12)] 
@@ -103,8 +112,7 @@ ggsave(filename="~/Desktop/area_monthly_landings_stable.pdf", monthly_areas_stab
 # Dungeness Crab
 crab$year <- as.factor(crab$year)
 crab2 <- crab[, c(15, 16, 12, 13, 2:11)]
-colnames(crab2) <- c("year", "area", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", 
-                     "May", "Jun", "Jul", "Aug", "Sep", "Oct")
+colnames(crab2) <- plot_cols
 crab_long <- melt(crab2, id_vars = c("area", "year"))
 colnames(crab_long) <- c("year", "area", "month", "landings")
 
@@ -117,4 +125,22 @@ crab_monthly <- ggplot(crab_long, aes(y = landings, x = month, fill = area)) +
   facet_wrap(~year, ncol = 4, scale = "free")
 
 ggsave(filename="~/Desktop/crab_monthly.pdf", crab_monthly,
+       width=400, height=250, units="mm", dpi=300)
+
+# Salmon
+salmon$year <- as.factor(salmon$year)
+salmon2 <- salmon[, c(15, 16, 12, 13, 2:11)]
+colnames(salmon2) <- plot_cols
+salmon_long <- melt(salmon2, id_vars = c("area", "year"))
+colnames(salmon_long) <- c("year", "area", "month", "landings")
+
+salmon_monthly <- ggplot(salmon_long, aes(y = landings, x = month, fill = area)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  ylab("mean landings (lbs)") +
+  ggtitle("Salmon") + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~year, ncol = 4, scale = "free")
+
+ggsave(filename="~/Desktop/salmon_monthly.pdf", salmon_monthly,
        width=400, height=250, units="mm", dpi=300)

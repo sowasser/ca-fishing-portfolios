@@ -98,3 +98,23 @@ monthly_areas_stable <- ggplot(all_soi_means2, aes(y = landings, x = month, fill
 ggsave(filename="~/Desktop/area_monthly_landings_stable.pdf", monthly_areas_stable,
        width=400, height=250, units="mm", dpi=300)
 
+# Yearly trends for species of interest ---------------------------------------
+
+# Dungeness Crab
+crab$year <- as.factor(crab$year)
+crab2 <- crab[, c(15, 16, 12, 13, 2:11)]
+colnames(crab2) <- c("year", "area", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", 
+                     "May", "Jun", "Jul", "Aug", "Sep", "Oct")
+crab_long <- melt(crab2, id_vars = c("area", "year"))
+colnames(crab_long) <- c("year", "area", "month", "landings")
+
+crab_monthly <- ggplot(crab_long, aes(y = landings, x = month, fill = area)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  ylab("mean landings (lbs)") +
+  ggtitle("Dungeness Crab") + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~year, ncol = 4, scale = "free")
+
+ggsave(filename="~/Desktop/crab_monthly.pdf", crab_monthly,
+       width=400, height=250, units="mm", dpi=300)

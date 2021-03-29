@@ -24,8 +24,8 @@ prawn <- all_areas %>% filter(str_detect(Species, "Prawn spot")) %>% bind_rows
 urchin <- all_areas %>% filter(str_detect(Species, "Sea urchin red")) %>% bind_rows
 swordfish <- all_areas %>% filter(str_detect(Species, "Swordfish")) %>% bind_rows
 
-# Combine all groundfish together - from list here:
-# https://wildlife.ca.gov/Conservation/Marine/Federal-Groundfish
+# Groundfish - from list here:
+# https://wildlife.ca.gov/Conservation/Marine/Federal-Groundfish 
 groundfish <- all_areas %>% filter(str_detect(Species, "Halibut|Rockfish|
                                               Thornyhead|Sablefish|Skate|
                                               Shark leopard|Shark soupfin|
@@ -33,31 +33,28 @@ groundfish <- all_areas %>% filter(str_detect(Species, "Halibut|Rockfish|
                                               Cabezon|Greenling|Lingcod|Cod|
                                               Whiting|Scorpionfish|Flounder|
                                               Sole|Sanddab")) %>% bind_rows
-# Remove species column, group by area & year, find sum
+# Update dataframe with new species name
 groundfish <- groundfish[, -1] %>% group_by(area, year) %>%
   summarize(across(January:Landings, sum))  
-groundfish <- groundfish[, c(3:15, 2, 1)]  # Move year & area columns to the end
-groundfish <- cbind(rep("Groundfish", length(groundfish$year)), groundfish)
+groundfish <- cbind(rep("Groundfish", length(groundfish$year)), groundfish[, c(3:15, 2, 1)])
 colnames(groundfish) <- initial_cols
 
-# Combine all salmon together
+# Salmon
 salmon <- all_areas %>% filter(str_detect(Species, "Salmon")) %>% bind_rows
 salmon <- salmon %>% filter(!str_detect(Species, "Roe"))  # Remove salmon roe fishery
-# Remove species column, group by area & year, find sum
+# Update dataframe with new species name
 salmon <- salmon[, -1] %>%  group_by(area, year) %>% 
   summarize(across(January:Landings, sum))
-salmon <- salmon[, c(3:15, 2, 1)]  # Move year & area columns to the end
-salmon <- cbind(rep("Salmon", length(salmon$year)), salmon)
+salmon <- cbind(rep("Salmon", length(salmon$year)), salmon[, c(3:15, 2, 1)])
 colnames(salmon) <- initial_cols
 
-# Combine coastal pelagic species gathered from NOAA fisheries
+# Coastal pelagic species gathered from NOAA fisheries
 pelagics <- all_areas %>% filter(str_detect(Species, "Sardine|Mackerel Pacific|
                                             Mackerel jack|Anchovy northern")) %>% bind_rows
-# Remove species column, group by area & year, find sum
+# Update dataframe with new species name
 pelagics <- pelagics[, -1] %>% group_by(area, year) %>% 
   summarize(across(January:Landings, sum))
-pelagics <- pelagics[, c(3:15, 2, 1)]  # Move year & area columns to the end
-pelagics <- cbind(rep("Pelagics coastal", length(pelagics$year)), pelagics)
+pelagics <- cbind(rep("Pelagics coastal", length(pelagics$year)), pelagics[, c(3:15, 2, 1)])
 colnames(pelagics) <- initial_cols
 
 # Create dataframe of all species of interest
@@ -92,10 +89,16 @@ all_soi_means <- all_soi_means[, c(1, 2, 13, 14, 3:12)]
 all_soi_means2 <- melt(all_soi_means, id_vars = c("area", "species"))
 colnames(all_soi_means2) <- c("species", "area", "month", "landings")
 
+# Update species names for the graph legend
+sp_names <- c("Dungeness Crab", "Groundfish", "Spiny Lobster", 
+              "Coastal Pelagics", "Spot Prawn", "Salmon", "Red Sea Urchin",
+              "Market Squid", "Swordfish","Albacore Tuna")
+
 # Plot monthly means for stable period
 monthly_areas_stable <- ggplot(all_soi_means2, aes(y = landings, x = month, fill = species)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("mean landings (lbs)") + xlab("mean across 2009-2014") +
+  scale_fill_hue(labels = sp_names) +
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~area, ncol = 3, scale = "free")
@@ -157,4 +160,3 @@ groundfish_monthly <- ggplot(groundfish_long, aes(y = landings, x = month, fill 
 
 ggsave(filename="DFW pdf data/Figures/groundfish_monthly.pdf", groundfish_monthly,
        width=400, height=250, units="mm", dpi=300)
-

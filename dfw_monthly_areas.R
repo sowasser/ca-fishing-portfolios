@@ -100,11 +100,10 @@ monthly_areas_stable <- ggplot(all_soi_means2, aes(y = landings, x = month, fill
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~area, ncol = 3, scale = "free")
 
-ggsave(filename="~/Desktop/area_monthly_landings_stable.pdf", monthly_areas_stable,
+ggsave(filename="DFW pdf data/Figures/area_monthly_landings_stable.pdf", monthly_areas_stable,
        width=400, height=250, units="mm", dpi=300)
 
 # Yearly trends for species of interest ---------------------------------------
-
 # Dungeness Crab
 crab$year <- as.factor(crab$year)
 crab2 <- crab[, c(15, 16, 12, 13, 2:11)]
@@ -120,7 +119,7 @@ crab_monthly <- ggplot(crab_long, aes(y = landings, x = month, fill = area)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~year, ncol = 4, scale = "free")
 
-ggsave(filename="~/Desktop/crab_monthly.pdf", crab_monthly,
+ggsave(filename="DFW pdf data/Figures/crab_monthly.pdf", crab_monthly,
        width=400, height=250, units="mm", dpi=300)
 
 # Salmon
@@ -138,5 +137,24 @@ salmon_monthly <- ggplot(salmon_long, aes(y = landings, x = month, fill = area))
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~year, ncol = 4, scale = "free")
 
-ggsave(filename="~/Desktop/salmon_monthly.pdf", salmon_monthly,
+ggsave(filename="DFW pdf data/Figures/salmon_monthly.pdf", salmon_monthly,
        width=400, height=250, units="mm", dpi=300)
+
+# Groundfish
+groundfish$year <- as.factor(groundfish$year)
+groundfish2 <- groundfish[, c(15, 16, 12, 13, 2:11)]
+colnames(groundfish2) <- plot_cols
+groundfish_long <- melt(groundfish2, id_vars = c("area", "year"))
+colnames(groundfish_long) <- c("year", "area", "month", "landings")
+
+groundfish_monthly <- ggplot(groundfish_long, aes(y = landings, x = month, fill = area)) +
+  geom_bar(position = "stack", stat = "identity") +
+  ylab("mean landings (lbs)") +
+  ggtitle("groundfish") + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~year, ncol = 4, scale = "free")
+
+ggsave(filename="DFW pdf data/Figures/groundfish_monthly.pdf", groundfish_monthly,
+       width=400, height=250, units="mm", dpi=300)
+

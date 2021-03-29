@@ -16,60 +16,53 @@ initial_cols <- c("Species", "January", "February", "March", "April", "May", "Ju
                   "Landings", "year", "area")
 
 # Islolate species of interest ------------------------------------------------
-halibut <- all_areas %>% filter(str_detect(Species, "Halibut California")) %>% bind_rows
 crab <- all_areas %>% filter(str_detect(Species, "Dungeness")) %>% bind_rows
 lobster <- all_areas %>% filter(str_detect(Species, "Lobster")) %>% bind_rows
 squid <- all_areas %>% filter(str_detect(Species, "Squid market")) %>% bind_rows
 albacore <- all_areas %>% filter(str_detect(Species, "albacore")) %>% bind_rows
 prawn <- all_areas %>% filter(str_detect(Species, "Prawn spot")) %>% bind_rows
 urchin <- all_areas %>% filter(str_detect(Species, "Sea urchin red")) %>% bind_rows
-sablefish <- all_areas %>% filter(str_detect(Species, "Sablefish")) %>% bind_rows
 swordfish <- all_areas %>% filter(str_detect(Species, "Swordfish")) %>% bind_rows
 
-# Combine all rockfish groups together
-rockfish <- all_areas %>% filter(str_detect(Species, "Rockfish")) %>% bind_rows
-rockfish <- rockfish[, -1] %>%  # remove species column
-  group_by(area, year) %>%  # group by area & year
-  summarize(across(January:Landings, sum))  # find sum
-rockfish <- rockfish[, c(3:15, 2, 1)]  # Move year & area columns to the end
-rockfish <- cbind(rep("Rockfish", length(rockfish$year)), rockfish)
-colnames(rockfish) <- initial_cols
-
-# Combine all thornyhead groups together
-thornyhead <- all_areas %>% filter(str_detect(Species, "Thornyhead")) %>% bind_rows
-thornyhead <- thornyhead[, -1] %>%  # remove species column
-  group_by(area, year) %>%  # group by area & year
-  summarize(across(January:Landings, sum))  # find sum
-thornyhead <- thornyhead[, c(3:15, 2, 1)]  # Move year & area columns to the end
-thornyhead <- cbind(rep("Thornyhead", length(thornyhead$year)), thornyhead)
-colnames(thornyhead) <- initial_cols
+# Combine all groundfish together - from list here:
+# https://wildlife.ca.gov/Conservation/Marine/Federal-Groundfish
+groundfish <- all_areas %>% filter(str_detect(Species, "Halibut|Rockfish|
+                                              Thornyhead|Sablefish|Skate|
+                                              Shark leopard|Shark soupfin|
+                                              Shark spiny dogfish|Ratfish|
+                                              Cabezon|Greenling|Lingcod|Cod|
+                                              Whiting|Scorpionfish|Flounder|
+                                              Sole|Sanddab")) %>% bind_rows
+# Remove species column, group by area & year, find sum
+groundfish <- groundfish[, -1] %>% group_by(area, year) %>%
+  summarize(across(January:Landings, sum))  
+groundfish <- groundfish[, c(3:15, 2, 1)]  # Move year & area columns to the end
+groundfish <- cbind(rep("Groundfish", length(groundfish$year)), groundfish)
+colnames(groundfish) <- initial_cols
 
 # Combine all salmon together
 salmon <- all_areas %>% filter(str_detect(Species, "Salmon")) %>% bind_rows
 salmon <- salmon %>% filter(!str_detect(Species, "Roe"))  # Remove salmon roe fishery
-salmon <- salmon[, -1] %>%  # remove species column
-  group_by(area, year) %>%  # group by area & year
-  summarize(across(January:Landings, sum))  # find sum
+# Remove species column, group by area & year, find sum
+salmon <- salmon[, -1] %>%  group_by(area, year) %>% 
+  summarize(across(January:Landings, sum))
 salmon <- salmon[, c(3:15, 2, 1)]  # Move year & area columns to the end
 salmon <- cbind(rep("Salmon", length(salmon$year)), salmon)
 colnames(salmon) <- initial_cols
 
 # Combine coastal pelagic species gathered from NOAA fisheries
-sardine <- all_areas %>% filter(str_detect(Species, "Sardine")) %>% bind_rows
-pac_mackerel <- all_areas %>% filter(str_detect(Species, "Mackerel Pacific")) %>% bind_rows
-jack_mackerel <- all_areas %>% filter(str_detect(Species, "Mackerel jack")) %>% bind_rows
-anchovy <- all_areas %>% filter(str_detect(Species, "Anchovy northern")) %>% bind_rows
-
-pelagics <- rbind(sardine, pac_mackerel, jack_mackerel, anchovy)[, -1]  # remove species column
-pelagics <- pelagics %>% group_by(area, year) %>%  # group by area & year
-  summarize(across(January:Landings, sum))  #find sum
+pelagics <- all_areas %>% filter(str_detect(Species, "Sardine|Mackerel Pacific|
+                                            Mackerel jack|Anchovy northern")) %>% bind_rows
+# Remove species column, group by area & year, find sum
+pelagics <- pelagics[, -1] %>% group_by(area, year) %>% 
+  summarize(across(January:Landings, sum))
 pelagics <- pelagics[, c(3:15, 2, 1)]  # Move year & area columns to the end
 pelagics <- cbind(rep("Pelagics coastal", length(pelagics$year)), pelagics)
 colnames(pelagics) <- initial_cols
 
 # Create dataframe of all species of interest
-all_soi <- rbind(halibut, crab, lobster, squid, albacore, prawn, urchin, sablefish,
-                 rockfish, swordfish, thornyhead, salmon, pelagics)
+all_soi <- rbind(crab, lobster, squid, albacore, prawn, urchin, swordfish, 
+                 groundfish, salmon, pelagics)
 
 # Write a .csv file with just the species of interest
 write.csv(all_soi, "Data/dfw_areas_soi.csv", row.names = FALSE)

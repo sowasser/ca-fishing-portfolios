@@ -15,17 +15,26 @@ These data were downloaded from the [California Department of Natural Resources,
 
 
 ## Overall timeseries
-Aggregated across all ports, the timeseries for the number of fishers, total revenue, and pounds landed from 1992-2014 shows a general declining trend in fishers and pounds landed. Revenue is highly variable over the timeseries, with a large increase in 2012 and 2014.
+Aggregated across all ports, the timeseries for the number of fishers, total revenue (adjusted for inflation to match the 2014 value), and pounds landed from 1992-2014 shows a general declining trend in fishers and pounds landed. Revenue is highly variable over the timeseries, with a large increase in 2012 and 2014.
 
 ```{r, include=FALSE}
 # Code for a summary of the timeseries data for all of CA, pulled from all_ca_summary.R
+library(priceR)
 library(reshape2)
 library(ggplot2)
 
 ca_summary <- read.csv("Data/ca_summary_92-14.csv")
 
 # Overall trends across timeseries --------------------------------------------
-summary_long <- melt(ca_summary, id="year")  # convert to long form for faceted graph
+# Adjust revenue for inflation
+revenue <- adjust_for_inflation(price = ca_summary$revenue, 
+                                from_date = ca_summary$year, 
+                                country = "US", 
+                                to_date = 2014)
+
+ca_adj <- cbind(ca_summary[, -3], revenue)
+
+summary_long <- melt(ca_adj, id="year")  # convert to long form for faceted graph
 summary_long$year <- as.numeric(summary_long$year)
 
 # Create list to use as year labels in graph
@@ -46,7 +55,7 @@ summary_plot
 ```
 
 ## Timeseries by port
-There is high variability in the amount of revenue collected for each port in the dataset, with the same increase towards the end of the timeseries (as seen in the general data above) for a few ports, namely the Bodega Bay Area Ports, Monterey Area Ports, the Princeton-Half Moon Area Ports, and the Ventura ports.
+There is high variability in the amount of revenue (adjusted for inflation to match the 2014 value) for each port in the dataset, with the same increase towards the end of the timeseries (as seen in the general data above) for a few ports, namely the Bodega Bay Area Ports, Monterey Area Ports, the Princeton-Half Moon Area Ports, and the Ventura ports.
 
 ```{r, include=FALSE}
 # Code for total revenue per port graph, from CA_port_landings.R
@@ -59,10 +68,10 @@ library(ggplot2)
 port_landings <- read.csv("Data/port_landings_updated.csv")
 
 pl <- port_landings %>% drop_na()  # remove NAs
-pl <- pl[order(pl$year, pl$port, -pl$ex.vessel_revenue), ]  # order by revenue
+pl <- pl[order(pl$year, pl$port, -pl$revenue_adj), ]  # order by revenue
 
 # Total revenue per port per year
-pl_revenue <- group_by(pl, year, port) %>% summarize(revenue = sum(ex.vessel_revenue))
+pl_revenue <- group_by(pl, year, port) %>% summarize(revenue = sum(revenue_adj))
 pl_revenue <- pl_revenue %>% filter(port != "OTHER CA PORTS")  # remove empty port category
 
 total_revenue <- ggplot(pl_revenue, aes(x = year, y = revenue)) + 
@@ -113,7 +122,7 @@ fisheries_number
 \newpage
 
 ## Timeseries by fishery species
-The timeseries of revenue for each species (here all gear types combined) demonstrate both what are the most revenue-producing species (dungeness crab, lobster, squid, red urchin, salmon) and the general trends in each species from 1992-2014. Notably, there has not been a significant fishery for species such as herring roe since the late 1990s, along with a large decline in red urchin around the same period. Market squid, on the other hand, has increased over the timeseries, as has dungeness crab, though revenue is highly variable. 
+The timeseries of revenue (adjusted for inflation to match the 2014 value) for each species (here all gear types combined) demonstrate both what are the most revenue-producing species (dungeness crab, lobster, squid, red urchin, salmon) and the general trends in each species from 1992-2014. Notably, there has not been a significant fishery for species such as herring roe since the late 1990s, along with a large decline in red urchin around the same period. Market squid, on the other hand, has increased over the timeseries, as has dungeness crab, though revenue is highly variable. 
 
 ```{r, include=FALSE}
 # Code for plot of revenue by fisheries species, from species_revenue.R
@@ -124,7 +133,7 @@ library(ggplot2)
 port_landings <- read.csv("Data/port_landings_updated.csv")
 
 fish_sums <- group_by(port_landings, year, port, fishery) %>% 
-  summarize(revenue = sum(ex.vessel_revenue))
+  summarize(revenue = sum(revenue_adj))
 fish_sums <- fish_sums %>% drop_na()
 fish_sums2 <-  group_by(fish_sums, year, fishery) %>% 
   summarize(revenue = sum(revenue))
@@ -143,7 +152,7 @@ fish_revenue_sum
 
 \newpage
 
-Overall, for each year, the most valuable fishery was most often market squid (12 years), followed by dungeness crab (8 years), herring roe (2 years), and shrimp/prawn (1 year).
+Overall, for each year, the most valuable fishery (adjusted for inflation to match the 2014 value) was most often market squid (12 years), followed by dungeness crab (8 years), herring roe (2 years), and shrimp/prawn (1 year).
 
 ``` {r, include=FALSE}
 # Code for overall most revenue-producing species per year, from CA_port_landings.R
@@ -156,11 +165,11 @@ library(ggplot2)
 port_landings <- read.csv("Data/port_landings_updated.csv")
 
 pl_max_yr <- pl %>% 
-  arrange(year, desc(ex.vessel_revenue)) %>% 
+  arrange(year, desc(revenue_adj)) %>% 
   group_by(year) %>%
   slice(1:1)
 
-max_revenue_yr <- ggplot(pl_max_yr, aes(y = ex.vessel_revenue, x = year, fill = fishery)) +
+max_revenue_yr <- ggplot(pl_max_yr, aes(y = revenue_adj, x = year, fill = fishery)) +
   geom_bar(position = "dodge", stat = "identity") +
   ylab("revenue") +
   theme_bw() +

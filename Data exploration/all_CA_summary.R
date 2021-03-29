@@ -3,6 +3,7 @@
 # https://data.cnra.ca.gov/dataset/human-uses-and-socioeconomic-dimensions-ca-north-coast-mpa-baseline-study-1992-2014
 # Specifically: "Commercial Fishing - All Fisheries Summary - 1992-2014"
 
+library(priceR)
 library(reshape2)
 library(ggplot2)
 library(viridis)
@@ -11,7 +12,15 @@ library(patchwork)
 ca_summary <- read.csv("Data/ca_summary_92-14.csv")
 
 # Overall trends across timeseries --------------------------------------------
-summary_long <- melt(ca_summary, id="year")  # convert to long form for faceted graph
+# Adjust revenue for inflation
+revenue <- adjust_for_inflation(price = ca_summary$revenue, 
+                                from_date = ca_summary$year, 
+                                country = "US", 
+                                to_date = 2014)
+
+ca_adj <- cbind(ca_summary[, -3], revenue)
+
+summary_long <- melt(ca_adj, id="year")  # convert to long form for faceted graph
 summary_long$year <- as.numeric(summary_long$year)
 
 # Create list to use as year labels in graph

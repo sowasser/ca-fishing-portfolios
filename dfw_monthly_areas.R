@@ -65,11 +65,14 @@ pelagics <- pelagics %>% group_by(area, year) %>%  # group by area & year
   summarize(across(January:Landings, sum))  #find sum
 pelagics <- pelagics[, c(3:15, 2, 1)]  # Move year & area columns to the end
 pelagics <- cbind(rep("Pelagics coastal", length(pelagics$year)), pelagics)
-colnames(pelagics) <- iniital_cols
+colnames(pelagics) <- initial_cols
 
 # Create dataframe of all species of interest
 all_soi <- rbind(halibut, crab, lobster, squid, albacore, prawn, urchin, sablefish,
                  rockfish, swordfish, thornyhead, salmon, pelagics)
+
+# Write a .csv file with just the species of interest
+write.csv(all_soi, "Data/dfw_areas_soi.csv", row.names = FALSE)
 
 
 # Monthly averages over the stable period of species of interest --------------

@@ -101,7 +101,7 @@ colnames(all_soi_means2) <- c("species", "area", "month", "landings")
 
 # Plot monthly means for stable period
 monthly_areas_stable <- ggplot(all_soi_means2, aes(y = landings, x = month, fill = species)) +
-  geom_bar(position = "dodge", stat = "identity") +
+  geom_bar(position = "stack", stat = "identity") +
   ylab("mean landings (lbs)") + xlab("mean across 2009-2014") +
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
@@ -120,7 +120,7 @@ crab_long <- melt(crab2, id_vars = c("area", "year"))
 colnames(crab_long) <- c("year", "area", "month", "landings")
 
 crab_monthly <- ggplot(crab_long, aes(y = landings, x = month, fill = area)) +
-  geom_bar(position = "dodge", stat = "identity") +
+  geom_bar(position = "stack", stat = "identity") +
   ylab("mean landings (lbs)") +
   ggtitle("Dungeness Crab") + 
   theme_bw() +
@@ -138,7 +138,7 @@ salmon_long <- melt(salmon2, id_vars = c("area", "year"))
 colnames(salmon_long) <- c("year", "area", "month", "landings")
 
 salmon_monthly <- ggplot(salmon_long, aes(y = landings, x = month, fill = area)) +
-  geom_bar(position = "dodge", stat = "identity") +
+  geom_bar(position = "stack", stat = "identity") +
   ylab("mean landings (lbs)") +
   ggtitle("Salmon") + 
   theme_bw() +

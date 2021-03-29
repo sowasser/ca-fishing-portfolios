@@ -15,7 +15,7 @@ These data were downloaded from the [California Department of Natural Resources,
 
 
 ## Overall timeseries
-Aggregated across all ports, the timeseries for the number of fishers, total revenue (adjusted for inflation to match the 2014 value), and pounds landed from 1992-2014 shows a general declining trend in fishers and pounds landed. Revenue is highly variable over the timeseries, with a large increase in 2012 and 2014.
+Aggregated across all ports, the timeseries for the number of fishers, total revenue (adjusted for inflation to match the 2014 value), and pounds landed from 1992-2014 shows a general declining trend in fishers and pounds landed. Revenue is highly variable over the timeseries, with a decline around 1997 and short-lived recoveries in 2003-2004 and 2012-2013.
 
 ```{r, include=FALSE}
 # Code for a summary of the timeseries data for all of CA, pulled from all_ca_summary.R
@@ -55,7 +55,7 @@ summary_plot
 ```
 
 ## Timeseries by port
-There is high variability in the amount of revenue (adjusted for inflation to match the 2014 value) for each port in the dataset, with the same increase towards the end of the timeseries (as seen in the general data above) for a few ports, namely the Bodega Bay Area Ports, Monterey Area Ports, the Princeton-Half Moon Area Ports, and the Ventura ports.
+There is high variability in the amount of revenue (adjusted for inflation to match the 2014 value) for each port in the dataset. Few ports show any overall trend, with the exception of an upwards trend for Ventura, and a slight decline for the Crecent City Area Ports, the Los Angeles - Long Beach Area Ports, and the San Francisco Area Ports.
 
 ```{r, include=FALSE}
 # Code for total revenue per port graph, from CA_port_landings.R

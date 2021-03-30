@@ -75,5 +75,5 @@ write.csv(sf, "Data/DFW areas/san_francisco.csv", row.names = FALSE)
 sb <- read_and_clean("Santa Barbara")
 write.csv(sb, "Data/DFW areas/santa_barbara.csv", row.names = FALSE)
 
-all <- rbind(bb, e, fb, la, m, mb, sd, sf, sb)
+all <- rbind(e, fb, bb, sf, m, mb, sb, la, sd)  # ordered north -> south
 write.csv(all, "Data/DFW areas/all_areas.csv", row.names = FALSE)

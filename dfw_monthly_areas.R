@@ -80,12 +80,29 @@ write.csv(all_soi, "Data/dfw_areas_soi.csv", row.names = FALSE)
 all_landings <- all_areas %>% group_by(area, year) %>% 
   summarize(across(January:Landings, sum))
 
-all_landings_stable <- all_landings %>% filter(between(year, 2009, 2014))
-all_landings_stable <- all_landings_stable[, -2]  # remove year column
+all_stable <- all_landings %>% filter(between(year, 2009, 2014))
+all_stable <- all_stable[, -2]  # remove year column
 
-all_landings_means <- all_landings_stable %>%
+all_means <- all_stable %>%
   group_by(area) %>%
   summarize(across(January:Landings, mean))
+
+colnames(all_means) <- c("species", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+all_means <- all_means[, c(1, 12, 13, 2:11)]  # Year starts in Nov.
+all_means <- melt(all_means, id_vars = c("area"))
+colnames(all_means) <- c("area", "month", "landings")
+all_means$area <- factor(all_means$area, levels = area_order)
+
+all_stable <- ggplot(all_means, aes(y = landings, x = month)) +
+  geom_bar(stat = "identity") +
+  ylab("mean landings (lbs)") + xlab("mean across 2009-2014") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~area, ncol = 3, scale = "free")
+
+ggsave(filename="DFW pdf data/Figures/all_landings_stable.pdf", all_stable,
+       width=400, height=250, units="mm", dpi=300)
 
 
 # Monthly averages over the stable period of species of interest --------------

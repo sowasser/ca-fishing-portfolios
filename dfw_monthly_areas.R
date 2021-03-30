@@ -25,6 +25,9 @@ area_order <- c("Eureka", "Fort Bragg", "Bodega Bay", "San Francisco",
                 "Monterey", "Morro Bay", "Santa Barbara", "Los Angeles",
                 "San Diego")
 
+months_abbrev <- c("species", "area", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
 
 # Islolate species of interest ------------------------------------------------
 crab <- all_areas %>% filter(str_detect(Species, "Dungeness")) %>% bind_rows
@@ -119,21 +122,16 @@ all_soi_means <- all_soi_stable %>%
 
 all_soi_means <- all_soi_means[, -15]  # Remove total landings
 
-
-# Update data for plotting ----------------------------------------------------
-plot_cols <- c("species", "area", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-
-colnames(all_soi_means) <- plot_cols
+colnames(all_soi_means) <- months_abbrev  # Update to abbreviated months
 
 # Change column & row order to match analyses
 all_soi_means <- all_soi_means[, c(1, 2, 13, 14, 3:12)]  # Year starts in Nov.
-all_soi_means2 <- melt(all_soi_means, id_vars = c("area", "species"))
-colnames(all_soi_means2) <- c("species", "area", "month", "landings")
-all_soi_means2$area <- factor(all_soi_means2$area, levels = area_order)
+all_soi_means <- melt(all_soi_means, id_vars = c("area", "species"))
+colnames(all_soi_means) <- c("species", "area", "month", "landings")
+all_soi_means$area <- factor(all_soi_means$area, levels = area_order)
 
 # Plot monthly means for stable period
-monthly_areas_stable <- ggplot(all_soi_means2, aes(y = landings, x = month, fill = species)) +
+monthly_areas_stable <- ggplot(all_soi_means, aes(y = landings, x = month, fill = species)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("mean landings (lbs)") + xlab("mean across 2009-2014") +
   scale_fill_hue(labels = sp_names) +
@@ -149,9 +147,9 @@ ggsave(filename="DFW pdf data/Figures/area_monthly_landings_stable.pdf", monthly
 # Dungeness Crab
 crab$year <- as.factor(crab$year)
 crab$area <- factor(crab$area, levels = area_order)
-crab2 <- crab[, c(15, 16, 12, 13, 2:11)]
-colnames(crab2) <- plot_cols
-crab_long <- melt(crab2, id_vars = c("area", "year"))
+crab <- crab[, c(15, 16, 12, 13, 2:11)]
+colnames(crab) <- plot_cols
+crab_long <- melt(crab, id_vars = c("area", "year"))
 colnames(crab_long) <- c("year", "area", "month", "landings")
 
 crab_monthly <- ggplot(crab_long, aes(y = landings, x = month, fill = area)) +
@@ -169,9 +167,9 @@ ggsave(filename="DFW pdf data/Figures/crab_monthly.pdf", crab_monthly,
 # Salmon
 salmon$year <- as.factor(salmon$year)
 salmon$area <- factor(salmon$area, levels = area_order)
-salmon2 <- salmon[, c(15, 16, 12, 13, 2:11)]
-colnames(salmon2) <- plot_cols
-salmon_long <- melt(salmon2, id_vars = c("area", "year"))
+salmon <- salmon[, c(15, 16, 12, 13, 2:11)]
+colnames(salmon) <- plot_cols
+salmon_long <- melt(salmon, id_vars = c("area", "year"))
 colnames(salmon_long) <- c("year", "area", "month", "landings")
 
 salmon_monthly <- ggplot(salmon_long, aes(y = landings, x = month, fill = area)) +
@@ -188,9 +186,9 @@ ggsave(filename="DFW pdf data/Figures/salmon_monthly.pdf", salmon_monthly,
 # Groundfish
 groundfish$year <- as.factor(groundfish$year)
 groundfish$area <- factor(groundfish$area, levels = area_order)
-groundfish2 <- groundfish[, c(15, 16, 12, 13, 2:11)]
-colnames(groundfish2) <- plot_cols
-groundfish_long <- melt(groundfish2, id_vars = c("area", "year"))
+groundfish <- groundfish[, c(15, 16, 12, 13, 2:11)]
+colnames(groundfish) <- plot_cols
+groundfish_long <- melt(groundfish, id_vars = c("area", "year"))
 colnames(groundfish_long) <- c("year", "area", "month", "landings")
 
 groundfish_monthly <- ggplot(groundfish_long, aes(y = landings, x = month, fill = area)) +

@@ -76,4 +76,6 @@ sb <- read_and_clean("Santa Barbara")
 write.csv(sb, "Data/DFW areas/santa_barbara.csv", row.names = FALSE)
 
 all <- rbind(e, fb, bb, sf, m, mb, sb, la, sd)  # ordered north -> south
+all <- all %>% filter(!str_detect(Species, "Total"))  # Any sum/total values
+
 write.csv(all, "Data/DFW areas/all_areas.csv", row.names = FALSE)

@@ -7,13 +7,10 @@ library(dplyr)
 library(reshape2)
 library(ggplot2)
 
-# Import dataset of all areas
-all_areas <- read.csv("Data/DFW areas/all_areas.csv")
 
-# Column names for the initial columns of the overall dataframe
-initial_cols <- c("Species", "January", "February", "March", "April", "May", "June",
-                  "July", "August", "September", "October", "November", "December", 
-                  "Landings", "year", "area")
+# Import datasets for all areas and for species of interest
+all_areas <- read.csv("Data/DFW areas/all_areas.csv")
+all_soi <- read.csv("Data/dfw_areas_soi.csv")
 
 # Update species names for the graph legend
 sp_names <- c("Dungeness Crab", "Groundfish", "Spiny Lobster", 
@@ -25,58 +22,8 @@ area_order <- c("Eureka", "Fort Bragg", "Bodega Bay", "San Francisco",
                 "Monterey", "Morro Bay", "Santa Barbara", "Los Angeles",
                 "San Diego")
 
-months_abbrev <- c("species", "area", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-
-
-# Islolate species of interest ------------------------------------------------
-crab <- all_areas %>% filter(str_detect(Species, "Dungeness")) %>% bind_rows
-lobster <- all_areas %>% filter(str_detect(Species, "Lobster")) %>% bind_rows
-squid <- all_areas %>% filter(str_detect(Species, "Squid market")) %>% bind_rows
-albacore <- all_areas %>% filter(str_detect(Species, "albacore")) %>% bind_rows
-prawn <- all_areas %>% filter(str_detect(Species, "Prawn spot")) %>% bind_rows
-urchin <- all_areas %>% filter(str_detect(Species, "Sea urchin red")) %>% bind_rows
-swordfish <- all_areas %>% filter(str_detect(Species, "Swordfish")) %>% bind_rows
-
-# Groundfish - from list here:
-# https://wildlife.ca.gov/Conservation/Marine/Federal-Groundfish 
-groundfish <- all_areas %>% filter(str_detect(Species, "Halibut|Rockfish|
-                                              Thornyhead|Sablefish|Skate|
-                                              Shark leopard|Shark soupfin|
-                                              Shark spiny dogfish|Ratfish|
-                                              Cabezon|Greenling|Lingcod|Cod|
-                                              Whiting|Scorpionfish|Flounder|
-                                              Sole|Sanddab")) %>% bind_rows
-# Update dataframe with new species name
-groundfish <- groundfish[, -1] %>% group_by(area, year) %>%
-  summarize(across(January:Landings, sum))  
-groundfish <- cbind(rep("Groundfish", length(groundfish$year)), groundfish[, c(3:15, 2, 1)])
-colnames(groundfish) <- initial_cols
-
-# Salmon
-salmon <- all_areas %>% filter(str_detect(Species, "Salmon")) %>% bind_rows
-salmon <- salmon %>% filter(!str_detect(Species, "Roe"))  # Remove salmon roe fishery
-# Update dataframe with new species name
-salmon <- salmon[, -1] %>%  group_by(area, year) %>% 
-  summarize(across(January:Landings, sum))
-salmon <- cbind(rep("Salmon", length(salmon$year)), salmon[, c(3:15, 2, 1)])
-colnames(salmon) <- initial_cols
-
-# Coastal pelagic species gathered from NOAA fisheries
-pelagics <- all_areas %>% filter(str_detect(Species, "Sardine|Mackerel Pacific|
-                                            Mackerel jack|Anchovy northern")) %>% bind_rows
-# Update dataframe with new species name
-pelagics <- pelagics[, -1] %>% group_by(area, year) %>% 
-  summarize(across(January:Landings, sum))
-pelagics <- cbind(rep("Pelagics coastal", length(pelagics$year)), pelagics[, c(3:15, 2, 1)])
-colnames(pelagics) <- initial_cols
-
-# Create dataframe of all species of interest
-all_soi <- rbind(crab, lobster, squid, albacore, prawn, urchin, swordfish, 
-                 groundfish, salmon, pelagics)
-
-# Write a .csv file with just the species of interest
-write.csv(all_soi, "Data/dfw_areas_soi.csv", row.names = FALSE)
+months_abbrev <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", 
+                   "Sep", "Oct", "Nov", "Dec")
 
 
 # All landings for the stable period ------------------------------------------
@@ -90,8 +37,7 @@ all_means <- all_stable %>%
   group_by(area) %>%
   summarize(across(January:Landings, mean))
 
-colnames(all_means) <- c("species", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+colnames(all_means) <- c("species", months_abbrev)
 all_means <- all_means[, c(1, 12, 13, 2:11)]  # Year starts in Nov.
 all_means <- melt(all_means, id_vars = c("area"))
 colnames(all_means) <- c("area", "month", "landings")
@@ -122,7 +68,7 @@ all_soi_means <- all_soi_stable %>%
 
 all_soi_means <- all_soi_means[, -15]  # Remove total landings
 
-colnames(all_soi_means) <- months_abbrev  # Update to abbreviated months
+colnames(all_soi_means) <- c("species", "area", months_abbrev)  # Update to abbreviated months
 
 # Change column & row order to match analyses
 all_soi_means <- all_soi_means[, c(1, 2, 13, 14, 3:12)]  # Year starts in Nov.
@@ -149,9 +95,8 @@ overall_means <- all_soi_stable %>%
   summarize(across(January:Landings, mean))
 
 # Reorder columns & remove total landings
+colnames(overall_means) <- c("species", months_abbrev)
 overall_means <- overall_means[, c(1, 12, 13, 2:11)]
-colnames(overall_means) <- c("species", "Nov", "Dec", "Jan", "Feb", "Mar", 
-                             "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct")
 overall_means <- melt(overall_means, id_vars = c("species"))
 colnames(overall_means) <- c("species", "month", "landings")
 
@@ -167,13 +112,13 @@ ggsave(filename="DFW pdf data/Figures/monthly_species_stable.pdf", monthly_stabl
        width=180, height=250, units="mm", dpi=300)
 
 
-
 # Yearly trends for species of interest ---------------------------------------
 # Dungeness Crab
+crab <- all_areas %>% filter(str_detect(Species, "Dungeness")) %>% bind_rows
 crab$year <- as.factor(crab$year)
 crab$area <- factor(crab$area, levels = area_order)
+colnames(crab) <- c("species", months_abbrev, "year", "area")
 crab <- crab[, c(15, 16, 12, 13, 2:11)]
-colnames(crab) <- plot_cols
 crab_long <- melt(crab, id_vars = c("area", "year"))
 colnames(crab_long) <- c("year", "area", "month", "landings")
 
@@ -190,10 +135,11 @@ ggsave(filename="DFW pdf data/Figures/crab_monthly.pdf", crab_monthly,
        width=400, height=250, units="mm", dpi=300)
 
 # Salmon
+salmon <- read.csv("Data/dfw_salmon.csv")
 salmon$year <- as.factor(salmon$year)
 salmon$area <- factor(salmon$area, levels = area_order)
+colnames(salmon) <- c("species", months_abbrev, "year", "area")
 salmon <- salmon[, c(15, 16, 12, 13, 2:11)]
-colnames(salmon) <- plot_cols
 salmon_long <- melt(salmon, id_vars = c("area", "year"))
 colnames(salmon_long) <- c("year", "area", "month", "landings")
 
@@ -209,10 +155,11 @@ ggsave(filename="DFW pdf data/Figures/salmon_monthly.pdf", salmon_monthly,
        width=400, height=250, units="mm", dpi=300)
 
 # Groundfish
+groundfish <- read.csv("Data/dfw_groundfish.csv")
 groundfish$year <- as.factor(groundfish$year)
 groundfish$area <- factor(groundfish$area, levels = area_order)
+colnames(groundfish) <- c("species", months_abbrev, "year", "area")
 groundfish <- groundfish[, c(15, 16, 12, 13, 2:11)]
-colnames(groundfish) <- plot_cols
 groundfish_long <- melt(groundfish, id_vars = c("area", "year"))
 colnames(groundfish_long) <- c("year", "area", "month", "landings")
 

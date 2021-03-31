@@ -19,11 +19,26 @@ stable_area_means <- all_soi_stable %>%
 
 stable_area_means <- stable_area_means[, -15]  # remove total landings
 
+# Dungeness Crab
 crab_means <- stable_area_means %>% filter(str_detect(Species, "Dungeness"))
 crab_area_means <- melt(crab_means[, -1], id.vars = "area")
 crab_area_means <- crab_area_means[, -2]
 
-kruskal.test(crab_area_means$value ~ crab_area_means$area)
+kruskal.test(crab_area_means$value ~ crab_area_means$area)  # p = 2.923e-10
+
+# Salmon
+salmon_means <- stable_area_means %>% filter(str_detect(Species, "Salmon"))
+salmon_area_means <- melt(salmon_means[, -1], id.vars = "area")
+salmon_area_means <- salmon_area_means[, -2]
+
+kruskal.test(salmon_area_means$value ~ salmon_area_means$area)  # p = 0.5133
+
+# Groundfish
+groundfish_means <- stable_area_means %>% filter(str_detect(Species, "Groundfish"))
+groundfish_area_means <- melt(groundfish_means[, -1], id.vars = "area")
+groundfish_area_means <- groundfish_area_means[, -2]
+
+kruskal.test(groundfish_area_means$value ~ groundfish_area_means$area)  # p = 1.714e-15
 
 
 # Kruskall-Wallis test for the mean by year across the stable period ----------
@@ -33,8 +48,23 @@ stable_year_means <- all_soi_stable %>%
 
 stable_year_means <- stable_year_means[, -15]  # remove total landings
 
+# Dungeness Crab
 crab_year_means <- stable_year_means %>% filter(str_detect(Species, "Dungeness"))
 crab_year_means <- melt(crab_year_means[, -1], id.vars = "year")
 crab_year_means <- crab_year_means[, -2]
 
-kruskal.test(crab_year_means$value ~ crab_year_means$year)
+kruskal.test(crab_year_means$value ~ crab_year_means$year)  # p = 0.574
+
+# Salmon
+salmon_means <- stable_year_means %>% filter(str_detect(Species, "Salmon"))
+salmon_year_means <- melt(salmon_means[, -1], id.vars = "year")
+salmon_year_means <- salmon_year_means[, -2]
+
+kruskal.test(salmon_year_means$value ~ salmon_year_means$year)  # p = 0.07025
+
+# Groundfish
+groundfish_means <- stable_year_means %>% filter(str_detect(Species, "Groundfish"))
+groundfish_year_means <- melt(groundfish_means[, -1], id.vars = "year")
+groundfish_year_means <- groundfish_year_means[, -2]
+
+kruskal.test(groundfish_year_means$value ~ groundfish_year_means$year)  # p = 2161

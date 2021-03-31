@@ -143,6 +143,31 @@ ggsave(filename="DFW pdf data/Figures/area_monthly_landings_stable.pdf", monthly
        width=400, height=250, units="mm", dpi=300)
 
 
+# Overall monthly trends for species of interest across the stable period -----
+overall_means <- all_soi_stable %>% 
+  group_by(Species) %>% 
+  summarize(across(January:Landings, mean))
+
+# Reorder columns & remove total landings
+overall_means <- overall_means[, c(1, 12, 13, 2:11)]
+colnames(overall_means) <- c("species", "Nov", "Dec", "Jan", "Feb", "Mar", 
+                             "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct")
+overall_means <- melt(overall_means, id_vars = c("species"))
+colnames(overall_means) <- c("species", "month", "landings")
+
+monthly_stable <- ggplot(overall_means, aes(y = landings, x = month)) +
+  geom_bar(position = "stack", stat = "identity") +
+  ylab("mean landings (lbs)") + xlab("mean across 2009-2014") +
+  scale_fill_hue(labels = sp_names) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~species, ncol = 2, scale = "free")
+
+ggsave(filename="DFW pdf data/Figures/monthly_species_stable.pdf", monthly_stable,
+       width=180, height=250, units="mm", dpi=300)
+
+
+
 # Yearly trends for species of interest ---------------------------------------
 # Dungeness Crab
 crab$year <- as.factor(crab$year)

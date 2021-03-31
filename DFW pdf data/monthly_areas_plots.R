@@ -173,3 +173,23 @@ groundfish_monthly <- ggplot(groundfish_long, aes(y = landings, x = month, fill 
 
 ggsave(filename="DFW pdf data/Figures/groundfish_monthly.pdf", groundfish_monthly,
        width=400, height=250, units="mm", dpi=300)
+
+# Market Squid
+squid <- all_areas %>% filter(str_detect(Species, "Squid market")) %>% bind_rows
+squid$year <- as.factor(squid$year)
+squid$area <- factor(squid$area, levels = area_order)
+colnames(squid) <- c("species", months_abbrev, "year", "area")
+squid <- squid[, c(15, 16, 12, 13, 2:11)]
+squid_long <- melt(squid, id_vars = c("area", "year"))
+colnames(squid_long) <- c("year", "area", "month", "landings")
+
+squid_monthly <- ggplot(squid_long, aes(y = landings, x = month, fill = area)) +
+  geom_bar(position = "stack", stat = "identity") +
+  ylab("mean landings (lbs)") +
+  ggtitle("Market Squid") + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~year, ncol = 4, scale = "free")
+
+ggsave(filename="DFW pdf data/Figures/squid_monthly.pdf", squid_monthly,
+       width=400, height=250, units="mm", dpi=300)

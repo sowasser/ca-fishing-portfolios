@@ -5,14 +5,47 @@ library(stringr)
 library(dplyr)
 library(reshape2)
 
-
 all_soi <- read.csv("Data/dfw_areas_soi.csv")
 
-# Isolate the stable period ---------------------------------------------------
+# Kruskal-Wallis test for the mean by year for entire period -----------------
+year_means <- all_soi %>% 
+  group_by(Species, year) %>% 
+  summarize(across(January:Landings, mean))
+
+year_means <- year_means[, -15]  # remove total landings
+
+# Dungeness Crab
+crab_year_means <- year_means %>% filter(str_detect(Species, "Dungeness"))
+crab_year_means <- melt(crab_year_means[, -1], id.vars = "year")
+crab_year_means <- crab_year_means[, -2]
+
+kruskal.test(crab_year_means$value ~ crab_year_means$year)  # p = 0.1225
+
+# Salmon
+salmon_means <- year_means %>% filter(str_detect(Species, "Salmon"))
+salmon_year_means <- melt(salmon_means[, -1], id.vars = "year")
+salmon_year_means <- salmon_year_means[, -2]
+
+kruskal.test(salmon_year_means$value ~ salmon_year_means$year)  # p = 0.027729*
+
+# Groundfish
+groundfish_means <- year_means %>% filter(str_detect(Species, "Groundfish"))
+groundfish_year_means <- melt(groundfish_means[, -1], id.vars = "year")
+groundfish_year_means <- groundfish_year_means[, -2]
+
+kruskal.test(groundfish_year_means$value ~ groundfish_year_means$year)  # p = 0.0006661***
+
+# Squid
+squid_means <- year_means %>% filter(str_detect(Species, "Squid market"))
+squid_year_means <- melt(squid_means[, -1], id.vars = "year")
+squid_year_means <- squid_year_means[, -2]
+
+kruskal.test(squid_year_means$value ~ squid_year_means$year)  # p = 0.03281*
+
+
+# Kruskal-Wallis test for the mean for each area across the stable period ----
 all_soi_stable <- all_soi %>% filter(between(year, 2009, 2014))
 
-
-# Kruskall-Wallis test for the mean for each area across the stable period ----
 stable_area_means <- all_soi_stable %>% 
   group_by(Species, area) %>% 
   summarize(across(January:Landings, mean))
@@ -46,40 +79,3 @@ squid_area_means <- melt(squid_means[, -1], id.vars = "area")
 squid_area_means <- squid_area_means[, -2]
 
 kruskal.test(squid_area_means$value ~ squid_area_means$area)  # p = 1.492e-11****
-
-
-
-# Kruskall-Wallis test for the mean by year across the stable period ----------
-stable_year_means <- all_soi_stable %>% 
-  group_by(Species, year) %>% 
-  summarize(across(January:Landings, mean))
-
-stable_year_means <- stable_year_means[, -15]  # remove total landings
-
-# Dungeness Crab
-crab_year_means <- stable_year_means %>% filter(str_detect(Species, "Dungeness"))
-crab_year_means <- melt(crab_year_means[, -1], id.vars = "year")
-crab_year_means <- crab_year_means[, -2]
-
-kruskal.test(crab_year_means$value ~ crab_year_means$year)  # p = 0.574
-
-# Salmon
-salmon_means <- stable_year_means %>% filter(str_detect(Species, "Salmon"))
-salmon_year_means <- melt(salmon_means[, -1], id.vars = "year")
-salmon_year_means <- salmon_year_means[, -2]
-
-kruskal.test(salmon_year_means$value ~ salmon_year_means$year)  # p = 0.07025
-
-# Groundfish
-groundfish_means <- stable_year_means %>% filter(str_detect(Species, "Groundfish"))
-groundfish_year_means <- melt(groundfish_means[, -1], id.vars = "year")
-groundfish_year_means <- groundfish_year_means[, -2]
-
-kruskal.test(groundfish_year_means$value ~ groundfish_year_means$year)  # p = 2161
-
-# Squid
-squid_means <- stable_year_means %>% filter(str_detect(Species, "Squid market"))
-squid_year_means <- melt(squid_means[, -1], id.vars = "year")
-squid_year_means <- squid_year_means[, -2]
-
-kruskal.test(squid_year_means$value ~ squid_year_means$year)  # p = 7376

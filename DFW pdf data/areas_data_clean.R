@@ -15,7 +15,7 @@ years <- c(2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
 read_and_clean <- function(area) {
   # Read in and clean all of the files for an area. Process:
   # 1. Read in data from the sub-directory for that area
-  # 2. Remove all unneccessary punctuation from the "Species" column
+  # 2. Remove all unnecessary punctuation from the "Species" column
   # 3. Add a column with the year of each dataframe, 
   # 4. Combine all years together & add a column with the area name
   files <- list.files(path = paste("DFW pdf data/updated/areas/", area, "/", sep = ""), 

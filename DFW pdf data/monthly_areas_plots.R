@@ -12,11 +12,6 @@ library(ggplot2)
 all_areas <- read.csv("Data/DFW areas/all_areas.csv")
 all_soi <- read.csv("Data/dfw_areas_soi.csv")
 
-# Update species names for the graph legend
-sp_names <- c("Dungeness Crab", "Groundfish", "Spiny Lobster", 
-              "Coastal Pelagics", "Spot Prawn", "Salmon", "Red Sea Urchin",
-              "Market Squid", "Swordfish","Albacore Tuna")
-
 # Order of areas from North -> South
 area_order <- c("Eureka", "Fort Bragg", "Bodega Bay", "San Francisco", 
                 "Monterey", "Morro Bay", "Santa Barbara", "Los Angeles",
@@ -113,16 +108,17 @@ ggsave(filename="DFW pdf data/Figures/monthly_species_stable.pdf", monthly_stabl
 
 
 # Yearly trends for species of interest ---------------------------------------
-# Dungeness Crab
-crab <- all_areas %>% filter(str_detect(Species, "Dungeness")) %>% bind_rows
-crab$year <- as.factor(crab$year)
-crab$area <- factor(crab$area, levels = area_order)
-colnames(crab) <- c("species", months_abbrev, "year", "area")
-crab <- crab[, c(15, 16, 12, 13, 2:11)]
-crab_long <- melt(crab, id_vars = c("area", "year"))
-colnames(crab_long) <- c("year", "area", "month", "landings")
+soi_plots <- all_soi[, -14]  # create new df for plots & remove total landings
+soi_plots$area <- factor(soi_plots$area, levels = area_order)
+colnames(soi_plots) <- c("species", months_abbrev, "year", "area")
+soi_plots <- soi_plots[, c(1, 15, 14, 12, 13, 2:11)]
+soi_plots$year <- as.factor(soi_plots$year)
+soi_plots <- melt(soi_plots, id_vars = c("species", "area", "year"))
+colnames(soi_plots) <- c("species", "area", "year", "month", "landings")
 
-crab_monthly <- ggplot(crab_long, aes(y = landings, x = month, fill = area)) +
+# Dungeness Crab
+crab <- soi_plots %>% filter(species == "Dungeness Crab")
+crab_monthly <- ggplot(crab, aes(y = landings, x = month, fill = area)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("mean landings (lbs)") +
   ggtitle("Dungeness Crab") + 
@@ -134,16 +130,10 @@ crab_monthly <- ggplot(crab_long, aes(y = landings, x = month, fill = area)) +
 ggsave(filename="DFW pdf data/Figures/crab_monthly.pdf", crab_monthly,
        width=400, height=250, units="mm", dpi=300)
 
-# Salmon
-salmon <- read.csv("Data/dfw_salmon.csv")
-salmon$year <- as.factor(salmon$year)
-salmon$area <- factor(salmon$area, levels = area_order)
-colnames(salmon) <- c("species", months_abbrev, "year", "area")
-salmon <- salmon[, c(15, 16, 12, 13, 2:11)]
-salmon_long <- melt(salmon, id_vars = c("area", "year"))
-colnames(salmon_long) <- c("year", "area", "month", "landings")
 
-salmon_monthly <- ggplot(salmon_long, aes(y = landings, x = month, fill = area)) +
+# Salmon
+salmon <- soi_plots %>% filter(species == "Salmon")
+salmon_monthly <- ggplot(salmon, aes(y = landings, x = month, fill = area)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("mean landings (lbs)") +
   ggtitle("Salmon") + 
@@ -155,15 +145,8 @@ ggsave(filename="DFW pdf data/Figures/salmon_monthly.pdf", salmon_monthly,
        width=400, height=250, units="mm", dpi=300)
 
 # Groundfish
-groundfish <- read.csv("Data/dfw_groundfish.csv")
-groundfish$year <- as.factor(groundfish$year)
-groundfish$area <- factor(groundfish$area, levels = area_order)
-colnames(groundfish) <- c("species", months_abbrev, "year", "area")
-groundfish <- groundfish[, c(15, 16, 12, 13, 2:11)]
-groundfish_long <- melt(groundfish, id_vars = c("area", "year"))
-colnames(groundfish_long) <- c("year", "area", "month", "landings")
-
-groundfish_monthly <- ggplot(groundfish_long, aes(y = landings, x = month, fill = area)) +
+groundfish <- soi_plots %>% filter(species == "Groundfish")
+groundfish_monthly <- ggplot(groundfish, aes(y = landings, x = month, fill = area)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("mean landings (lbs)") +
   ggtitle("groundfish") + 
@@ -175,15 +158,8 @@ ggsave(filename="DFW pdf data/Figures/groundfish_monthly.pdf", groundfish_monthl
        width=400, height=250, units="mm", dpi=300)
 
 # Market Squid
-squid <- all_areas %>% filter(str_detect(Species, "Squid market")) %>% bind_rows
-squid$year <- as.factor(squid$year)
-squid$area <- factor(squid$area, levels = area_order)
-colnames(squid) <- c("species", months_abbrev, "year", "area")
-squid <- squid[, c(15, 16, 12, 13, 2:11)]
-squid_long <- melt(squid, id_vars = c("area", "year"))
-colnames(squid_long) <- c("year", "area", "month", "landings")
-
-squid_monthly <- ggplot(squid_long, aes(y = landings, x = month, fill = area)) +
+squid <- soi_plots %>% filter(species == "Market Squid")
+squid_monthly <- ggplot(squid, aes(y = landings, x = month, fill = area)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("mean landings (lbs)") +
   ggtitle("Market Squid") + 

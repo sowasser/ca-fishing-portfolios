@@ -60,7 +60,7 @@ pelagics <- all_areas %>% filter(str_detect(Species, "Sardine|Mackerel Pacific|
 # Update dataframe with new species name
 pelagics <- pelagics[, -1] %>% group_by(area, year) %>% 
   summarize(across(January:Landings, sum))
-pelagics <- cbind(rep("Pelagics coastal", length(pelagics$year)), pelagics[, c(3:15, 2, 1)])
+pelagics <- cbind(rep("Pelagics", length(pelagics$year)), pelagics[, c(3:15, 2, 1)])
 colnames(pelagics) <- initial_cols
 
 write.csv(pelagics, "Data/dfw_pelagics.csv", row.names = FALSE)
@@ -69,6 +69,19 @@ write.csv(pelagics, "Data/dfw_pelagics.csv", row.names = FALSE)
 # Create dataframe of all species of interest ---------------------------------
 all_soi <- rbind(crab, lobster, squid, albacore, prawn, urchin, swordfish, 
                  groundfish, salmon, pelagics)
+
+all_soi$Species <- trimws(all_soi$Species)  # trim white space from names
+
+# Replace DFW species names with more understandable text
+all_soi$Species <- str_replace_all(all_soi$Species, 
+                                   c("Crab Dungeness" = "Dungeness Crab",
+                                     "Lobster California spiny" = "Spiny Lobster",
+                                     "Prawn spot" = "Spot Prawn",
+                                     "Sea urchin red" = "Red Sea Urchin",
+                                     "Squid market" = "Market Squid",
+                                     "Tuna albacore" = "Albacore Tuna"))
+species <- levels(factor(all_soi$Species))  # list of species
+print(species)  # check species list
 
 # Write a .csv file with just the species of interest
 write.csv(all_soi, "Data/dfw_areas_soi.csv", row.names = FALSE)

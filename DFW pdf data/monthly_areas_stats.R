@@ -91,3 +91,77 @@ squid_area_means$area <- as.factor(squid_area_means$area)
 
 kruskal.test(squid_area_means$value ~ squid_area_means$area)  # p = 1.492e-11****
 posthoc.kruskal.nemenyi.test(squid_area_means$value ~ squid_area_means$area)
+
+
+# Kruskal-Wallis test for species within each area ------------------------
+# Eureka
+e_means <- stable_area_means %>% filter(area == "Eureka")
+e_means <- melt(e_means, id.vars = c("Species", "area"))
+e_means$Species <- as.factor(e_means$Species)
+
+kruskal.test(e_means$value ~ e_means$Species)  # p = 1.785e-08****
+posthoc.kruskal.nemenyi.test(e_means$value ~ e_means$Species)
+
+# Fort Bragg
+fb_means <- stable_area_means %>% filter(area == "Fort Bragg")
+fb_means <- melt(fb_means, id.vars = c("Species", "area"))
+fb_means$Species <- as.factor(fb_means$Species)
+
+kruskal.test(fb_means$value ~ fb_means$Species)  # p = 1.837e-12****
+posthoc.kruskal.nemenyi.test(fb_means$value ~ fb_means$Species)
+
+# Bodega Bay
+bb_means <- stable_area_means %>% filter(area == "Bodega Bay")
+bb_means <- melt(bb_means, id.vars = c("Species", "area"))
+bb_means$Species <- as.factor(bb_means$Species)
+
+kruskal.test(bb_means$value ~ bb_means$Species)  # p = 1.542e-10****
+posthoc.kruskal.nemenyi.test(bb_means$value ~ bb_means$Species)
+
+# San Francisco
+sf_means <- stable_area_means %>% filter(area == "San Francisco")
+sf_means <- melt(sf_means, id.vars = c("Species", "area"))
+sf_means$Species <- as.factor(sf_means$Species)
+
+kruskal.test(sf_means$value ~ sf_means$Species)  # p = 0.0004046****
+posthoc.kruskal.nemenyi.test(sf_means$value ~ sf_means$Species)
+
+# Monterey
+m_means <- stable_area_means %>% filter(area == "Monterey")
+m_means <- melt(m_means, id.vars = c("Species", "area"))
+m_means$Species <- as.factor(m_means$Species)
+
+kruskal.test(m_means$value ~ m_means$Species)  # p = 2.144e-12****
+posthoc.kruskal.nemenyi.test(m_means$value ~ m_means$Species)
+
+# Morro Bay
+mb_means <- stable_area_means %>% filter(area == "Morro Bay")
+mb_means <- melt(mb_means, id.vars = c("Species", "area"))
+mb_means$Species <- as.factor(mb_means$Species)
+
+kruskal.test(mb_means$value ~ mb_means$Species)  # p = 2.793e-08****
+posthoc.kruskal.nemenyi.test(mb_means$value ~ mb_means$Species)
+
+# Santa Barbara
+sb_means <- stable_area_means %>% filter(area == "Santa Barbara")
+sb_means <- melt(sb_means, id.vars = c("Species", "area"))
+sb_means$Species <- as.factor(sb_means$Species)
+
+kruskal.test(sb_means$value ~ sb_means$Species)  # p < 2.2e-16****
+posthoc.kruskal.nemenyi.test(sb_means$value ~ sb_means$Species)
+
+# Los Angeles
+la_means <- stable_area_means %>% filter(area == "Los Angeles")
+la_means <- melt(la_means, id.vars = c("Species", "area"))
+la_means$Species <- as.factor(la_means$Species)
+
+kruskal.test(la_means$value ~ la_means$Species)  # p = 7.993e-15****
+posthoc.kruskal.nemenyi.test(la_means$value ~ la_means$Species)
+
+# San Diego
+sd_means <- stable_area_means %>% filter(area == "San Diego")
+sd_means <- melt(sd_means, id.vars = c("Species", "area"))
+sd_means$Species <- as.factor(sd_means$Species)
+
+kruskal.test(sd_means$value ~ sd_means$Species)  # p = 2.924e-13****
+posthoc.kruskal.nemenyi.test(sd_means$value ~ sd_means$Species)

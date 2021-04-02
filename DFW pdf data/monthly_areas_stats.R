@@ -9,6 +9,8 @@ library(PMCMR)
 all_soi <- read.csv("Data/dfw_areas_soi.csv")
 
 # Kruskal-Wallis test for the mean by year for entire period -----------------
+# Information on Nemenyi post-hoc test here: 
+# https://www.rdocumentation.org/packages/PMCMR/versions/4.3/topics/posthoc.kruskal.nemenyi.test
 year_means <- all_soi %>% 
   group_by(Species, year) %>% 
   summarize(across(January:Landings, mean))
@@ -28,8 +30,7 @@ salmon_year_means <- melt(salmon_means[, -1], id.vars = "year")
 salmon_year_means <- salmon_year_means[, -2]
 
 kruskal.test(salmon_year_means$value ~ salmon_year_means$year)  # p = 0.027729*
-posthoc.kruskal.nemenyi.test(salmon_year_means$value ~ salmon_year_means$year,
-                             dist = "Tukey")
+posthoc.kruskal.nemenyi.test(salmon_year_means$value ~ salmon_year_means$year)
 
 # Groundfish
 groundfish_means <- year_means %>% filter(str_detect(Species, "Groundfish"))
@@ -37,6 +38,7 @@ groundfish_year_means <- melt(groundfish_means[, -1], id.vars = "year")
 groundfish_year_means <- groundfish_year_means[, -2]
 
 kruskal.test(groundfish_year_means$value ~ groundfish_year_means$year)  # p = 0.0006661***
+posthoc.kruskal.nemenyi.test(groundfish_year_means$value ~ groundfish_year_means$year)
 
 # Squid
 squid_means <- year_means %>% filter(str_detect(Species, "Squid"))
@@ -44,11 +46,10 @@ squid_year_means <- melt(squid_means[, -1], id.vars = "year")
 squid_year_means <- squid_year_means[, -2]
 
 kruskal.test(squid_year_means$value ~ squid_year_means$year)  # p = 0.03281*
+posthoc.kruskal.nemenyi.test(squid_year_means$value ~ squid_year_means$year)
 
 
 # Kruskal-Wallis test for the mean for each area across the stable period ----
-# Information on Nemenyi post-hoc test here: 
-# https://www.rdocumentation.org/packages/PMCMR/versions/4.3/topics/posthoc.kruskal.nemenyi.test
 all_soi_stable <- all_soi %>% filter(between(year, 2009, 2014))
 
 stable_area_means <- all_soi_stable %>% 

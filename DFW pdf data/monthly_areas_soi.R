@@ -70,7 +70,7 @@ bigeye <- all_areas %>% filter(str_detect(Species, "Tuna bigeye")) %>% bind_rows
 prawn <- all_areas %>% filter(str_detect(Species, "Prawn spot")) %>% bind_rows
 swordfish <- all_areas %>% filter(str_detect(Species, "Swordfish")) %>% bind_rows
 opah <- all_areas %>% filter(str_detect(Species, "Opah")) %>% bind_rows
-herring_roe <- all_areas %>% filter(str_detect(Species, "Herring Pacific roe")) %>% bind_rows
+herring_roe <- all_areas %>% filter(str_detect(Species, "Herring Pacific  roe")) %>% bind_rows
 
 # Red sea urchin --------------------------------------------------------------
 urchin <- all_areas %>% filter(str_detect(Species, "Sea urchin red|
@@ -135,7 +135,7 @@ colnames(pelagics) <- initial_cols
 
 # Create dataframe of all species of interest ---------------------------------
 all_soi <- rbind(crab, lobster, squid, albacore, bigeye, prawn, swordfish, 
-                 opah, herring_roe, hagfish, urchin, shrimp, groundfish, 
+                 opah, herring_roe, urchin, hagfish, shrimp, groundfish, 
                  salmon, pelagics)
 
 all_soi$Species <- trimws(all_soi$Species)  # trim white space from names
@@ -148,12 +148,16 @@ all_soi$Species <- str_replace_all(all_soi$Species,
                                      "Squid market" = "Market Squid",
                                      "Tuna albacore" = "Albacore Tuna",
                                      "Tuna bigeye" = "Bigeye Tuna",
-                                     "Herring Pacific roe" = "Herring Roe"))
+                                     "Herring Pacific  roe" = "Herring Roe",
+                                     "Herring Roe on kelp" = "Herring Roe"))
 species <- levels(factor(all_soi$Species))  # list of species
 print(species)  # check species list
 
 
-
+# Category for everything not selected above ----------------------------------
+other <- all_areas %>% filter(!str_detect(Species, "Dungeness|Lobster|
+                                          Squid market|albacore|Tuna bigeye|
+                                          Prawn spot|Swordfish|Opah|Herring Pacific roe"))
 
 # Check relative landings for the species of interest -------------------------
 total_landings <- all_soi[, c(1, 14:16)]

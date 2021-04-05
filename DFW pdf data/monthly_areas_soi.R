@@ -245,12 +245,13 @@ total_landings <- total_landings %>% group_by(Species) %>%
 
 total_plot <- ggplot(total_landings, aes(y = landings, x = reorder(Species, -landings))) +
   geom_bar(position = "dodge", stat = "identity") +
-  ylab("mean landings (lbs)") + xlab("high-landings species/fisheries")
+  ylab("mean landings (lbs)") + xlab("high-landings species/fisheries") +
   theme_bw() +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 
 ggsave(filename="DFW pdf data/Figures/all_soi_landings.pdf", total_plot,
-       width=300, height=100, units="mm", dpi=300)
+       width=300, height=150, units="mm", dpi=300)
 
 # Write a .csv file with just the species of interest
 write.csv(all_soi, "Data/dfw_areas_soi.csv", row.names = FALSE)

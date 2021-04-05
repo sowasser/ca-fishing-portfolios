@@ -77,8 +77,8 @@ swordfish <- all_areas %>% filter(str_detect(Species, "Swordfish")) %>% bind_row
 opah <- all_areas %>% filter(str_detect(Species, "Opah")) %>% bind_rows
 
 # Herring roe -----------------------------------------------------------------
-herring_roe <- all_areas %>% filter(str_detect(Species, "Herring Pacific roe|
-                                               Herring Roe")) %>% bind_rows
+herring_roe <- all_areas %>% filter(str_detect(Species, 
+                                               "Herring Pacific roe|Herring Roe")) %>% bind_rows
 # Update dataframe with new species name
 herring_roe <- herring_roe[, -1] %>% group_by(area, year) %>%
   summarize(across(January:Landings, sum))  
@@ -86,8 +86,8 @@ herring_roe <- cbind(rep("Herring Roe", length(herring_roe$year)), herring_roe[,
 colnames(herring_roe) <- initial_cols
 
 # Red sea urchin --------------------------------------------------------------
-urchin <- all_areas %>% filter(str_detect(Species, "Sea urchin red|
-                                          Urchin red")) %>% bind_rows
+urchin <- all_areas %>% filter(str_detect(Species, 
+                                          "Sea urchin red|Urchin red")) %>% bind_rows
 # Update dataframe with new species name
 urchin <- urchin[, -1] %>% group_by(area, year) %>%
   summarize(across(January:Landings, sum))  
@@ -95,8 +95,8 @@ urchin <- cbind(rep("Red Sea Urchin", length(urchin$year)), urchin[, c(3:15, 2, 
 colnames(urchin) <- initial_cols
 
 # Hagfish ---------------------------------------------------------------------
-hagfish <- all_areas %>% filter(str_detect(Species, "Hagfish|
-                                           Hagfishes")) %>% bind_rows
+hagfish <- all_areas %>% filter(str_detect(Species, 
+                                           "Hagfish|Hagfishes")) %>% bind_rows
 # Update dataframe with new species name
 hagfish <- hagfish[, -1] %>% group_by(area, year) %>%
   summarize(across(January:Landings, sum))  
@@ -104,8 +104,8 @@ hagfish <- cbind(rep("Hagfish", length(hagfish$year)), hagfish[, c(3:15, 2, 1)])
 colnames(hagfish) <- initial_cols
 
 # Shrimp ----------------------------------------------------------------------
-shrimp <- all_areas %>% filter(str_detect(Species, "Shrimp Pacific Ocean|
-                                          Shrimp ocean pink")) %>% bind_rows
+shrimp <- all_areas %>% filter(str_detect(Species, 
+                                          "Shrimp Pacific Ocean|Shrimp ocean pink")) %>% bind_rows
 # Update dataframe with new species name
 shrimp <- shrimp[, -1] %>% group_by(area, year) %>%
   summarize(across(January:Landings, sum))  
@@ -114,13 +114,8 @@ colnames(shrimp) <- initial_cols
 
 # Groundfish - from list here -------------------------------------------------
 # https://wildlife.ca.gov/Conservation/Marine/Federal-Groundfish 
-groundfish <- all_areas %>% filter(str_detect(Species, "Halibut|Rockfish|
-                                              Thornyhead|Sablefish|Skate|
-                                              Shark leopard|Shark soupfin|
-                                              Shark spiny dogfish|Ratfish|
-                                              Cabezon|Greenling|Lingcod|Cod|
-                                              Whiting|Scorpionfish|Flounder|
-                                              Sole|Sanddab")) %>% bind_rows
+groundfish <- all_areas %>% filter(str_detect(Species, 
+                                              "Halibut|Rockfish|Thornyhead|Sablefish|Skate|Shark leopard|Shark soupfin|Shark spiny dogfish|Ratfish|Cabezon|Greenling|Lingcod|Cod|Whiting|Scorpionfish|Flounder|Sole|Sanddab")) %>% bind_rows
 # Update dataframe with new species name
 groundfish <- groundfish[, -1] %>% group_by(area, year) %>%
   summarize(across(January:Landings, sum))  
@@ -137,9 +132,8 @@ salmon <- cbind(rep("Salmon", length(salmon$year)), salmon[, c(3:15, 2, 1)])
 colnames(salmon) <- initial_cols
 
 # Coastal pelagic species gathered from NOAA fisheries ------------------------
-pelagics <- all_areas %>% filter(str_detect(Species, "Sardine|Mackerel Pacific|
-                                            Mackerel jack|Mackerel unspecified|
-                                            Anchovy northern")) %>% bind_rows
+pelagics <- all_areas %>% filter(str_detect(Species, 
+                                            "Sardine|Mackerel Pacific|Mackerel jack|Mackerel unspecified|Anchovy northern")) %>% bind_rows
 # Update dataframe with new species name
 pelagics <- pelagics[, -1] %>% group_by(area, year) %>% 
   summarize(across(January:Landings, sum))

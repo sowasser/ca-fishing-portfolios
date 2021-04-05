@@ -4,42 +4,43 @@
 library(stringr)
 library(dplyr)
 library(reshape2)
+library(ggplot2)
 
 # Import dataset of all areas
 all_areas <- read.csv("Data/DFW areas/all_areas.csv")
 
 # Find most-landed species ----------------------------------------------------
 # Isolate total landings and find mean by year
-total_landings <- all_areas[, c(1, 14:16)]
-total_landings <- total_landings %>% group_by(area, Species) %>% 
+high_landings <- all_areas[, c(1, 14:16)]
+high_landings <- high_landings %>% group_by(area, Species) %>% 
   summarize(landings = mean(Landings))  
 
 # Isolate each area & order by landings in descending order
-total_e <- total_landings %>% filter(area == "Eureka")
+total_e <- high_landings %>% filter(area == "Eureka")
 total_e <- total_e[order(-total_e$landings), ]
 
-total_fb <- total_landings %>% filter(area == "Fort Bragg")
+total_fb <- high_landings %>% filter(area == "Fort Bragg")
 total_fb <- total_fb[order(-total_fb$landings), ]
 
-total_bb <- total_landings %>% filter(area == "Bodega Bay")
+total_bb <- high_landings %>% filter(area == "Bodega Bay")
 total_bb <- total_bb[order(-total_bb$landings), ]
 
-total_sf <- total_landings %>% filter(area == "San Francisco")
+total_sf <- high_landings %>% filter(area == "San Francisco")
 total_sf <- total_sf[order(-total_sf$landings), ]
 
-total_m <- total_landings %>% filter(area == "Monterey")
+total_m <- high_landings %>% filter(area == "Monterey")
 total_m <- total_m[order(-total_m$landings), ]
 
-total_mb <- total_landings %>% filter(area == "Morro Bay")
+total_mb <- high_landings %>% filter(area == "Morro Bay")
 total_mb <- total_mb[order(-total_mb$landings), ]
 
-total_sb <- total_landings %>% filter(area == "Santa Barbara")
+total_sb <- high_landings %>% filter(area == "Santa Barbara")
 total_sb <- total_sb[order(-total_sb$landings), ]
 
-total_la <- total_landings %>% filter(area == "Los Angeles")
+total_la <- high_landings %>% filter(area == "Los Angeles")
 total_la <- total_la[order(-total_la$landings), ]
 
-total_sd <- total_landings %>% filter(area == "San Diego")
+total_sd <- high_landings %>% filter(area == "San Diego")
 total_sd <- total_sd[order(-total_sd$landings), ]
 
 # Create dataframe of highest landed species
@@ -52,7 +53,7 @@ high_landings <- rbind(total_e[1:11, 1:2], total_fb[1:11, 1:2],
 # Get list of unique species names (not fully unique :/ )
 high_landings <- trimws(high_landings$Species)
 high_landings <- levels(factor(high_landings$Species))
-print(high_landings)
+# print(high_landings)
 
 
 # Isolate species of interest -------------------------------------------------
@@ -65,18 +66,38 @@ crab <- all_areas %>% filter(str_detect(Species, "Dungeness")) %>% bind_rows
 lobster <- all_areas %>% filter(str_detect(Species, "Lobster")) %>% bind_rows
 squid <- all_areas %>% filter(str_detect(Species, "Squid market")) %>% bind_rows
 albacore <- all_areas %>% filter(str_detect(Species, "albacore")) %>% bind_rows
+bigeye <- all_areas %>% filter(str_detect(Species, "Tuna bigeye")) %>% bind_rows
 prawn <- all_areas %>% filter(str_detect(Species, "Prawn spot")) %>% bind_rows
 swordfish <- all_areas %>% filter(str_detect(Species, "Swordfish")) %>% bind_rows
-
+opah <- all_areas %>% filter(str_detect(Species, "Opah")) %>% bind_rows
+herring_roe <- all_areas %>% filter(str_detect(Species, "Herring Pacific roe")) %>% bind_rows
 
 # Red sea urchin --------------------------------------------------------------
-urchin <- all_areas %>% filter(str_detect(Species, "Sea urchin red|Urchin red")) %>% bind_rows
+urchin <- all_areas %>% filter(str_detect(Species, "Sea urchin red|
+                                          Urchin red")) %>% bind_rows
 # Update dataframe with new species name
 urchin <- urchin[, -1] %>% group_by(area, year) %>%
   summarize(across(January:Landings, sum))  
 urchin <- cbind(rep("Red Sea Urchin", length(urchin$year)), urchin[, c(3:15, 2, 1)])
 colnames(urchin) <- initial_cols
 
+# Hagfish ---------------------------------------------------------------------
+hagfish <- all_areas %>% filter(str_detect(Species, "Hagfish|
+                                           Hagfishes")) %>% bind_rows
+# Update dataframe with new species name
+hagfish <- hagfish[, -1] %>% group_by(area, year) %>%
+  summarize(across(January:Landings, sum))  
+hagfish <- cbind(rep("Hagfish", length(hagfish$year)), hagfish[, c(3:15, 2, 1)])
+colnames(hagfish) <- initial_cols
+
+# Shrimp ----------------------------------------------------------------------
+shrimp <- all_areas %>% filter(str_detect(Species, "Shrimp Pacific Ocean|
+                                          Shrimp ocean pink")) %>% bind_rows
+# Update dataframe with new species name
+shrimp <- shrimp[, -1] %>% group_by(area, year) %>%
+  summarize(across(January:Landings, sum))  
+shrimp <- cbind(rep("Ocean Shrimp", length(shrimp$year)), shrimp[, c(3:15, 2, 1)])
+colnames(shrimp) <- initial_cols
 
 # Groundfish - from list here -------------------------------------------------
 # https://wildlife.ca.gov/Conservation/Marine/Federal-Groundfish 
@@ -93,7 +114,6 @@ groundfish <- groundfish[, -1] %>% group_by(area, year) %>%
 groundfish <- cbind(rep("Groundfish", length(groundfish$year)), groundfish[, c(3:15, 2, 1)])
 colnames(groundfish) <- initial_cols
 
-
 # Salmon ----------------------------------------------------------------------
 salmon <- all_areas %>% filter(str_detect(Species, "Salmon")) %>% bind_rows
 salmon <- salmon %>% filter(!str_detect(Species, "Roe"))  # Remove salmon roe fishery
@@ -102,7 +122,6 @@ salmon <- salmon[, -1] %>%  group_by(area, year) %>%
   summarize(across(January:Landings, sum))
 salmon <- cbind(rep("Salmon", length(salmon$year)), salmon[, c(3:15, 2, 1)])
 colnames(salmon) <- initial_cols
-
 
 # Coastal pelagic species gathered from NOAA fisheries ------------------------
 pelagics <- all_areas %>% filter(str_detect(Species, "Sardine|Mackerel Pacific|
@@ -115,8 +134,9 @@ colnames(pelagics) <- initial_cols
 
 
 # Create dataframe of all species of interest ---------------------------------
-all_soi <- rbind(crab, lobster, squid, albacore, prawn, swordfish, urchin, 
-                 groundfish, salmon, pelagics)
+all_soi <- rbind(crab, lobster, squid, albacore, bigeye, prawn, swordfish, 
+                 opah, herring_roe, hagfish, urchin, shrimp, groundfish, 
+                 salmon, pelagics)
 
 all_soi$Species <- trimws(all_soi$Species)  # trim white space from names
 
@@ -126,9 +146,30 @@ all_soi$Species <- str_replace_all(all_soi$Species,
                                      "Lobster California spiny" = "Spiny Lobster",
                                      "Prawn spot" = "Spot Prawn",
                                      "Squid market" = "Market Squid",
-                                     "Tuna albacore" = "Albacore Tuna"))
+                                     "Tuna albacore" = "Albacore Tuna",
+                                     "Tuna bigeye" = "Bigeye Tuna",
+                                     "Herring Pacific roe" = "Herring Roe"))
 species <- levels(factor(all_soi$Species))  # list of species
 print(species)  # check species list
+
+
+
+
+# Check relative landings for the species of interest -------------------------
+total_landings <- all_soi[, c(1, 14:16)]
+total_landings <- total_landings %>% group_by(Species) %>% 
+  summarize(landings = mean(Landings)) 
+
+total_plot <- ggplot(total_landings, aes(y = landings, x = reorder(Species, -landings))) +
+  geom_bar(position = "dodge", stat = "identity") +
+  ylab("mean landings (lbs)") +
+  ggtitle("data area") + 
+  # scale_fill_discrete(breaks = area_order) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+ggsave(filename="DFW pdf data/Figures/all_soi_landings.pdf", total_plot,
+       width=300, height=100, units="mm", dpi=300)
 
 # Write a .csv file with just the species of interest
 write.csv(all_soi, "Data/dfw_areas_soi.csv", row.names = FALSE)

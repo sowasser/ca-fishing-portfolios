@@ -66,8 +66,16 @@ lobster <- all_areas %>% filter(str_detect(Species, "Lobster")) %>% bind_rows
 squid <- all_areas %>% filter(str_detect(Species, "Squid market")) %>% bind_rows
 albacore <- all_areas %>% filter(str_detect(Species, "albacore")) %>% bind_rows
 prawn <- all_areas %>% filter(str_detect(Species, "Prawn spot")) %>% bind_rows
-urchin <- all_areas %>% filter(str_detect(Species, "Sea urchin red")) %>% bind_rows  # TODO: add "urchin red"
 swordfish <- all_areas %>% filter(str_detect(Species, "Swordfish")) %>% bind_rows
+
+
+# Red sea urchin --------------------------------------------------------------
+urchin <- all_areas %>% filter(str_detect(Species, "Sea urchin red|Urchin red")) %>% bind_rows
+# Update dataframe with new species name
+urchin <- urchin[, -1] %>% group_by(area, year) %>%
+  summarize(across(January:Landings, sum))  
+urchin <- cbind(rep("Red Sea Urchin", length(urchin$year)), urchin[, c(3:15, 2, 1)])
+colnames(urchin) <- initial_cols
 
 
 # Groundfish - from list here -------------------------------------------------
@@ -85,8 +93,6 @@ groundfish <- groundfish[, -1] %>% group_by(area, year) %>%
 groundfish <- cbind(rep("Groundfish", length(groundfish$year)), groundfish[, c(3:15, 2, 1)])
 colnames(groundfish) <- initial_cols
 
-write.csv(groundfish, "Data/dfw_groundfish.csv", row.names = FALSE)
-
 
 # Salmon ----------------------------------------------------------------------
 salmon <- all_areas %>% filter(str_detect(Species, "Salmon")) %>% bind_rows
@@ -96,8 +102,6 @@ salmon <- salmon[, -1] %>%  group_by(area, year) %>%
   summarize(across(January:Landings, sum))
 salmon <- cbind(rep("Salmon", length(salmon$year)), salmon[, c(3:15, 2, 1)])
 colnames(salmon) <- initial_cols
-
-write.csv(salmon, "Data/dfw_salmon.csv", row.names = FALSE)
 
 
 # Coastal pelagic species gathered from NOAA fisheries ------------------------
@@ -109,11 +113,9 @@ pelagics <- pelagics[, -1] %>% group_by(area, year) %>%
 pelagics <- cbind(rep("Pelagics", length(pelagics$year)), pelagics[, c(3:15, 2, 1)])
 colnames(pelagics) <- initial_cols
 
-write.csv(pelagics, "Data/dfw_pelagics.csv", row.names = FALSE)
-
 
 # Create dataframe of all species of interest ---------------------------------
-all_soi <- rbind(crab, lobster, squid, albacore, prawn, urchin, swordfish, 
+all_soi <- rbind(crab, lobster, squid, albacore, prawn, swordfish, urchin, 
                  groundfish, salmon, pelagics)
 
 all_soi$Species <- trimws(all_soi$Species)  # trim white space from names
@@ -123,7 +125,6 @@ all_soi$Species <- str_replace_all(all_soi$Species,
                                    c("Crab Dungeness" = "Dungeness Crab",
                                      "Lobster California spiny" = "Spiny Lobster",
                                      "Prawn spot" = "Spot Prawn",
-                                     "Sea urchin red" = "Red Sea Urchin",
                                      "Squid market" = "Market Squid",
                                      "Tuna albacore" = "Albacore Tuna"))
 species <- levels(factor(all_soi$Species))  # list of species

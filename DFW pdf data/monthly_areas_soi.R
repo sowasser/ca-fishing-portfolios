@@ -10,6 +10,12 @@ library(ggplot2)
 # Import dataset of all areas
 all_areas <- read.csv("Data/DFW areas/all_areas.csv")
 
+# Fix known issues with species names
+all_areas$Species <- str_replace_all(all_areas$Species, 
+                                     c("Lobs ter California spiny" = "Lobster California spiny",
+                                       "Anchovy  northern" = "Anchovy northern",
+                                       "Crab y ellow rock" = "Crab yellow rock"))
+
 # Find most-landed species ----------------------------------------------------
 # Isolate total landings and find mean by year
 high_landings <- all_areas[, c(1, 14:16)]
@@ -56,11 +62,6 @@ high_landings <- levels(factor(high_landings$Species))
 print(high_landings)
 
 
-# Fix known issues with species names -----------------------------------------
-all_areas$Species <- str_replace_all(all_areas$Species, 
-                                     c("Lobs ter California spiny" = "Lobster California spiny",
-                                       "Anchovy  northern" = "Anchovy northern"))
-
 # Isolate species of interest -------------------------------------------------
 # Column names for the initial columns of the overall dataframe
 initial_cols <- c("Species", "January", "February", "March", "April", "May", "June",
@@ -72,9 +73,30 @@ lobster <- all_areas %>% filter(str_detect(Species, "Lobster")) %>% bind_rows
 squid <- all_areas %>% filter(str_detect(Species, "Squid market")) %>% bind_rows
 albacore <- all_areas %>% filter(str_detect(Species, "albacore")) %>% bind_rows
 bigeye <- all_areas %>% filter(str_detect(Species, "Tuna bigeye")) %>% bind_rows
-prawn <- all_areas %>% filter(str_detect(Species, "Prawn spot")) %>% bind_rows
+prawn_spot <- all_areas %>% filter(str_detect(Species, "Prawn spot")) %>% bind_rows
 swordfish <- all_areas %>% filter(str_detect(Species, "Swordfish")) %>% bind_rows
 opah <- all_areas %>% filter(str_detect(Species, "Opah")) %>% bind_rows
+bonito <- all_areas %>% filter(str_detect(Species, "Bonito Pacific")) %>% bind_rows
+prawn_ridge <- all_areas %>% filter(str_detect(Species, "Prawn ridgeback")) %>% bind_rows
+
+# Rock crab -------------------------------------------------------------------
+rock_crab <- all_areas %>% filter(str_detect(Species, 
+                                             "Crab red rock|Crab rock unspecified|Crab yellow rock")) %>% bind_rows
+# Update dataframe with new species name
+rock_crab <- rock_crab[, -1] %>% group_by(area, year) %>%
+  summarize(across(January:Landings, sum))  
+rock_crab <- cbind(rep("Rock Crab", length(rock_crab$year)), rock_crab[, c(3:15, 2, 1)])
+colnames(rock_crab) <- initial_cols
+
+# Yellowfin/Skipjack ----------------------------------------------------------
+# Info on grouping here: https://escholarship.org/uc/item/24r1s04n
+yellow_skip <- all_areas %>% filter(str_detect(Species, 
+                                               "Tuna yellowfin|Tuna skipjack")) %>% bind_rows
+# Update dataframe with new species name
+yellow_skip <- yellow_skip[, -1] %>% group_by(area, year) %>%
+  summarize(across(January:Landings, sum))  
+yellow_skip <- cbind(rep("Yellowfin/Skipjack", length(yellow_skip$year)), yellow_skip[, c(3:15, 2, 1)])
+colnames(yellow_skip) <- initial_cols
 
 # Herring roe -----------------------------------------------------------------
 herring_roe <- all_areas %>% filter(str_detect(Species, 
@@ -115,7 +137,7 @@ colnames(shrimp) <- initial_cols
 # Groundfish - from list here -------------------------------------------------
 # https://wildlife.ca.gov/Conservation/Marine/Federal-Groundfish 
 groundfish <- all_areas %>% filter(str_detect(Species, 
-                                              "Halibut|Rockfish|Thornyhead|Sablefish|Skate|Shark leopard|Shark soupfin|Shark spiny dogfish|Ratfish|Cabezon|Greenling|Lingcod|Cod|Whiting|Scorpionfish|Flounder|Sole|Sanddab")) %>% bind_rows
+                                              "Halibut|Rockfish|Thornyhead|Sablefish|Skate|Shark leopard|Shark soupfin|Shark spiny dogfish|Ratfish|Cabezon|Greenling|Lingcod|Cod|Whiting|Scorpionfish|Flounder|Sole|Sanddab|Grenadiers")) %>% bind_rows
 # Update dataframe with new species name
 groundfish <- groundfish[, -1] %>% group_by(area, year) %>%
   summarize(across(January:Landings, sum))  
@@ -133,7 +155,7 @@ colnames(salmon) <- initial_cols
 
 # Coastal pelagic species gathered from NOAA fisheries ------------------------
 pelagics <- all_areas %>% filter(str_detect(Species, 
-                                            "Sardine|Mackerel Pacific|Mackerel jack|Mackerel unspecified|Anchovy northern")) %>% bind_rows
+                                            "Sardine|Mackerel|Mackerel|Mackerel|Anchovy northern")) %>% bind_rows
 # Update dataframe with new species name
 pelagics <- pelagics[, -1] %>% group_by(area, year) %>% 
   summarize(across(January:Landings, sum))
@@ -147,7 +169,10 @@ other <- other %>% filter(!str_detect(Species, "Lobster"))
 other <- other %>% filter(!str_detect(Species, "Squid market"))
 other <- other %>% filter(!str_detect(Species, "albacore"))
 other <- other %>% filter(!str_detect(Species, "Tuna bigeye"))
+other <- other %>% filter(!str_detect(Species, "Tuna yellowfin"))
+other <- other %>% filter(!str_detect(Species, "Tuna skipjack"))
 other <- other %>% filter(!str_detect(Species, "Prawn spot"))
+other <- other %>% filter(!str_detect(Species, "Prawn ridgeback"))
 other <- other %>% filter(!str_detect(Species, "Swordfish"))
 other <- other %>% filter(!str_detect(Species, "Opah"))
 other <- other %>% filter(!str_detect(Species, "Herring Pacific roe"))
@@ -175,10 +200,13 @@ other <- other %>% filter(!str_detect(Species, "Scorpionfish"))
 other <- other %>% filter(!str_detect(Species, "Flounder"))
 other <- other %>% filter(!str_detect(Species, "Sole"))
 other <- other %>% filter(!str_detect(Species, "Sanddab"))
+other <- other %>% filter(!str_detect(Species, "Grenadiers"))
 other <- other %>% filter(!str_detect(Species, "Salmon"))
 other <- other %>% filter(!str_detect(Species, "Sardine"))
 other <- other %>% filter(!str_detect(Species, "Mackerel"))
 other <- other %>% filter(!str_detect(Species, "Anchovy"))
+other <- other %>% filter(!str_detect(Species, "Bonito Pacific"))
+other <- other %>% filter(!str_detect(Species, "Crab red rock|Crab rock unspecified|Crab yellow rock"))
 
 other_species <- levels(factor(other$Species))
 print(other_species)
@@ -189,9 +217,10 @@ colnames(other) <- initial_cols
 
 
 # Create dataframe of all species of interest ---------------------------------
-all_soi <- rbind(crab, lobster, squid, albacore, bigeye, prawn, swordfish, 
-                 opah, herring_roe, urchin, hagfish, shrimp, groundfish, 
-                 salmon, pelagics, other)
+all_soi <- rbind(crab, lobster, squid, albacore, bigeye, yellow_skip, 
+                 prawn_spot, prawn_ridge, swordfish, opah, herring_roe, urchin, 
+                 hagfish, shrimp, groundfish, salmon, pelagics, bonito, 
+                 rock_crab, other)
 
 all_soi$Species <- trimws(all_soi$Species)  # trim white space from names
 
@@ -202,7 +231,9 @@ all_soi$Species <- str_replace_all(all_soi$Species,
                                      "Prawn spot" = "Spot Prawn",
                                      "Squid market" = "Market Squid",
                                      "Tuna albacore" = "Albacore Tuna",
-                                     "Tuna bigeye" = "Bigeye Tuna"))
+                                     "Tuna bigeye" = "Bigeye Tuna",
+                                     "Bonito Pacific" = "Pacific Bonito",
+                                     "Prawn ridgeback" = "Ridgeback Prawn"))
 species <- levels(factor(all_soi$Species))  # list of species
 print(species)  # check species list
 
@@ -214,9 +245,7 @@ total_landings <- total_landings %>% group_by(Species) %>%
 
 total_plot <- ggplot(total_landings, aes(y = landings, x = reorder(Species, -landings))) +
   geom_bar(position = "dodge", stat = "identity") +
-  ylab("mean landings (lbs)") +
-  ggtitle("data area") + 
-  # scale_fill_discrete(breaks = area_order) +
+  ylab("mean landings (lbs)") + xlab("high-landings species/fisheries")
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 

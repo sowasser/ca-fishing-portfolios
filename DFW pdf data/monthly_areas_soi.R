@@ -8,19 +8,65 @@ library(reshape2)
 # Import dataset of all areas
 all_areas <- read.csv("Data/DFW areas/all_areas.csv")
 
+# Find most-landed species ----------------------------------------------------
+# Isolate total landings and find mean by year
+total_landings <- all_areas[, c(1, 14:16)]
+total_landings <- total_landings %>% group_by(area, Species) %>% 
+  summarize(landings = mean(Landings))  
+
+# Isolate each area & order by landings in descending order
+total_e <- total_landings %>% filter(area == "Eureka")
+total_e <- total_e[order(-total_e$landings), ]
+
+total_fb <- total_landings %>% filter(area == "Fort Bragg")
+total_fb <- total_fb[order(-total_fb$landings), ]
+
+total_bb <- total_landings %>% filter(area == "Bodega Bay")
+total_bb <- total_bb[order(-total_bb$landings), ]
+
+total_sf <- total_landings %>% filter(area == "San Francisco")
+total_sf <- total_sf[order(-total_sf$landings), ]
+
+total_m <- total_landings %>% filter(area == "Monterey")
+total_m <- total_m[order(-total_m$landings), ]
+
+total_mb <- total_landings %>% filter(area == "Morro Bay")
+total_mb <- total_mb[order(-total_mb$landings), ]
+
+total_sb <- total_landings %>% filter(area == "Santa Barbara")
+total_sb <- total_sb[order(-total_sb$landings), ]
+
+total_la <- total_landings %>% filter(area == "Los Angeles")
+total_la <- total_la[order(-total_la$landings), ]
+
+total_sd <- total_landings %>% filter(area == "San Diego")
+total_sd <- total_sd[order(-total_sd$landings), ]
+
+# Create dataframe of highest landed species
+high_landings <- rbind(total_e[1:11, 1:2], total_fb[1:11, 1:2], 
+                       total_bb[1:11, 1:2], total_sf[1:11, 1:2], 
+                       total_m[1:11, 1:2], total_mb[1:11, 1:2],
+                       total_sb[1:11, 1:2], total_la[1:11, 1:2], 
+                       total_sd[1:11, 1:2])
+
+# Get list of unique species names (not fully unique :/ )
+high_landings <- trimws(high_landings$Species)
+high_landings <- levels(factor(high_landings$Species))
+print(high_landings)
+
+
+# Isolate species of interest -------------------------------------------------
 # Column names for the initial columns of the overall dataframe
 initial_cols <- c("Species", "January", "February", "March", "April", "May", "June",
                   "July", "August", "September", "October", "November", "December", 
                   "Landings", "year", "area")
 
-
-# Islolate species of interest ------------------------------------------------
 crab <- all_areas %>% filter(str_detect(Species, "Dungeness")) %>% bind_rows
 lobster <- all_areas %>% filter(str_detect(Species, "Lobster")) %>% bind_rows
 squid <- all_areas %>% filter(str_detect(Species, "Squid market")) %>% bind_rows
 albacore <- all_areas %>% filter(str_detect(Species, "albacore")) %>% bind_rows
 prawn <- all_areas %>% filter(str_detect(Species, "Prawn spot")) %>% bind_rows
-urchin <- all_areas %>% filter(str_detect(Species, "Sea urchin red")) %>% bind_rows
+urchin <- all_areas %>% filter(str_detect(Species, "Sea urchin red")) %>% bind_rows  # TODO: add "urchin red"
 swordfish <- all_areas %>% filter(str_detect(Species, "Swordfish")) %>% bind_rows
 
 

@@ -148,22 +148,44 @@ colnames(pelagics) <- initial_cols
 
 
 # Category for everything not selected above ----------------------------------
-# TODO: figure out why this list still includes some of the species that should be excluded!!!
-other <- all_areas %>% filter(!str_detect(Species, "Dungeness|Lobster|
-                                          Squid market|albacore|Tuna bigeye|
-                                          Prawn spot|Swordfish|Opah|
-                                          Herring Pacific roe|Sea urchin red|
-                                          Urchin red|Hagfish|Hagfishes|
-                                          Shrimp Pacific Ocean|
-                                          Shrimp ocean pink|Halibut|Rockfish|
-                                          Thornyhead|Sablefish|Skate|
-                                          Shark leopard|Shark soupfin|
-                                          Shark spiny dogfish|Ratfish|Cabezon|
-                                          Greenling|Lingcod|Cod|Whiting|
-                                          Scorpionfish|Flounder|Sole|Sanddab|
-                                          Salmon|Sardine|Mackerel Pacific|
-                                          Mackerel jack|Anchovy northern"))
-other <- all_areas %>% filter(Species == "Crab Dungeness")
+other <- all_areas %>% filter(!str_detect(Species, "Dungeness"))
+other <- other %>% filter(!str_detect(Species, "Lobster"))
+other <- other %>% filter(!str_detect(Species, "Squid market"))
+other <- other %>% filter(!str_detect(Species, "albacore"))
+other <- other %>% filter(!str_detect(Species, "Tuna bigeye"))
+other <- other %>% filter(!str_detect(Species, "Prawn spot"))
+other <- other %>% filter(!str_detect(Species, "Swordfish"))
+other <- other %>% filter(!str_detect(Species, "Opah"))
+other <- other %>% filter(!str_detect(Species, "Herring Pacific roe"))
+other <- other %>% filter(!str_detect(Species, "Sea urchin red"))
+other <- other %>% filter(!str_detect(Species, "Urchin red"))
+other <- other %>% filter(!str_detect(Species, "Hagfish"))
+other <- other %>% filter(!str_detect(Species, "Hagfishes"))
+other <- other %>% filter(!str_detect(Species, "Shrimp Pacific Ocean"))
+other <- other %>% filter(!str_detect(Species, "Shrimp ocean pink"))
+other <- other %>% filter(!str_detect(Species, "Halibut"))
+other <- other %>% filter(!str_detect(Species, "Rockfish"))
+other <- other %>% filter(!str_detect(Species, "Thornyhead"))
+other <- other %>% filter(!str_detect(Species, "Sablefish"))
+other <- other %>% filter(!str_detect(Species, "Skate"))
+other <- other %>% filter(!str_detect(Species, "Shark leopard"))
+other <- other %>% filter(!str_detect(Species, "Shark soupfin"))
+other <- other %>% filter(!str_detect(Species, "Shark spiny dogfish"))
+other <- other %>% filter(!str_detect(Species, "Ratfish"))
+other <- other %>% filter(!str_detect(Species, "Cabezon"))
+other <- other %>% filter(!str_detect(Species, "Greenling"))
+other <- other %>% filter(!str_detect(Species, "Lingcod"))
+other <- other %>% filter(!str_detect(Species, "Cod"))
+other <- other %>% filter(!str_detect(Species, "Whiting"))
+other <- other %>% filter(!str_detect(Species, "Scorpionfish"))
+other <- other %>% filter(!str_detect(Species, "Flounder"))
+other <- other %>% filter(!str_detect(Species, "Sole"))
+other <- other %>% filter(!str_detect(Species, "Sanddab"))
+other <- other %>% filter(!str_detect(Species, "Salmon"))
+other <- other %>% filter(!str_detect(Species, "Sardine"))
+other <- other %>% filter(!str_detect(Species, "Mackerel"))
+other <- other %>% filter(!str_detect(Species, "Anchovy"))
+
 other_species <- levels(factor(other$Species))
 print(other_species)
 other <- other[, -1] %>% group_by(area, year) %>% 

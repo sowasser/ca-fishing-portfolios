@@ -78,4 +78,13 @@ write.csv(sb, "Data/DFW areas/santa_barbara.csv", row.names = FALSE)
 all <- rbind(e, fb, bb, sf, m, mb, sb, la, sd)  # ordered north -> south
 all <- all %>% filter(!str_detect(Species, "Total"))  # Any sum/total values
 
+
+# Replace weird characters in species names ----
+all$Species <- trimws(all$Species)
+all$Species <- str_replace_all(all$Species, 
+                               c("[^[:alnum:]]" = " ",
+                                 "  " = " "))
+all_species <- levels(factor(all$Species))
+print(all_species)  # 390 species names
+
 write.csv(all, "Data/DFW areas/all_areas.csv", row.names = FALSE)

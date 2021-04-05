@@ -2,6 +2,7 @@
 # landings by area.
 
 library(stringr)
+library(stringi)
 library(dplyr)
 library(reshape2)
 library(ggplot2)
@@ -51,10 +52,14 @@ high_landings <- rbind(total_e[1:11, 1:2], total_fb[1:11, 1:2],
                        total_sd[1:11, 1:2])
 
 # Get list of unique species names (not fully unique :/ )
-high_landings <- trimws(high_landings$Species)
 high_landings <- levels(factor(high_landings$Species))
-# print(high_landings)
+print(high_landings)
 
+
+# Fix known issues with species names -----------------------------------------
+all_areas$Species <- str_replace_all(all_areas$Species, 
+                                     c("Lobs ter California spiny" = "Lobster California spiny",
+                                       "Anchovy  northern" = "Anchovy northern"))
 
 # Isolate species of interest -------------------------------------------------
 # Column names for the initial columns of the overall dataframe
@@ -70,7 +75,15 @@ bigeye <- all_areas %>% filter(str_detect(Species, "Tuna bigeye")) %>% bind_rows
 prawn <- all_areas %>% filter(str_detect(Species, "Prawn spot")) %>% bind_rows
 swordfish <- all_areas %>% filter(str_detect(Species, "Swordfish")) %>% bind_rows
 opah <- all_areas %>% filter(str_detect(Species, "Opah")) %>% bind_rows
-herring_roe <- all_areas %>% filter(str_detect(Species, "Herring Pacific  roe")) %>% bind_rows
+
+# Herring roe -----------------------------------------------------------------
+herring_roe <- all_areas %>% filter(str_detect(Species, "Herring Pacific roe|
+                                               Herring Roe")) %>% bind_rows
+# Update dataframe with new species name
+herring_roe <- herring_roe[, -1] %>% group_by(area, year) %>%
+  summarize(across(January:Landings, sum))  
+herring_roe <- cbind(rep("Herring Roe", length(herring_roe$year)), herring_roe[, c(3:15, 2, 1)])
+colnames(herring_roe) <- initial_cols
 
 # Red sea urchin --------------------------------------------------------------
 urchin <- all_areas %>% filter(str_detect(Species, "Sea urchin red|
@@ -125,7 +138,8 @@ colnames(salmon) <- initial_cols
 
 # Coastal pelagic species gathered from NOAA fisheries ------------------------
 pelagics <- all_areas %>% filter(str_detect(Species, "Sardine|Mackerel Pacific|
-                                            Mackerel jack|Anchovy northern")) %>% bind_rows
+                                            Mackerel jack|Mackerel unspecified|
+                                            Anchovy northern")) %>% bind_rows
 # Update dataframe with new species name
 pelagics <- pelagics[, -1] %>% group_by(area, year) %>% 
   summarize(across(January:Landings, sum))
@@ -133,10 +147,35 @@ pelagics <- cbind(rep("Pelagics", length(pelagics$year)), pelagics[, c(3:15, 2, 
 colnames(pelagics) <- initial_cols
 
 
+# Category for everything not selected above ----------------------------------
+# TODO: figure out why this list still includes some of the species that should be excluded!!!
+other <- all_areas %>% filter(!str_detect(Species, "Dungeness|Lobster|
+                                          Squid market|albacore|Tuna bigeye|
+                                          Prawn spot|Swordfish|Opah|
+                                          Herring Pacific roe|Sea urchin red|
+                                          Urchin red|Hagfish|Hagfishes|
+                                          Shrimp Pacific Ocean|
+                                          Shrimp ocean pink|Halibut|Rockfish|
+                                          Thornyhead|Sablefish|Skate|
+                                          Shark leopard|Shark soupfin|
+                                          Shark spiny dogfish|Ratfish|Cabezon|
+                                          Greenling|Lingcod|Cod|Whiting|
+                                          Scorpionfish|Flounder|Sole|Sanddab|
+                                          Salmon|Sardine|Mackerel Pacific|
+                                          Mackerel jack|Anchovy northern"))
+other <- all_areas %>% filter(Species == "Crab Dungeness")
+other_species <- levels(factor(other$Species))
+print(other_species)
+other <- other[, -1] %>% group_by(area, year) %>% 
+  summarize(across(January:Landings, sum))
+other <- cbind(rep("other", length(other$year)), other[, c(3:15, 2, 1)])
+colnames(other) <- initial_cols
+
+
 # Create dataframe of all species of interest ---------------------------------
 all_soi <- rbind(crab, lobster, squid, albacore, bigeye, prawn, swordfish, 
                  opah, herring_roe, urchin, hagfish, shrimp, groundfish, 
-                 salmon, pelagics)
+                 salmon, pelagics, other)
 
 all_soi$Species <- trimws(all_soi$Species)  # trim white space from names
 
@@ -147,17 +186,10 @@ all_soi$Species <- str_replace_all(all_soi$Species,
                                      "Prawn spot" = "Spot Prawn",
                                      "Squid market" = "Market Squid",
                                      "Tuna albacore" = "Albacore Tuna",
-                                     "Tuna bigeye" = "Bigeye Tuna",
-                                     "Herring Pacific  roe" = "Herring Roe",
-                                     "Herring Roe on kelp" = "Herring Roe"))
+                                     "Tuna bigeye" = "Bigeye Tuna"))
 species <- levels(factor(all_soi$Species))  # list of species
 print(species)  # check species list
 
-
-# Category for everything not selected above ----------------------------------
-other <- all_areas %>% filter(!str_detect(Species, "Dungeness|Lobster|
-                                          Squid market|albacore|Tuna bigeye|
-                                          Prawn spot|Swordfish|Opah|Herring Pacific roe"))
 
 # Check relative landings for the species of interest -------------------------
 total_landings <- all_soi[, c(1, 14:16)]

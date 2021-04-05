@@ -1,0 +1,22 @@
+---
+title: "Monthly trends in California fisheries, aggregated by area, from 2000-2019"
+author: "Sophia Wassermann"
+date: "4/5/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data source
+
+These data were collected from PDFs of the Final Californial Commercial Landings data for 2000-2019, downloaded from the [California Department of Fish and Wildlife][1]. The data are aggregated into nine areas, from North to South: Eureka, Fort Bragg, Bodega Bay, San Francisco, Monterey, Santa Barbara, Los Angeles, and San Diego (Figure 1). Landings are reported for each month.
+
+![Map of the areas used by the California Department of Fish and Wildlife for the commercial landings data.](Figures/areas_map.png){width=50%}
+
+## Fisheries of interest
+
+Landings were reported for every fisheries species in each area, and so to focus the analysis and reduce the number of variables, ten species/species groups were selected as fisheries of interest.
+
+[1]: https://wildlife.ca.gov/Fishing/Commercial/Landings

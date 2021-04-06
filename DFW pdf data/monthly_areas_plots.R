@@ -136,7 +136,7 @@ species_timeseries <- function(fishery) {
   
   plt <- ggplot(df, aes(x = month, y = landings, fill = area)) +
     geom_bar(position = "stack", stat = "identity") +
-    ylab("mean landings (lbs)") +
+    ylab("mean landings (lbs)") + xlab(" ") +
     ggtitle(fishery) + 
     scale_fill_viridis(discrete = TRUE) +
     theme_bw() +

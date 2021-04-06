@@ -11,12 +11,22 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Data source
 
-These data were collected from PDFs of the Final Californial Commercial Landings data for 2000-2019, downloaded from the [California Department of Fish and Wildlife][1]. The data are aggregated into nine areas, from North to South: Eureka, Fort Bragg, Bodega Bay, San Francisco, Monterey, Santa Barbara, Los Angeles, and San Diego (Figure 1). Landings are reported for each month.
+These data were collected from PDFs of the Final Californial Commercial Landings data for 2000-2019, downloaded from the [California Department of Fish and Wildlife (CADFW)][1]. The data are aggregated into nine areas, from North to South: Eureka, Fort Bragg, Bodega Bay, San Francisco, Monterey, Santa Barbara, Los Angeles, and San Diego (Figure 1). Landings are reported for each month.
 
 ![Map of the areas used by the California Department of Fish and Wildlife for the commercial landings data.](Figures/areas_map.png){width=50%}
 
 ## Fisheries of interest
 
-Landings were reported for every fisheries species in each area, and so to focus the analysis and reduce the number of variables, ten species/species groups were selected as fisheries of interest.
+The data set includes over 300 species, so to focus the analysis and reduce the number of variables, the most highly-landed species and fisheries were isolated as fisheries of interest (Figure 2). While some fisheries, e.g. Dungeness crab, consist of a single species, other species were combined to form a fishery determined by habitat and gear type. 'Groundfish' incorporates the following species and species complexes: California halibut, rockfish, thornyhead, sablefish, skate, leopard shark, soupfin shark, spiny dogfish, grenadiers, cabezon, greenling, cod, lingcod, Pacific whiting, scorpionfish, flounder, sole, and sanddab. Species selection for groundfish was based on the [CADFW List of Federally Managed Groundfish Species][2]. 'Pelagics' consists of Pacific sardine, Pacific mackerel, Jack mackerel, and Northern anchovy, following the [NOAA West Coast Coastal Pelagic Species][3] definition. Market squid were not included in pelagics as they constitute a large proportion of landings on their own. Other generalizations are for Pacific ocean and pink ocean shrimp, red and yellow rock crab, salmon, and hagfish. 
+
+While fisheries landings are important for understanding fishing patterns and portfolio-building, landing quantity does not necessarily equal revenue importance. Based on the all-state revenue data from the California Department of Natural Resources California North Coast MPA Baseline Study, 1992-2014, spot prawn was included as a species of interst. Because of the lack of generalization to the other areas, the San Francisco brine shrimp fishery was excluded, despite being one of the most-landed species for the area. With 19 fisheries excluded as fisheries of interest, the 'other' category represents 0.95% of the mean landings for the dataset (Figure 2).
+
+![Species and fisheries with the highest mean landings for the areas in the dataset, from 2000-2019.](Figures/all_soi_landings.pdf)
+
+
+
+![Mean monthly landings for fisheries of interest over the stable period - 2009-2014.](Figures/monthly_species_stable.pdf)
 
 [1]: https://wildlife.ca.gov/Fishing/Commercial/Landings
+[2]: https://wildlife.ca.gov/Conservation/Marine/Federal-Groundfish
+[3]: https://www.fisheries.noaa.gov/species/west-coast-coastal-pelagic-species

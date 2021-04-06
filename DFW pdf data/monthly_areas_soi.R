@@ -155,7 +155,7 @@ colnames(salmon) <- initial_cols
 
 # Coastal pelagic species gathered from NOAA fisheries ------------------------
 pelagics <- all_areas %>% filter(str_detect(Species, 
-                                            "Sardine|Mackerel|Mackerel|Mackerel|Anchovy northern")) %>% bind_rows
+                                            "Sardine|Mackerel|Anchovy northern")) %>% bind_rows
 # Update dataframe with new species name
 pelagics <- pelagics[, -1] %>% group_by(area, year) %>% 
   summarize(across(January:Landings, sum))
@@ -241,6 +241,10 @@ total_plot <- ggplot(total_landings, aes(y = landings, x = reorder(Species, -lan
 
 ggsave(filename="DFW pdf data/Figures/all_soi_landings.pdf", total_plot,
        width=300, height=150, units="mm", dpi=300)
+
+# Calculate what percentage 'other' represents
+(total_landings[[10,2]] / sum(total_landings[-10,2])) * 100
+
 
 # Write .csv files for all SOI and the top SOI --------------------------------
 write.csv(all_soi, "Data/dfw_areas_all_soi.csv", row.names = FALSE)

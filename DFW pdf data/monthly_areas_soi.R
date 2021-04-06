@@ -250,5 +250,5 @@ ggsave(filename="DFW pdf data/Figures/all_soi_landings.pdf", total_plot,
 write.csv(all_soi, "Data/dfw_areas_all_soi.csv", row.names = FALSE)
 
 top_soi <- rbind(squid, pelagics, groundfish, crab, urchin, shrimp, 
-                 herring_roe, salmon, yellow_skip)
+                 herring_roe, salmon)
 write.csv(top_soi, "Data/dfw_areas_top_soi.csv", row.names = FALSE)

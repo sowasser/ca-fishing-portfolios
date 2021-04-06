@@ -139,7 +139,7 @@ species_timeseries <- function(fishery) {
          plot=plt, width=400, height=250, units="mm", dpi=300)
 }
 
-# Function call for each species ----------------------------------------------
+# Function call for each species 
 for (s in soi_fisheries) {
   species_timeseries(s)
 }

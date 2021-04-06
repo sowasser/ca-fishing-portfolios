@@ -95,7 +95,7 @@ yellow_skip <- all_areas %>% filter(str_detect(Species,
 # Update dataframe with new species name
 yellow_skip <- yellow_skip[, -1] %>% group_by(area, year) %>%
   summarize(across(January:Landings, sum))  
-yellow_skip <- cbind(rep("Yellowfin/Skipjack", length(yellow_skip$year)), yellow_skip[, c(3:15, 2, 1)])
+yellow_skip <- cbind(rep("Yellowfin_Skipjack", length(yellow_skip$year)), yellow_skip[, c(3:15, 2, 1)])
 colnames(yellow_skip) <- initial_cols
 
 # Herring roe -----------------------------------------------------------------

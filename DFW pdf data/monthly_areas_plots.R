@@ -24,14 +24,13 @@ months_abbrev <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
                    "Sep", "Oct", "Nov", "Dec")
 
 
-# All landings for the stable period ------------------------------------------
+# All landings ----------------------------------------------------------------
 all_landings <- all_areas %>% group_by(area, year) %>% 
   summarize(across(January:Landings, sum))
 
-all_stable <- all_landings %>% filter(between(year, 2009, 2014))
-all_stable <- all_stable[, -2]  # remove year column
+all_landings <- all_landings[, -2]  # remove year column
 
-all_means <- all_stable %>%
+all_means <- all_landings %>%
   group_by(area) %>%
   summarize(across(January:Landings, mean))
 
@@ -41,26 +40,21 @@ all_means <- melt(all_means, id_vars = c("area"))
 colnames(all_means) <- c("area", "month", "landings")
 all_means$area <- factor(all_means$area, levels = area_order)
 
-all_stable <- ggplot(all_means, aes(y = landings, x = month)) +
+all_mean_landings <- ggplot(all_means, aes(y = landings, x = month)) +
   geom_bar(stat = "identity") +
-  ylab("mean landings (lbs)") + xlab("mean across 2009-2014") +
+  ylab("mean landings (lbs)") + xlab(" ") +
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~area, ncol = 3, scale = "free")
 
-ggsave(filename="DFW pdf data/Figures/all_landings_stable.pdf", all_stable,
+ggsave(filename="DFW pdf data/Figures/all_landings.pdf", all_mean_landings,
        width=400, height=250, units="mm", dpi=300)
 
+# Find monthly mean for each year for the top species of interest -------------
+top_soi2 <- top_soi[, -15]  # remove year column
+top_soi2$Species <- str_trim(top_soi2$Species, side = "both")  # Remove extra white spaces
 
-# Monthly averages over the stable period for the top species of interest -----
-# Filter for 2009-2014
-top_soi_stable <- top_soi %>% filter(between(year, 2009, 2014))
-
-# Find monthly mean for each year
-top_soi_stable <- top_soi_stable[, -15]  # remove year column
-top_soi_stable$Species <- str_trim(top_soi_stable$Species, side = "both")  # Remove extra white spaces
-
-top_soi_means <- top_soi_stable %>% 
+top_soi_means <- top_soi2 %>% 
   group_by(Species, area) %>% 
   summarize(across(January:Landings, mean))
 
@@ -72,24 +66,23 @@ colnames(top_soi_means) <- c("species", "area", months_abbrev)  # Update to abbr
 top_soi_means <- top_soi_means[, c(1, 2, 13, 14, 3:12)]  # Year starts in Nov.
 top_soi_means <- melt(top_soi_means, id_vars = c("area", "species"))
 colnames(top_soi_means) <- c("species", "area", "month", "landings")
-top_soi_means$area <- factor(top_soi_means$area, levels = area_order)
+top_soi_means$area <- factor(top_soi_means2$area, levels = area_order)
 
 # Plot monthly means for stable period
-monthly_areas_stable <- ggplot(top_soi_means, aes(y = landings, x = month, fill = species)) +
+monthly_areas <- ggplot(top_soi_means, aes(y = landings, x = month, fill = species)) +
   geom_bar(position = "stack", stat = "identity") +
-  ylab("mean landings (lbs)") + xlab("mean across 2009-2014") +
+  ylab("mean landings (lbs)") + xlab(" ") +
   theme_bw() +
   scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~area, ncol = 3, scale = "free")
 
-ggsave(filename="DFW pdf data/Figures/area_monthly_landings_stable.pdf", monthly_areas_stable,
+ggsave(filename="DFW pdf data/Figures/area_monthly_landings.pdf", monthly_areas,
        width=400, height=250, units="mm", dpi=300)
 
 
-# Overall monthly trends for species of interest across the stable period -----
-all_soi_stable <- all_soi %>% filter(between(year, 2009, 2014))
-overall_means <- all_soi_stable %>% 
+# Overall monthly trends for species of interest ------------------------------
+overall_means <- all_soi %>% 
   group_by(Species) %>% 
   summarize(across(January:Landings, mean))
 
@@ -99,15 +92,15 @@ overall_means <- overall_means[, c(1, 12, 13, 2:11)]
 overall_means <- melt(overall_means, id_vars = c("species"))
 colnames(overall_means) <- c("species", "month", "landings")
 
-monthly_stable <- ggplot(overall_means, aes(y = landings, x = month)) +
+monthly_species <- ggplot(overall_means, aes(y = landings, x = month)) +
   geom_bar(position = "stack", stat = "identity") +
-  ylab("mean landings (lbs)") + xlab("mean across 2009-2014") +
+  ylab("mean landings (lbs)") + xlab(" ") +
   theme_bw() +
   scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~species, ncol = 4, scale = "free")
 
-ggsave(filename="DFW pdf data/Figures/monthly_species_stable.pdf", monthly_stable,
+ggsave(filename="DFW pdf data/Figures/monthly_species.pdf", monthly_species,
        width=400, height=300, units="mm", dpi=300)
 
 

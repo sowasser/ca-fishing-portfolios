@@ -120,59 +120,26 @@ soi_plots$year <- as.factor(soi_plots$year)
 soi_plots <- melt(soi_plots, id_vars = c("species", "area", "year"))
 colnames(soi_plots) <- c("species", "area", "year", "month", "landings")
 
-# Dungeness Crab
-crab <- soi_plots %>% filter(species == "Dungeness Crab")
-crab_monthly <- ggplot(crab, aes(y = landings, x = month, fill = area)) +
-  geom_bar(position = "stack", stat = "identity") +
-  ylab("mean landings (lbs)") +
-  ggtitle("Dungeness Crab") + 
-  scale_fill_viridis(discrete = TRUE) +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  facet_wrap(~year, ncol = 4, scale = "free")
+soi_fisheries <- levels(factor(soi_plots$species))
 
-ggsave(filename="DFW pdf data/Figures/crab_monthly.pdf", crab_monthly,
-       width=400, height=250, units="mm", dpi=300)
+species_timeseries <- function(fishery) {
+  df <- soi_plots %>% filter(species == fishery)
+  
+  plt <- ggplot(df, aes(x = month, y = landings, fill = area)) +
+    geom_bar(position = "stack", stat = "identity") +
+    ylab("mean landings (lbs)") +
+    ggtitle(fishery) + 
+    scale_fill_viridis(discrete = TRUE) +
+    theme_bw() +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+    facet_wrap(~year, ncol = 4, scale = "free")
+  
+  ggsave(filename=paste("DFW pdf data/Figures/Species timeseries/", fishery, "_revenue.pdf", 
+                        sep=""), 
+         plot=plt, width=400, height=250, units="mm", dpi=300)
+}
 
-
-# Salmon
-salmon <- soi_plots %>% filter(species == "Salmon")
-salmon_monthly <- ggplot(salmon, aes(y = landings, x = month, fill = area)) +
-  geom_bar(position = "stack", stat = "identity") +
-  ylab("mean landings (lbs)") +
-  ggtitle("Salmon") + 
-  scale_fill_viridis(discrete = TRUE) +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  facet_wrap(~year, ncol = 4, scale = "free")
-
-ggsave(filename="DFW pdf data/Figures/salmon_monthly.pdf", salmon_monthly,
-       width=400, height=250, units="mm", dpi=300)
-
-# Groundfish
-groundfish <- soi_plots %>% filter(species == "Groundfish")
-groundfish_monthly <- ggplot(groundfish, aes(y = landings, x = month, fill = area)) +
-  geom_bar(position = "stack", stat = "identity") +
-  ylab("mean landings (lbs)") +
-  ggtitle("groundfish") + 
-  scale_fill_viridis(discrete = TRUE) +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  facet_wrap(~year, ncol = 4, scale = "free")
-
-ggsave(filename="DFW pdf data/Figures/groundfish_monthly.pdf", groundfish_monthly,
-       width=400, height=250, units="mm", dpi=300)
-
-# Market Squid
-squid <- soi_plots %>% filter(species == "Market Squid")
-squid_monthly <- ggplot(squid, aes(y = landings, x = month, fill = area)) +
-  geom_bar(position = "stack", stat = "identity") +
-  ylab("mean landings (lbs)") +
-  ggtitle("Market Squid") + 
-  scale_fill_viridis(discrete = TRUE) +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  facet_wrap(~year, ncol = 4, scale = "free")
-
-ggsave(filename="DFW pdf data/Figures/squid_monthly.pdf", squid_monthly,
-       width=400, height=250, units="mm", dpi=300)
+# Function call for each species ----------------------------------------------
+for (s in soi_fisheries) {
+  species_timeseries(s)
+}

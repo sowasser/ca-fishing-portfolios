@@ -242,5 +242,9 @@ total_plot <- ggplot(total_landings, aes(y = landings, x = reorder(Species, -lan
 ggsave(filename="DFW pdf data/Figures/all_soi_landings.pdf", total_plot,
        width=300, height=150, units="mm", dpi=300)
 
-# Write a .csv file with just the species of interest
-write.csv(all_soi, "Data/dfw_areas_soi.csv", row.names = FALSE)
+# Write .csv files for all SOI and the top SOI --------------------------------
+write.csv(all_soi, "Data/dfw_areas_all_soi.csv", row.names = FALSE)
+
+top_soi <- rbind(squid, pelagics, groundfish, crab, urchin, shrimp, 
+                 herring_roe, salmon, yellow_skip)
+write.csv(top_soi, "Data/dfw_areas_top_soi.csv", row.names = FALSE)

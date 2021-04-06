@@ -20,8 +20,21 @@ area_order <- c("Eureka", "Fort Bragg", "Bodega Bay", "San Francisco",
                 "Monterey", "Morro Bay", "Santa Barbara", "Los Angeles",
                 "San Diego")
 
+# Abbreviation of months for nice plots
 months_abbrev <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", 
                    "Sep", "Oct", "Nov", "Dec")
+
+# Species of interest ordered by highest landings 
+species_order <- c("Market Squid", "Pelagics", "Groundfish", "Dungeness Crab",
+                   "Red Sea Urchin", "Ocean Shrimp", "Herring Roe", "Salmon", 
+                   "Yellowfin_Skipjack", "Spiny Lobster", "Hagfish", 
+                   "Pacific Bonito", "Rock Crab", "Swordfish", 
+                   "Ridgeback Prawn", "Albacore Tuna", "Bigeye Tuna", 
+                   "Spot Prawn", "Opah", "other")
+# Top species of interest ordered by highest landings
+top_species_order <- c("Market Squid", "Pelagics", "Groundfish", 
+                       "Dungeness Crab","Red Sea Urchin", "Ocean Shrimp",
+                       "Herring Roe", "Salmon")
 
 
 # All landings ----------------------------------------------------------------
@@ -50,6 +63,7 @@ all_mean_landings <- ggplot(all_means, aes(y = landings, x = month)) +
 ggsave(filename="DFW pdf data/Figures/all_landings.pdf", all_mean_landings,
        width=400, height=250, units="mm", dpi=300)
 
+
 # Find monthly mean for each year for the top species of interest -------------
 top_soi2 <- top_soi[, -15]  # remove year column
 top_soi2$Species <- str_trim(top_soi2$Species, side = "both")  # Remove extra white spaces
@@ -66,7 +80,8 @@ colnames(top_soi_means) <- c("species", "area", months_abbrev)  # Update to abbr
 top_soi_means <- top_soi_means[, c(1, 2, 13, 14, 3:12)]  # Year starts in Nov.
 top_soi_means <- melt(top_soi_means, id_vars = c("area", "species"))
 colnames(top_soi_means) <- c("species", "area", "month", "landings")
-top_soi_means$area <- factor(top_soi_means2$area, levels = area_order)
+top_soi_means$area <- factor(top_soi_means$area, levels = area_order)
+top_soi_means$species <- factor(top_soi_means$species, levels = top_species_order)
 
 # Plot monthly means for stable period
 monthly_areas <- ggplot(top_soi_means, aes(y = landings, x = month, fill = species)) +
@@ -91,6 +106,7 @@ colnames(overall_means) <- c("species", months_abbrev)
 overall_means <- overall_means[, c(1, 12, 13, 2:11)]
 overall_means <- melt(overall_means, id_vars = c("species"))
 colnames(overall_means) <- c("species", "month", "landings")
+overall_means$species <- factor(overall_means$species, levels = species_order)
 
 monthly_species <- ggplot(overall_means, aes(y = landings, x = month)) +
   geom_bar(position = "stack", stat = "identity") +

@@ -249,6 +249,6 @@ ggsave(filename="DFW pdf data/Figures/all_soi_landings.pdf", total_plot,
 # Write .csv files for all SOI and the top SOI --------------------------------
 write.csv(all_soi, "Data/dfw_areas_all_soi.csv", row.names = FALSE)
 
-top_soi <- rbind(squid, pelagics, groundfish, crab, urchin, shrimp, 
-                 herring_roe, salmon)
+top_soi <- all_soi %>% filter(str_detect(Species, 
+                                         "Market Squid|Pelagics|Groundfish|Dungeness Crab|Red Sea Urchin|Ocean Shrimp|Herring Roe|Salmon"))
 write.csv(top_soi, "Data/dfw_areas_top_soi.csv", row.names = FALSE)

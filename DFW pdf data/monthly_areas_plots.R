@@ -118,37 +118,3 @@ monthly_species <- ggplot(overall_means, aes(y = landings, x = month)) +
 
 ggsave(filename="DFW pdf data/Figures/monthly_species.pdf", monthly_species,
        width=400, height=300, units="mm", dpi=300)
-
-
-# Yearly trends for species of interest ---------------------------------------
-soi_plots <- all_soi[, -14]  # create new df for plots & remove total landings
-soi_plots$area <- factor(soi_plots$area, levels = area_order)
-colnames(soi_plots) <- c("species", months_abbrev, "year", "area")
-soi_plots <- soi_plots[, c(1, 15, 14, 12, 13, 2:11)]
-soi_plots$year <- as.factor(soi_plots$year)
-soi_plots <- melt(soi_plots, id_vars = c("species", "area", "year"))
-colnames(soi_plots) <- c("species", "area", "year", "month", "landings")
-
-soi_fisheries <- levels(factor(soi_plots$species))
-
-species_timeseries <- function(fishery) {
-  df <- soi_plots %>% filter(species == fishery)
-  
-  plt <- ggplot(df, aes(x = month, y = landings, fill = area)) +
-    geom_bar(position = "stack", stat = "identity") +
-    ylab("mean landings (lbs)") + xlab(" ") +
-    ggtitle(fishery) + 
-    scale_fill_viridis(discrete = TRUE) +
-    theme_bw() +
-    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-    facet_wrap(~year, ncol = 4, scale = "free")
-  
-  ggsave(filename=paste("DFW pdf data/Figures/Species timeseries/", fishery, "_revenue.pdf", 
-                        sep=""), 
-         plot=plt, width=400, height=250, units="mm", dpi=300)
-}
-
-# Function call for each species 
-for (s in soi_fisheries) {
-  species_timeseries(s)
-}

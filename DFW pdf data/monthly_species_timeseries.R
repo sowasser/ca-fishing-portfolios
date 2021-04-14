@@ -3,7 +3,8 @@
 # https://wildlife.ca.gov/Fishing/Commercial/Landings
 
 # In this script, graphs of monthly landings for each of the species, faceted 
-# by year 
+# by year, are created with the appropriate year labels demonstrating the 
+# correct month/year combination.
 
 library(dplyr)
 library(reshape2)
@@ -11,10 +12,8 @@ library(ggplot2)
 library(viridis)
 
 
-# Import datasets for all areas and for species of interest
-all_areas <- read.csv("Data/DFW areas/all_areas.csv")
+# Import dataset for all species of interest
 all_soi <- read.csv("Data/dfw_areas_all_soi.csv")
-top_soi <- read.csv("Data/dfw_areas_top_soi.csv")
 
 # Order of areas from North -> South
 area_order <- c("Eureka", "Fort Bragg", "Bodega Bay", "San Francisco", 
@@ -37,8 +36,6 @@ colnames(soi_plots) <- c("species", "area", "year", "month", "landings")
 
 
 # Replace simple years with a year range --------------------------------------
-years <- as.character(2000:2019)
-
 new_year <- function(this_year) {
   # Function creates a new year label depending on the month so that the years
   # actually match up with the month order used for assessing the fisheries,
@@ -62,18 +59,23 @@ new_year <- function(this_year) {
   return(df)
 }
 
+# Call function for all years
+years <- as.character(2000:2019)
+
 for (y in years) {
   soi_plots <- new_year(y)
 }
 
-
 # Remove rows that include years without any data
 soi_plots <- soi_plots %>% filter(!year == "2019-2020")
 
-# Create plots in a loop ------------------------------------------------------
+
+# Create plots in a function --------------------------------------------------
 soi_fisheries <- levels(factor(soi_plots$species))
 
 species_timeseries <- function(fishery) {
+  # Function creates an plot for each of the species of interest with a unique
+  # title and saves them all to one folder with unique name.
   df <- soi_plots %>% filter(species == fishery)
   
   plt <- ggplot(df, aes(x = month, y = landings, fill = area)) +

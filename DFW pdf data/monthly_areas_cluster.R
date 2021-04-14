@@ -21,8 +21,10 @@ fishyear$month <- as.factor(fishyear$month)
 squid <- fishyear %>% filter(str_detect(species, "Squid"))
 squid <- squid[, -1]
 
+# Create dissimilarity matrix using Gower metric
 gower_df <- daisy(squid, metric = "gower")
 
+# Determine ideal number of clusters
 silhouette <- c()
 silhouette = c(silhouette, NA)
 for(i in 2:10){
@@ -37,9 +39,11 @@ plot(1:10, silhouette,
      ylab = "Silhouette Width")
 lines(1:10, silhouette)
 
+# Examine medoids
 pam <- pam(gower_df, diss = TRUE, k = 6)
 squid[pam$meoids, ]
 
+# Conduct partitioning "around medoids"
 pam_summary <- squid %>% 
   mutate(cluster = pam$clustering) %>% 
   group_by(cluster) %>% 

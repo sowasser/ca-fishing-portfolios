@@ -69,6 +69,8 @@ for (y in years) {
 # Remove rows that include years without any data
 soi_plots <- soi_plots %>% filter(!year == "2019-2020")
 
+write.csv(soi_plots, "Data/DFW areas/fisheries_year_soi.csv", row.names = FALSE)
+
 
 # Create plots in a function --------------------------------------------------
 soi_fisheries <- levels(factor(soi_plots$species))

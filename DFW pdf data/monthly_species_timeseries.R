@@ -37,12 +37,13 @@ colnames(soi_plots) <- c("species", "area", "year", "month", "landings")
 
 
 # Replace simple years with a year range --------------------------------------
-years <- c("2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", 
-           "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015",
-           "2016", "2017", "2018", "2019")
 years <- as.character(2000:2019)
 
 new_year <- function(this_year) {
+  # Function creates a new year label depending on the month so that the years
+  # actually match up with the month order used for assessing the fisheries,
+  # which composes November & December of one year, then January-October of the
+  # next. 
   df <- soi_plots
   df <- within(df, year[year == this_year & month == "Nov" | 
                           year == this_year & month == "Dec"] 
@@ -67,10 +68,7 @@ for (y in years) {
 
 
 # Remove rows that include years without any data
-df <- df %>% filter(!year == "1999-2000" & !year == "2019-2020")
-
-# Rename temporary dataframe to match previous dataframe
-soi_plots <- df
+soi_plots <- soi_plots %>% filter(!year == "2019-2020")
 
 # Create plots in a loop ------------------------------------------------------
 soi_fisheries <- levels(factor(soi_plots$species))

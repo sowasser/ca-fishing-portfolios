@@ -208,12 +208,13 @@ kwAllPairsNemenyiTest(sd_means$value ~ sd_means$Species)
 
 # Anderson-Darling test to see if all of the species come from one dist.
 total_means <- list(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
-                     c(colMeans(pelagics_means[, -c(1, 2)], na.rm = TRUE)),
-                     c(colMeans(groundfish_means[, -c(1, 2)], na.rm = TRUE)),
-                     c(colMeans(urchin_means[, -c(1, 2)], na.rm = TRUE)),
-                     c(colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE)),
-                     c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
-                     c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
+                    c(colMeans(pelagics_means[, -c(1, 2)], na.rm = TRUE)),
+                    c(colMeans(groundfish_means[, -c(1, 2)], na.rm = TRUE)),
+                    c(colMeans(crab_means[, -c(1, 2)], na.rm = TRUE)),
+                    c(colMeans(urchin_means[, -c(1, 2)], na.rm = TRUE)),
+                    c(colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE)),
+                    c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
+                    c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
 
 ad.test(total_means)  # p = 1.045e-16 / 7.000e-17
 
@@ -221,13 +222,14 @@ ad.test(total_means)  # p = 1.045e-16 / 7.000e-17
 total_means2 <- cbind(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
                       c(colMeans(pelagics_means[, -c(1, 2)], na.rm = TRUE)),
                       c(colMeans(groundfish_means[, -c(1, 2)], na.rm = TRUE)),
+                      c(colMeans(crab_means[, -c(1, 2)], na.rm = TRUE)),
                       c(colMeans(urchin_means[, -c(1, 2)], na.rm = TRUE)),
                       c(colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE)),
                       c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
                       c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
-colnames(total_means2) <- c("Market Squid", "Coastal Pelagics", "Groundfish",
-                            "Red Sea Urchin", "Ocean Shrimp", "Herring Roe",
-                            "Salmon")
+colnames(total_means2) <- c("Market Squid", "Pelagics", "Groundfish", 
+                            "Dungeness Crab", "Red Sea Urchin", "Ocean Shrimp",
+                            "Herring Roe", "Salmon")
 
 species_cor <- cor(total_means2)
 

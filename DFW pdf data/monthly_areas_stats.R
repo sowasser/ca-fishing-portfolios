@@ -7,6 +7,8 @@ library(reshape2)
 library(PMCMRplus)
 library(kSamples)
 library(ggcorrplot)
+library(ggplot2)
+library(viridis)
 
 all_soi <- read.csv("Data/dfw_areas_all_soi.csv")
 top_soi <- read.csv("Data/dfw_areas_top_soi.csv")
@@ -230,3 +232,28 @@ colnames(total_means2) <- c("Market Squid", "Coastal Pelagics", "Groundfish",
 species_cor <- cor(total_means2)
 
 ggcorrplot(species_cor, hc.order = TRUE, type = "lower")
+
+# Density plot of top species of interest
+total_means_long <- total_means2[c(11, 12, 1:10), ]  # re-order months
+row.names(total_means_long) <- NULL  # Re-set row-names for plotting
+total_means_long <- melt(total_means_long)
+colnames(total_means_long) <- c("month", "species", "landings")
+
+months <- c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", 
+            "Aug", "Sep", "Oct")
+
+species_overlap <- ggplot(total_means_long, aes(x = month, y = landings, fill = species)) +
+  theme_bw() +
+  geom_area(position = "identity", alpha = 0.6) +
+  scale_fill_viridis(discrete = TRUE) +
+  scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7 ,8 ,9, 10, 11, 12), 
+                     labels = c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", 
+                                "May", "Jun", "Jul", "Aug", "Sep", "Oct")) +
+  xlab(" ") + ylab("mean landings") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+ggsave(filename="DFW pdf data/Figures/species_overlap.pdf", 
+       plot=species_overlap, width=200, height=130, units="mm", dpi=300)
+
+
+

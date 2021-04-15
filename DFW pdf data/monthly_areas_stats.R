@@ -36,26 +36,26 @@ groundfish_year_means <- groundfish_year_means[, -2]
 kruskal.test(groundfish_year_means$value ~ groundfish_year_means$year)  # p = 1.7e-07****
 
 # Dungeness Crab
-crab_year_means <- year_means %>% filter(str_detect(Species, "Dungeness"))
-crab_year_means <- melt(crab_year_means[, -1], id.vars = "year")
+crab_means <- year_means %>% filter(str_detect(Species, "Dungeness"))
+crab_year_means <- melt(crab_means[, -1], id.vars = "year")
 crab_year_means <- crab_year_means[, -2]
 kruskal.test(crab_year_means$value ~ crab_year_means$year)  # p = 0.6775
 
 # Red Sea Urchin
-urchin_year_means <- year_means %>% filter(str_detect(Species, "Urchin"))
-urchin_year_means <- melt(urchin_year_means[, -1], id.vars = "year")
+urchin_means <- year_means %>% filter(str_detect(Species, "Urchin"))
+urchin_year_means <- melt(urchin_means[, -1], id.vars = "year")
 urchin_year_means <- urchin_year_means[, -2]
 kruskal.test(urchin_year_means$value ~ urchin_year_means$year)  # p < 2.2e-16****
 
 # Ocean Shrimp
-shrimp_year_means <- year_means %>% filter(str_detect(Species, "Ocean Shrimp"))
-shrimp_year_means <- melt(shrimp_year_means[, -1], id.vars = "year")
+shrimp_means <- year_means %>% filter(str_detect(Species, "Ocean Shrimp"))
+shrimp_year_means <- melt(shrimp_means[, -1], id.vars = "year")
 shrimp_year_means <- shrimp_year_means[, -2]
 kruskal.test(shrimp_year_means$value ~ shrimp_year_means$year)  # p = 0.2062
 
 # Herring Roe
-roe_year_means <- year_means %>% filter(str_detect(Species, "Roe"))
-roe_year_means <- melt(roe_year_means[, -1], id.vars = "year")
+roe_means <- year_means %>% filter(str_detect(Species, "Roe"))
+roe_year_means <- melt(roe_means[, -1], id.vars = "year")
 roe_year_means <- roe_year_means[, -2]
 kruskal.test(roe_year_means$value ~ roe_year_means$year)  # p = .5099
 
@@ -198,3 +198,16 @@ sd_means$Species <- as.factor(sd_means$Species)
 
 kruskal.test(sd_means$value ~ sd_means$Species)  # p = 4.756e-13****
 kwAllPairsNemenyiTest(sd_means$value ~ sd_means$Species)
+
+
+# Species correlation across momths -------------------------------------------
+total_means <- rbind(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE),
+                     colMeans(pelagics_means[, -c(1, 2)], na.rm = TRUE),
+                     colMeans(groundfish_means[, -c(1, 2)], na.rm = TRUE),
+                     colMeans(urchin_means[, -c(1, 2)], na.rm = TRUE),
+                     colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE),
+                     colMeans(roe_means[, -c(1, 2)], na.rm = TRUE),
+                     colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE))
+row.names(total_means) <- c("Market Squid", "Coastal Pelagics", "Groundfish", 
+                            "Red Sea Urchin", "Ocean Shrimp", "Herring Roe",
+                            "Salmon")

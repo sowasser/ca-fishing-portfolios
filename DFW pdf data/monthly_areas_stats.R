@@ -6,7 +6,6 @@ library(dplyr)
 library(reshape2)
 library(PMCMRplus)
 library(kSamples)
-library(ggcorrplot)
 library(ggplot2)
 library(viridis)
 
@@ -205,7 +204,6 @@ kwAllPairsNemenyiTest(sd_means$value ~ sd_means$Species)
 
 
 # Species distribution across months ------------------------------------------
-
 # Anderson-Darling test to see if all of the species come from one dist.
 total_means <- list(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
                     c(colMeans(pelagics_means[, -c(1, 2)], na.rm = TRUE)),
@@ -231,9 +229,23 @@ colnames(total_means2) <- c("Market Squid", "Pelagics", "Groundfish",
                             "Dungeness Crab", "Red Sea Urchin", "Ocean Shrimp",
                             "Herring Roe", "Salmon")
 
-species_cor <- cor(total_means2)
+# Get correlation & round to 2 decimal places for plot
+species_cor <- round(cor(total_means2, method = "spearman"), 2)
 
-ggcorrplot(species_cor, hc.order = TRUE, type = "lower")
+species_cor_plot <- ggplot(melt(species_cor), aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile(height = 0.8, width = 0.8) +
+  scale_fill_gradient2(low="blue", mid="white", high="red", limits = c(-1, 1)) +
+  geom_text(aes(Var2, Var1, label = value), color = "black", size = 3) +
+  theme_minimal() +
+  coord_equal() +
+  labs(x =" ", y = "", fill = "Correlation") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, margin = margin(-3,0,0,0)),
+        axis.text.y = element_text(margin = margin(0, -3, 0, 0)),
+        panel.grid.major = element_blank())
+
+ggsave(filename = "DFW pdf data/Figures/species_correlations.pdf", 
+       plot = species_cor_plot, width = 195, height = 160, units = "mm", dpi = 300)
+
 
 # Density plot of top species of interest
 total_means_long <- total_means2[c(11, 12, 1:10), ]  # re-order months
@@ -254,8 +266,5 @@ species_overlap <- ggplot(total_means_long, aes(x = month, y = landings, fill = 
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-ggsave(filename="DFW pdf data/Figures/species_overlap.pdf", 
-       plot=species_overlap, width=200, height=130, units="mm", dpi=300)
-
-
-
+ggsave(filename = "DFW pdf data/Figures/species_overlap.pdf", 
+       plot = species_overlap, width = 200, height = 130, units = "mm", dpi = 300)

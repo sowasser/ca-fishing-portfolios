@@ -216,7 +216,7 @@ total_means <- list(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
                     c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
                     c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
 
-ad.test(total_means)  # p = 1.045e-16 / 7.000e-17
+ad.test(total_means)  # p = 9.375e-18 / 6.108e-18
 
 # Correlation between species
 total_means2 <- cbind(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),

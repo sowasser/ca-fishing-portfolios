@@ -205,7 +205,7 @@ kwAllPairsNemenyiTest(sd_means$value ~ sd_means$Species)
 
 # Species distribution across months ------------------------------------------
 # Anderson-Darling test to see if all of the species come from one dist.
-total_means <- list(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
+total_means_ad <- list(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
                     c(colMeans(pelagics_means[, -c(1, 2)], na.rm = TRUE)),
                     c(colMeans(groundfish_means[, -c(1, 2)], na.rm = TRUE)),
                     c(colMeans(crab_means[, -c(1, 2)], na.rm = TRUE)),
@@ -214,10 +214,10 @@ total_means <- list(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
                     c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
                     c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
 
-ad.test(total_means)  # p = 9.375e-18 / 6.108e-18
+ad.test(total_means_ad)  # p = 9.375e-18 / 6.108e-18
 
-# Correlation between species
-total_means2 <- cbind(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
+# Kruskal-Wallis for all means
+total_means_kw <- rbind(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
                       c(colMeans(pelagics_means[, -c(1, 2)], na.rm = TRUE)),
                       c(colMeans(groundfish_means[, -c(1, 2)], na.rm = TRUE)),
                       c(colMeans(crab_means[, -c(1, 2)], na.rm = TRUE)),
@@ -225,12 +225,32 @@ total_means2 <- cbind(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
                       c(colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE)),
                       c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
                       c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
-colnames(total_means2) <- c("Market Squid", "Pelagics", "Groundfish", 
+rownames(total_means_kw) <- c("Market Squid", "Pelagics", "Groundfish", 
+                            "Dungeness Crab", "Red Sea Urchin", "Ocean Shrimp",
+                            "Herring Roe", "Salmon")
+total_means_kw <- melt(total_means_kw)
+colnames(total_means_kw) <- c("species", "month", "landings")
+total_means_kw$species <- as.factor(total_means_kw$species)
+
+kruskal.test(total_means_kw$landings ~ total_means_kw$species)
+kwAllPairsNemenyiTest(total_means_kw$landings ~ total_means_kw$species)
+
+
+# Correlation between species
+total_means_cr <- cbind(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
+                      c(colMeans(pelagics_means[, -c(1, 2)], na.rm = TRUE)),
+                      c(colMeans(groundfish_means[, -c(1, 2)], na.rm = TRUE)),
+                      c(colMeans(crab_means[, -c(1, 2)], na.rm = TRUE)),
+                      c(colMeans(urchin_means[, -c(1, 2)], na.rm = TRUE)),
+                      c(colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE)),
+                      c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
+                      c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
+colnames(total_means_cr) <- c("Market Squid", "Pelagics", "Groundfish", 
                             "Dungeness Crab", "Red Sea Urchin", "Ocean Shrimp",
                             "Herring Roe", "Salmon")
 
 # Get correlation & round to 2 decimal places for plot
-species_cor <- round(cor(total_means2, method = "spearman"), 2)
+species_cor <- round(cor(total_means_cr, method = "spearman"), 2)
 
 species_cor_plot <- ggplot(melt(species_cor), aes(x = Var1, y = Var2, fill = value)) +
   geom_tile(height = 0.8, width = 0.8) +

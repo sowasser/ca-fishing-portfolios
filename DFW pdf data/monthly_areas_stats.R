@@ -17,26 +17,26 @@ top_soi <- read.csv("Data/dfw_areas_top_soi.csv")
 # https://www.rdocumentation.org/packages/PMCMR/versions/4.3/topics/posthoc.kruskal.nemenyi.test
 year_means <- all_soi %>% 
   group_by(Species, year) %>% 
-  summarize(across(January:Landings, mean))
+  summarize(across(January:Landings, mean, na.rm = TRUE))
 year_means <- year_means[, -15]  # remove total landings
 
 # Squid
 squid_means <- year_means %>% filter(str_detect(Species, "Squid"))
 squid_year_means <- melt(squid_means[, -1], id.vars = "year")
 squid_year_means <- squid_year_means[, -2]
-kruskal.test(squid_year_means$value ~ squid_year_means$year)  # p = 1.579e-14****
+kruskal.test(squid_year_means$value ~ squid_year_means$year)  # p = 0.03281*
 
 # Pelagics 
 pelagics_means <- year_means %>% filter(str_detect(Species, "Pelagics"))
 pelagics_year_means <- melt(pelagics_means[, -1], id.vars = "year")
 pelagics_year_means <- pelagics_year_means[, -2]
-kruskal.test(pelagics_year_means$value ~ pelagics_year_means$year)  # p = 0.03281*
+kruskal.test(pelagics_year_means$value ~ pelagics_year_means$year)  # p = 1.579e-14****
 
 # Groundfish
 groundfish_means <- year_means %>% filter(str_detect(Species, "Groundfish"))
 groundfish_year_means <- melt(groundfish_means[, -1], id.vars = "year")
 groundfish_year_means <- groundfish_year_means[, -2]
-kruskal.test(groundfish_year_means$value ~ groundfish_year_means$year)  # p = 1.7e-07****
+kruskal.test(groundfish_year_means$value ~ groundfish_year_means$year)  # p = 1.179e-07****
 
 # Dungeness Crab
 crab_means <- year_means %>% filter(str_detect(Species, "Dungeness"))
@@ -66,20 +66,20 @@ kruskal.test(roe_year_means$value ~ roe_year_means$year)  # p = .5099
 salmon_means <- year_means %>% filter(str_detect(Species, "Salmon"))
 salmon_year_means <- melt(salmon_means[, -1], id.vars = "year")
 salmon_year_means <- salmon_year_means[, -2]
-kruskal.test(salmon_year_means$value ~ salmon_year_means$year)  # p = 0.027729*
+kruskal.test(salmon_year_means$value ~ salmon_year_means$year)  # p = 0.02781*
 
 
 # Kruskal-Wallis test for the mean for each area across the stable period ----
 area_means <- all_soi %>% 
   group_by(Species, area) %>% 
-  summarize(across(January:Landings, mean))
+  summarize(across(January:Landings, mean, na.rm = TRUE))
 area_means <- area_means[, -15]  # remove total landings
 
 # Squid
 squid_area_means <- area_means %>% filter(str_detect(Species, "Squid"))
 squid_area_means <- melt(squid_area_means[, -1], id.vars = "area")
 squid_area_means <- squid_area_means[, -2]
-kruskal.test(squid_area_means$value ~ squid_area_means$area)  # p = 1.032e-1****
+kruskal.test(squid_area_means$value ~ squid_area_means$area)  # p = 1.032e-13****
 
 # Pelagics 
 pelagics_area_means <- area_means %>% filter(str_detect(Species, "Pelagics"))
@@ -127,7 +127,7 @@ kruskal.test(salmon_area_means$value ~ salmon_area_means$area)  # p = 0.0003448*
 # Kruskal-Wallis test for the top SOI within each area ------------------------
 top_means <- top_soi %>% 
   group_by(Species, area) %>% 
-  summarize(across(January:Landings, mean))
+  summarize(across(January:Landings, mean, na.rm = TRUE))
 top_means <- top_means[, -15]  # remove total landings
 
 # Eureka

@@ -70,7 +70,7 @@ top_soi2$Species <- str_trim(top_soi2$Species, side = "both")  # Remove extra wh
 
 top_soi_means <- top_soi2 %>% 
   group_by(Species, area) %>% 
-  summarize(across(January:Landings, mean))
+  summarize(across(January:Landings, mean, na.rm = TRUE))
 
 top_soi_means <- top_soi_means[, -15]  # Remove total landings
 
@@ -99,7 +99,7 @@ ggsave(filename="DFW pdf data/Figures/area_monthly_landings.pdf", monthly_areas,
 # Overall monthly trends for species of interest ------------------------------
 overall_means <- all_soi %>% 
   group_by(Species) %>% 
-  summarize(across(January:Landings, mean))
+  summarize(across(January:Landings, mean, na.rm = TRUE))
 
 # Reorder columns & remove total landings
 colnames(overall_means) <- c("species", months_abbrev)

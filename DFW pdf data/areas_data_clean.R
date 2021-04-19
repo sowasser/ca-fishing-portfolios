@@ -87,4 +87,10 @@ all$Species <- str_replace_all(all$Species,
 all_species <- levels(factor(all$Species))
 print(all_species)  # 390 species names
 
+# Fix known issues with species names
+all$Species <- str_replace_all(all$Species, 
+                               c("Lobs ter California spiny" = "Lobster California spiny",
+                                 "Anchovy  northern" = "Anchovy northern",
+                                 "Crab y ellow rock" = "Crab yellow rock"))
+
 write.csv(all, "Data/DFW areas/all_areas.csv", row.names = FALSE)

@@ -10,12 +10,6 @@ library(ggplot2)
 # Import dataset of all areas
 all_areas <- read.csv("Data/DFW areas/all_areas.csv")
 
-# Fix known issues with species names
-all_areas$Species <- str_replace_all(all_areas$Species, 
-                                     c("Lobs ter California spiny" = "Lobster California spiny",
-                                       "Anchovy  northern" = "Anchovy northern",
-                                       "Crab y ellow rock" = "Crab yellow rock"))
-
 # Find most-landed species ----------------------------------------------------
 # Isolate total landings and find mean by year
 high_landings <- all_areas[, c(1, 14:16)]
@@ -78,6 +72,16 @@ swordfish <- all_areas %>% filter(str_detect(Species, "Swordfish")) %>% bind_row
 opah <- all_areas %>% filter(str_detect(Species, "Opah")) %>% bind_rows
 bonito <- all_areas %>% filter(str_detect(Species, "Bonito Pacific")) %>% bind_rows
 prawn_ridge <- all_areas %>% filter(str_detect(Species, "Prawn ridgeback")) %>% bind_rows
+whiting <- all_areas %>% filter(str_detect(Species, "Whiting")) %>% bind_rows
+
+# Halibut ---------------------------------------------------------------------
+halibut <- all_areas %>% filter(str_detect(Species, "Halibut")) %>% bind_rows
+
+# Update dataframe with new species name
+halibut <- halibut[, -1] %>% group_by(area, year) %>%
+  summarize(across(January:Landings, sum))  
+halibut <- cbind(rep("Halibut", length(halibut$year)), halibut[, c(3:15, 2, 1)])
+colnames(halibut) <- initial_cols
 
 # Rock crab -------------------------------------------------------------------
 rock_crab <- all_areas %>% filter(str_detect(Species, 
@@ -134,15 +138,26 @@ shrimp <- shrimp[, -1] %>% group_by(area, year) %>%
 shrimp <- cbind(rep("Ocean Shrimp", length(shrimp$year)), shrimp[, c(3:15, 2, 1)])
 colnames(shrimp) <- initial_cols
 
+# Dover sole, thornyhead, sablefish -------------------------------------------
+deep_trawl <- all_areas %>% filter(str_detect(Species, 
+                                              "Sole Dover|Thornyhead|Sablefish")) %>% bind_rows
+# Update dataframe with new species name
+deep_trawl <- deep_trawl[, -1] %>% group_by(area, year) %>%
+  summarize(across(January:Landings, sum))  
+deep_trawl <- cbind(rep("Dover Sole_Thornyhead_Sablefish", length(deep_trawl$year)), deep_trawl[, c(3:15, 2, 1)])
+colnames(deep_trawl) <- initial_cols
+
 # Groundfish - from list here -------------------------------------------------
 # https://wildlife.ca.gov/Conservation/Marine/Federal-Groundfish 
-groundfish <- all_areas %>% filter(str_detect(Species, 
-                                              "Halibut|Rockfish|Thornyhead|Sablefish|Skate|Shark leopard|Shark soupfin|Shark spiny dogfish|Ratfish|Cabezon|Greenling|Lingcod|Cod|Whiting|Scorpionfish|Flounder|Sole|Sanddab|Grenadiers")) %>% bind_rows
+# Without Dover sole, thornyhead, sablefish
+other_ground <- all_areas %>% filter(str_detect(Species, 
+                                                "Rockfish|Skate|Shark leopard|Shark soupfin|Shark spiny dogfish|Ratfish|Cabezon|Greenling|Lingcod|Cod|Scorpionfish|Flounder|Sole|Sanddab|Grenadiers")) %>% bind_rows
+other_ground <- other_ground %>% filter(!str_detect(Species, "Sole Dover")) %>% bind_rows
 # Update dataframe with new species name
-groundfish <- groundfish[, -1] %>% group_by(area, year) %>%
+other_ground <- other_ground[, -1] %>% group_by(area, year) %>%
   summarize(across(January:Landings, sum))  
-groundfish <- cbind(rep("Groundfish", length(groundfish$year)), groundfish[, c(3:15, 2, 1)])
-colnames(groundfish) <- initial_cols
+other_ground <- cbind(rep("Other Groundfish", length(other_ground$year)), other_ground[, c(3:15, 2, 1)])
+colnames(other_ground) <- initial_cols
 
 # Salmon ----------------------------------------------------------------------
 salmon <- all_areas %>% filter(str_detect(Species, "Salmon")) %>% bind_rows
@@ -208,8 +223,8 @@ colnames(other) <- initial_cols
 # Create dataframe of all species of interest ---------------------------------
 all_soi <- rbind(crab, lobster, squid, albacore, bigeye, yellow_skip, 
                  prawn_spot, prawn_ridge, swordfish, opah, herring_roe, urchin, 
-                 hagfish, shrimp, groundfish, salmon, pelagics, bonito, 
-                 rock_crab, other)
+                 hagfish, shrimp, deep_trawl, other_ground, salmon, pelagics, 
+                 bonito, rock_crab, whiting, halibut, other)
 
 all_soi$Species <- trimws(all_soi$Species)  # trim white space from names
 
@@ -222,7 +237,8 @@ all_soi$Species <- str_replace_all(all_soi$Species,
                                      "Tuna albacore" = "Albacore Tuna",
                                      "Tuna bigeye" = "Bigeye Tuna",
                                      "Bonito Pacific" = "Pacific Bonito",
-                                     "Prawn ridgeback" = "Ridgeback Prawn"))
+                                     "Prawn ridgeback" = "Ridgeback Prawn",
+                                     "Whiting Pacific" = "Pacific Whiting"))
 species <- levels(factor(all_soi$Species))  # list of species
 print(species)  # check species list
 

@@ -6,10 +6,11 @@ library(stringr)
 library(dplyr)
 library(reshape2)
 library(PMCMRplus)
+library(vegan)
 
 # Read in cleaned data with only the fisheries of interest
-all_soi <- read.csv("Data/dfw_areas_all_soi.csv")
-all_soi <- all_soi[, -14]  # remove total landings column
+all_soi_original <- read.csv("Data/dfw_areas_all_soi.csv")
+all_soi <- all_soi_original[, -14]  # remove total landings column
 
 # Remove more southern areas where salmon aren't fished
 salmon_areas <- all_soi %>% 
@@ -57,6 +58,39 @@ after_means <- salmon_areas %>%
   group_by(Species) %>% 
   summarize(across(January:December, mean, na.rm = TRUE))
 after_means <- melt(after_means, id.vars = c("Species"))
+
+# Mean of total landings across all years & areas
+closed_all <- all_soi_original %>%
+  filter(year %in% closed_years)
+closed_all <- closed_all[, c("Species", "Landings")]
+closed_all <- closed_all %>%
+  group_by(Species) %>%
+  summarise_at(vars(Landings),
+               list(landings = mean))
+
+before_all <- all_soi_original %>%
+  filter(year %in% before_years)
+before_all <- before_all[, c("Species", "Landings")]
+before_all <- before_all %>%
+  group_by(Species) %>%
+  summarise_at(vars(Landings),
+               list(landings = mean))
+
+after_all <- all_soi_original %>%
+  filter(year %in% after_years)
+after_all <- after_all[, c("Species", "Landings")]
+after_all <- after_all %>%
+  group_by(Species) %>%
+  summarise_at(vars(Landings),
+               list(landings = mean))
+
+
+# Shannon index for species across all areas and years ------------------------
+# These are unitless, so hard to compare. See:
+# https://www.researchgate.net/post/Comparing-Shannon-Index-H-values-between-two-communities 
+shannon_closed <- diversity(closed_all$landings)
+shannon_before <- diversity(before_all$landings)
+shannon_after <- diversity(after_all$landings)
 
 
 # Compare fisheries of interest correlated with salmon across periods 

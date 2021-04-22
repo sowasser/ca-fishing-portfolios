@@ -1,6 +1,9 @@
 # Script for stats on species parings (complimentary vs. substitutional) for 
 # the DFW data, aggregated by area and month, for the species of interest.
 
+# Information on Nemenyi post-hoc test here: 
+# https://www.rdocumentation.org/packages/PMCMR/versions/4.3/topics/posthoc.kruskal.nemenyi.test
+
 library(stringr)
 library(dplyr)
 library(reshape2)
@@ -13,8 +16,6 @@ all_soi <- read.csv("Data/dfw_areas_all_soi.csv")
 top_soi <- read.csv("Data/dfw_areas_top_soi.csv")
 
 # Kruskal-Wallis test for the mean by year for top SOI ------------------------
-# Information on Nemenyi post-hoc test here: 
-# https://www.rdocumentation.org/packages/PMCMR/versions/4.3/topics/posthoc.kruskal.nemenyi.test
 year_means <- all_soi %>% 
   group_by(Species, year) %>% 
   summarize(across(January:Landings, mean, na.rm = TRUE))
@@ -32,11 +33,23 @@ pelagics_year_means <- melt(pelagics_means[, -1], id.vars = "year")
 pelagics_year_means <- pelagics_year_means[, -2]
 kruskal.test(pelagics_year_means$value ~ pelagics_year_means$year)  # p = 1.579e-14****
 
-# Groundfish
-groundfish_means <- year_means %>% filter(str_detect(Species, "Groundfish"))
+# Dover Sole / Thornyhead / Sablefish 
+dsts_means <- year_means %>% filter(str_detect(Species, "Dover Sole_Thornyhead_Sablefish"))
+dsts_year_means <- melt(dsts_means[, -1], id.vars = "year")
+dsts_year_means <- dsts_year_means[, -2]
+kruskal.test(dsts_year_means$value ~ dsts_year_means$year)  # p = 1.177e-05****
+
+# Pacific Whiting
+whiting_means <- year_means %>% filter(str_detect(Species, "Whiting"))
+whiting_year_means <- melt(whiting_means[, -1], id.vars = "year")
+whiting_year_means <- whiting_year_means[, -2]
+kruskal.test(whiting_year_means$value ~ whiting_year_means$year)  # p = 0.1134
+
+# Other Groundfish
+groundfish_means <- year_means %>% filter(str_detect(Species, "Other Groundfish"))
 groundfish_year_means <- melt(groundfish_means[, -1], id.vars = "year")
 groundfish_year_means <- groundfish_year_means[, -2]
-kruskal.test(groundfish_year_means$value ~ groundfish_year_means$year)  # p = 1.179e-07****
+kruskal.test(groundfish_year_means$value ~ groundfish_year_means$year)  # p = 4.141e-14****
 
 # Dungeness Crab
 crab_means <- year_means %>% filter(str_detect(Species, "Dungeness"))
@@ -87,8 +100,20 @@ pelagics_area_means <- melt(pelagics_area_means[, -1], id.vars = "area")
 pelagics_area_means <- pelagics_area_means[, -2]
 kruskal.test(pelagics_area_means$value ~ pelagics_area_means$area)  # p = 2.447e-16****
 
-# Groundfish
-groundfish_area_means <- area_means %>% filter(str_detect(Species, "Groundfish"))
+# Dover Sole / Thornyhead / Sablefish 
+dsts_area_means <- area_means %>% filter(str_detect(Species, "Dover Sole_Thornyhead_Sablefish"))
+dsts_area_means <- melt(dsts__area_means[, -1], id.vars = "area")
+dsts_area_means <- dsts_area_means[, -2]
+kruskal.test(dsts_area_means$value ~ dsts_area_means$area)  # p < 2.2e-16****
+
+# Pacific Whiting
+whiting_area_means <- area_means %>% filter(str_detect(Species, "Whiting"))
+whiting_area_means <- melt(whiting_area_means[, -1], id.vars = "area")
+whiting_area_means <- whiting_area_means[, -2]
+kruskal.test(whiting_area_means$value ~ whiting_area_means$area)  # p = 5.185e-10****
+
+# Other Groundfish
+groundfish_area_means <- area_means %>% filter(str_detect(Species, "Other Groundfish"))
 groundfish_area_means <- melt(groundfish_area_means[, -1], id.vars = "area")
 groundfish_area_means <- groundfish_area_means[, -2]
 kruskal.test(groundfish_area_means$value ~ groundfish_area_means$area)  # p < 2.2e-16****
@@ -206,48 +231,58 @@ kwAllPairsNemenyiTest(sd_means$value ~ sd_means$Species)
 # Species distribution across months ------------------------------------------
 # Anderson-Darling test to see if all of the species come from one dist.
 total_means_ad <- list(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
-                    c(colMeans(pelagics_means[, -c(1, 2)], na.rm = TRUE)),
-                    c(colMeans(groundfish_means[, -c(1, 2)], na.rm = TRUE)),
-                    c(colMeans(crab_means[, -c(1, 2)], na.rm = TRUE)),
-                    c(colMeans(urchin_means[, -c(1, 2)], na.rm = TRUE)),
-                    c(colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE)),
-                    c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
-                    c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
+                       c(colMeans(pelagics_means[, -c(1, 2)], na.rm = TRUE)),
+                       c(colMeans(dsts_means[, -c(1, 2)], na.rm = TRUE)),
+                       c(colMeans(whiting_means[, -c(1, 2)], na.rm = TRUE)),
+                       c(colMeans(groundfish_means[, -c(1, 2)], na.rm = TRUE)),
+                       c(colMeans(crab_means[, -c(1, 2)], na.rm = TRUE)),
+                       c(colMeans(urchin_means[, -c(1, 2)], na.rm = TRUE)),
+                       c(colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE)),
+                       c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
+                       c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
 
-ad.test(total_means_ad)  # p = 9.375e-18 / 6.108e-18
+ad.test(total_means_ad)  # p = 2.213e-21 / 1.368e-21****
 
 # Kruskal-Wallis for all means
 total_means_kw <- rbind(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
-                      c(colMeans(pelagics_means[, -c(1, 2)], na.rm = TRUE)),
-                      c(colMeans(groundfish_means[, -c(1, 2)], na.rm = TRUE)),
-                      c(colMeans(crab_means[, -c(1, 2)], na.rm = TRUE)),
-                      c(colMeans(urchin_means[, -c(1, 2)], na.rm = TRUE)),
-                      c(colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE)),
-                      c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
-                      c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
-rownames(total_means_kw) <- c("Market Squid", "Pelagics", "Groundfish", 
-                            "Dungeness Crab", "Red Sea Urchin", "Ocean Shrimp",
-                            "Herring Roe", "Salmon")
+                        c(colMeans(pelagics_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(dsts_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(whiting_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(groundfish_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(crab_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(urchin_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
+rownames(total_means_kw) <- c("Market Squid", "Coastal Pelagics", 
+                              "Dover Sole/Thornyhead/Sablefish", 
+                              "Pacific Whiting", "Other Groundfish", 
+                              "Dungeness Crab", "Red Sea Urchin", 
+                              "Ocean Shrimp", "Herring Roe", "Salmon")
 total_means_kw <- melt(total_means_kw)
 colnames(total_means_kw) <- c("species", "month", "landings")
 total_means_kw$species <- as.factor(total_means_kw$species)
 
-kruskal.test(total_means_kw$landings ~ total_means_kw$species)
+kruskal.test(total_means_kw$landings ~ total_means_kw$species)  # p = 2.738e-12****
 kwAllPairsNemenyiTest(total_means_kw$landings ~ total_means_kw$species)
 
 
 # Correlation between species
 total_means_cr <- cbind(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
-                      c(colMeans(pelagics_means[, -c(1, 2)], na.rm = TRUE)),
-                      c(colMeans(groundfish_means[, -c(1, 2)], na.rm = TRUE)),
-                      c(colMeans(crab_means[, -c(1, 2)], na.rm = TRUE)),
-                      c(colMeans(urchin_means[, -c(1, 2)], na.rm = TRUE)),
-                      c(colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE)),
-                      c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
-                      c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
-colnames(total_means_cr) <- c("Market Squid", "Pelagics", "Groundfish", 
-                            "Dungeness Crab", "Red Sea Urchin", "Ocean Shrimp",
-                            "Herring Roe", "Salmon")
+                        c(colMeans(pelagics_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(dsts_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(whiting_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(groundfish_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(crab_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(urchin_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
+                        c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
+colnames(total_means_cr) <- c("Market Squid", "Coastal Pelagics", 
+                              "Dover Sole/Thornyhead/Sablefish", 
+                              "Pacific Whiting", "Other Groundfish", 
+                              "Dungeness Crab", "Red Sea Urchin", 
+                              "Ocean Shrimp", "Herring Roe", "Salmon")
 
 # Get correlation & round to 2 decimal places for plot
 species_cor <- round(cor(total_means_cr, method = "spearman"), 2)
@@ -263,7 +298,7 @@ species_cor_plot <- ggplot(melt(species_cor), aes(x = Var1, y = Var2, fill = val
         axis.text.y = element_text(margin = margin(0, -3, 0, 0)),
         panel.grid.major = element_blank())
 
-ggsave(filename = "DFW pdf data/Figures/species_correlations.pdf", 
+ggsave(filename = "DFW pdf data/Figures/species_correlations.pdf", k
        plot = species_cor_plot, width = 195, height = 160, units = "mm", dpi = 300)
 
 

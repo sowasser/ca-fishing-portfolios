@@ -7,6 +7,7 @@ library(dplyr)
 library(reshape2)
 library(PMCMRplus)
 library(vegan)
+library(iNEXT)
 
 # Read in cleaned data with only the fisheries of interest
 all_soi_original <- read.csv("Data/dfw_areas_all_soi.csv")
@@ -85,12 +86,20 @@ after_all <- after_all %>%
                list(landings = mean))
 
 
-# Shannon index for species across all areas and years ------------------------
-# These are unitless, so hard to compare. See:
+# Diversity for species across all areas and years ----------------------------
+# Shannon index is unitless, so hard to compare. See:
 # https://www.researchgate.net/post/Comparing-Shannon-Index-H-values-between-two-communities 
 shannon_closed <- diversity(closed_all$landings)
 shannon_before <- diversity(before_all$landings)
 shannon_after <- diversity(after_all$landings)
+
+# Hill numbers are a potential alternative-
+# https://www.uvm.edu/~ngotelli/manuscriptpdfs/ChaoHill.pdf
+# https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12613
+dv_all <- cbind(closed_all$landings, before_all$landings, after_all$landings)
+colnames(dv_all) <- c("closed", "before", "after")
+
+hill_closed <- iNEXT(dv_all, datatype = "abundance")
 
 
 # Compare fisheries of interest correlated with salmon across periods 

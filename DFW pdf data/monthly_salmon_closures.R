@@ -8,6 +8,7 @@ library(reshape2)
 library(PMCMRplus)
 library(vegan)
 library(iNEXT)
+library(ggplot2)
 
 # Read in cleaned data with only the fisheries of interest
 all_soi_original <- read.csv("Data/dfw_areas_all_soi.csv")
@@ -96,10 +97,30 @@ shannon_after <- diversity(after_all$landings)
 # Hill numbers are a potential alternative-
 # https://www.uvm.edu/~ngotelli/manuscriptpdfs/ChaoHill.pdf
 # https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12613
+# Not sure this will ever mean anything because only the abundance differs
 dv_all <- cbind(closed_all$landings, before_all$landings, after_all$landings)
 colnames(dv_all) <- c("closed", "before", "after")
 
 hill_closed <- iNEXT(dv_all, datatype = "abundance")
+
+
+# Plot of species abundances in the different periods
+all_long <- cbind(before_all, closed_all, after_all)  # combine all to check species
+all_long <- all_long[, -c(3, 5)]  # remove extra species columns
+colnames(all_long) <- c("species", "before", "closed", "after")
+all_long <- melt(all_long, id.vars = "species")
+colnames(all_long) <- c("species", "period", "landings")
+
+all_species <- ggplot(all_long, aes(x = species, y = landings)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  ylab("mean landings (lbs)") + xlab("fisheries of interest") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~period, ncol = 1)
+
+ggsave(filename = "DFW pdf data/Figures/Salmon closure/all_species.pdf", 
+       plot = all_species, width = 200, height = 320, units = "mm", dpi = 300)
 
 
 # Compare fisheries of interest correlated with salmon across periods 

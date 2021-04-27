@@ -377,44 +377,28 @@ ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/squ
 
 
 # Timeseries of mean landings per year for each fishery of interest -----------
-years_mean <- salmon_areas %>%
-  group_by(Species, year) %>% 
-  summarise_at(vars)
-  summarize(across(January:December, mean, na.rm = TRUE))
-
-before_sd <- all_soi_original %>%
-  filter(year %in% before_years)
-before_sd <- before_sd[, c("Species", "Landings")]
-before_sd <- before_sd %>%
-  group_by(Species) %>%
+years_mean <- salmon_areas[, c("Species", "year", "Landings")]
+years_mean <- years_mean %>%
+  group_by(Species, year) %>%
   summarise_at(vars(Landings),
-               list(stdev = sd))
+               list(landings = mean))
 
 soi <- c("Herring Roe", "Ocean Shrimp", "Red Sea Urchin", "Dungeness Crab",
          "Other Groundfish", "Pacific Whiting", 
          "Dover Sole_Thornyhead_Sablefish", "Pelagics", "Market Squid")
 
+years_mean_soi <- years_mean %>% filter(Species %in% soi)
+years_mean_soi$year <- as.factor(years_mean_soi$year)
 
-species_timeseries <- function(fishery) {
-  # Function creates an plot for each of the species of interest with a unique
-  # title and saves them all to one folder with unique name.
-  df <- years_mean %>% filter(Species == fishery)
-  
-  plt <- ggplot(df, aes(x = month, y = landings, fill = area)) +
-    geom_bar(position = "stack", stat = "identity") +
-    ylab("mean landings (lbs)") + xlab(" ") +
-    ggtitle(fishery) + 
-    scale_fill_viridis(discrete = TRUE) +
-    theme_bw() +
-    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-    facet_wrap(~year, ncol = 4, scale = "free")
-  
-  ggsave(filename=paste("DFW pdf data/Figures/Species timeseries/", fishery, "_landings.pdf", 
-                        sep=""), 
-         plot=plt, width=400, height=250, units="mm", dpi=300)
-}
+years_mean_plot <- ggplot(years_mean_soi, aes(x = year, y = landings, 
+                                              fill = factor(ifelse(year==2008 | year==2009, "closed", "open")))) +
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_manual(name = "salmon fishery", values = c("black", "grey50")) +
+  ylab("mean landings (lbs)") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~Species, scale = "free", ncol = 3)
 
-# Function call for each species 
-for (s in soi_fisheries) {
-  species_timeseries(s)
-}
+ggsave(filename = "DFW pdf data/Figures/Salmon closure/years_mean.pdf", 
+       plot = years_mean_plot, width = 300, height = 200, units = "mm", dpi = 300)

@@ -377,5 +377,44 @@ ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/squ
 
 
 # Timeseries of mean landings per year for each fishery of interest -----------
+years_mean <- salmon_areas %>%
+  group_by(Species, year) %>% 
+  summarise_at(vars)
+  summarize(across(January:December, mean, na.rm = TRUE))
+
+before_sd <- all_soi_original %>%
+  filter(year %in% before_years)
+before_sd <- before_sd[, c("Species", "Landings")]
+before_sd <- before_sd %>%
+  group_by(Species) %>%
+  summarise_at(vars(Landings),
+               list(stdev = sd))
+
+soi <- c("Herring Roe", "Ocean Shrimp", "Red Sea Urchin", "Dungeness Crab",
+         "Other Groundfish", "Pacific Whiting", 
+         "Dover Sole_Thornyhead_Sablefish", "Pelagics", "Market Squid")
 
 
+species_timeseries <- function(fishery) {
+  # Function creates an plot for each of the species of interest with a unique
+  # title and saves them all to one folder with unique name.
+  df <- years_mean %>% filter(Species == fishery)
+  
+  plt <- ggplot(df, aes(x = month, y = landings, fill = area)) +
+    geom_bar(position = "stack", stat = "identity") +
+    ylab("mean landings (lbs)") + xlab(" ") +
+    ggtitle(fishery) + 
+    scale_fill_viridis(discrete = TRUE) +
+    theme_bw() +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+    facet_wrap(~year, ncol = 4, scale = "free")
+  
+  ggsave(filename=paste("DFW pdf data/Figures/Species timeseries/", fishery, "_landings.pdf", 
+                        sep=""), 
+         plot=plt, width=400, height=250, units="mm", dpi=300)
+}
+
+# Function call for each species 
+for (s in soi_fisheries) {
+  species_timeseries(s)
+}

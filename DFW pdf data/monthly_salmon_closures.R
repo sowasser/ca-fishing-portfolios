@@ -12,8 +12,7 @@ library(ggplot2)
 library(viridis)
 
 # Read in cleaned data with only the fisheries of interest
-all_soi_original <- read.csv("Data/dfw_areas_all_soi.csv")
-all_soi <- all_soi_original[, -14]  # remove total landings column
+all_soi <- read.csv("Data/dfw_areas_all_soi.csv")
 
 # Remove more southern areas where salmon aren't fished
 salmon_areas <- all_soi %>% 
@@ -25,70 +24,76 @@ before_years <- c(2000:2007)
 after_years <- c(2010:2019)
 
 # Find mean across years in each period, but maintain areas
-closed <- salmon_areas %>%
+closed <- salmon_areas[, -14] %>%  # remove total landings column
   filter(year %in% closed_years) %>%
   group_by(Species, area) %>% 
   summarize(across(January:December, mean, na.rm = TRUE))
 closed <- melt(closed, id.vars = c("Species", "area"))
 
-before <- salmon_areas %>% 
+before <- salmon_areas[, -14] %>%  # remove total landings column 
   filter(year %in% before_years) %>%
   group_by(Species, area) %>% 
   summarize(across(January:December, mean, na.rm = TRUE))
 before <- melt(before, id.vars = c("Species", "area"))
 
-after <- salmon_areas %>% 
+after <- ssalmon_areas[, -14] %>%  # remove total landings column 
   filter(year %in% after_years) %>%
   group_by(Species, area) %>% 
   summarize(across(January:December, mean, na.rm = TRUE))
 after <- melt(after, id.vars = c("Species", "area"))
 
 # Find mean across all years and areas
-closed_means <- salmon_areas %>%
+closed_means <- salmon_areas[, -14] %>%  # remove total landings column %>%
   filter(year %in% closed_years) %>%
   group_by(Species) %>% 
   summarize(across(January:December, mean, na.rm = TRUE))
 closed_means <- melt(closed_means, id.vars = c("Species"))
 
-before_means <- salmon_areas %>%
+before_means <- salmon_areas[, -14] %>%  # remove total landings column
   filter(year %in% before_years) %>%
   group_by(Species) %>% 
   summarize(across(January:December, mean, na.rm = TRUE))
 before_means <- melt(before_means, id.vars = c("Species"))
 
-after_means <- salmon_areas %>%
+after_means <- salmon_areas[, -14] %>%  # remove total landings column
   filter(year %in% after_years) %>%
   group_by(Species) %>% 
   summarize(across(January:December, mean, na.rm = TRUE))
 after_means <- melt(after_means, id.vars = c("Species"))
 
 # Mean of total landings across all years & areas
-closed_all <- all_soi_original %>%
+closed_all <- salmon_areas %>%
   filter(year %in% closed_years)
 closed_all <- closed_all[, c("Species", "Landings")]
 closed_all <- closed_all %>%
   group_by(Species) %>%
   summarise_at(vars(Landings),
                list(landings = mean))
+closed_all <- cbind(rep("closed", length(closed_all$Species)), closed_all)
+colnames(closed_all) <- c("period", "species", "landings")
 
-before_all <- all_soi_original %>%
+before_all <- salmon_areas %>%
   filter(year %in% before_years)
 before_all <- before_all[, c("Species", "Landings")]
 before_all <- before_all %>%
   group_by(Species) %>%
   summarise_at(vars(Landings),
                list(landings = mean))
+before_all <- cbind(rep("before", length(before_all$Species)), before_all)
+colnames(before_all) <- c("period", "species", "landings")
 
-after_all <- all_soi_original %>%
+after_all <- salmon_areas %>%
   filter(year %in% after_years)
 after_all <- after_all[, c("Species", "Landings")]
 after_all <- after_all %>%
   group_by(Species) %>%
   summarise_at(vars(Landings),
                list(landings = mean))
+after_all <- cbind(rep("after", length(after_all$Species)), after_all)
+colnames(after_all) <- c("period", "species", "landings")
 
 # Standard deviation of total landings across all years & areas
-closed_sd <- all_soi_original %>%
+closed_sd <- salmon_areas %>%
   filter(year %in% closed_years)
 closed_sd <- closed_sd[, c("Species", "Landings")]
 closed_sd <- closed_sd %>%
@@ -96,7 +101,7 @@ closed_sd <- closed_sd %>%
   summarise_at(vars(Landings),
                list(stdev = sd))
 
-before_sd <- all_soi_original %>%
+before_sd <- salmon_areas %>%
   filter(year %in% before_years)
 before_sd <- before_sd[, c("Species", "Landings")]
 before_sd <- before_sd %>%
@@ -104,7 +109,7 @@ before_sd <- before_sd %>%
   summarise_at(vars(Landings),
                list(stdev = sd))
 
-after_sd <- all_soi_original %>%
+after_sd <- salmon_areas %>%
   filter(year %in% after_years)
 after_sd <- after_sd[, c("Species", "Landings")]
 after_sd <- after_sd %>%
@@ -120,26 +125,15 @@ shannon_closed <- diversity(closed_all$landings)
 shannon_before <- diversity(before_all$landings)
 shannon_after <- diversity(after_all$landings)
 
-# Hill numbers are a potential alternative-
-# https://www.uvm.edu/~ngotelli/manuscriptpdfs/ChaoHill.pdf
-# https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12613
-# Not sure this will ever mean anything because only the abundance differs
-dv_all <- cbind(closed_all$landings, before_all$landings, after_all$landings)
-colnames(dv_all) <- c("closed", "before", "after")
 
-hill_closed <- iNEXT(dv_all, datatype = "abundance")
+# Plot of species abundances in the different periods -------------------------
+all_long <- rbind(before_all, closed_all, after_all)  # combine all
 
-
-# Plot of species abundances in the different periods
-all_long <- cbind(before_all, closed_all, after_all)  # combine all to check species
-all_long <- all_long[, -c(3, 5)]  # remove extra species columns
-colnames(all_long) <- c("species", "before", "closed", "after")
-all_long <- melt(all_long, id.vars = "species")
-
-# Add standard deviations for error bars
+# Add standard deviations error bars & make sure periods are in correct order
 sd_all <- rbind(before_sd, closed_sd, after_sd)
 all_long <- cbind(all_long, sd_all$stdev)
-colnames(all_long) <- c("species", "period", "landings", "stdev")
+colnames(all_long) <- c("period", "species","landings", "stdev")
+all_long$period <- factor(all_long$period, levels = c("before", "closed", "after"))
 
 all_species <- ggplot(all_long, aes(x = species, y = landings)) +
   geom_bar(position = "dodge", stat = "identity") +

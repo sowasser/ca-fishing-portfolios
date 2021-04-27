@@ -9,6 +9,7 @@ library(PMCMRplus)
 library(vegan)
 library(iNEXT)
 library(ggplot2)
+library(viridis)
 
 # Read in cleaned data with only the fisheries of interest
 all_soi_original <- read.csv("Data/dfw_areas_all_soi.csv")
@@ -177,7 +178,7 @@ roe_salmonclosure <- ggplot(roe, aes(x = observation, y = value, fill = period))
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-ggsave(filename = "DFW pdf data/Figures/Salmon closure/roe_salmonclosure.pdf", 
+ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/roe_salmonclosure.pdf", 
        plot = roe_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
 # Ocean Shrimp ----------------------------------------------------------------
@@ -202,10 +203,10 @@ shrimp_salmonclosure <- ggplot(shrimp, aes(x = observation, y = value, fill = pe
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-ggsave(filename = "DFW pdf data/Figures/Salmon closure/shrimp_salmonclosure.pdf", 
+ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/shrimp_salmonclosure.pdf", 
        plot = shrimp_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
-# Red Sea Urchin --------------------------------------------------------------
+# Red Sea Urchin*** -----------------------------------------------------------
 urchin_closed <- closed_means %>% filter(Species == "Red Sea Urchin")
 urchin_before <- before_means %>% filter(Species == "Red Sea Urchin")
 urchin_after <- after_means %>% filter(Species == "Red Sea Urchin")
@@ -227,7 +228,7 @@ urchin_salmonclosure <- ggplot(urchin, aes(x = observation, y = value, fill = pe
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-ggsave(filename = "DFW pdf data/Figures/Salmon closure/urchin_salmonclosure.pdf", 
+ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/urchin_salmonclosure.pdf", 
        plot = urchin_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
 # Dungeness Crab --------------------------------------------------------------
@@ -252,10 +253,10 @@ crab_salmonclosure <- ggplot(crab, aes(x = observation, y = value, fill = period
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-ggsave(filename = "DFW pdf data/Figures/Salmon closure/crab_salmonclosure.pdf", 
+ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/crab_salmonclosure.pdf", 
        plot = crab_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
-# Other Groundfish ------------------------------------------------------------
+# Other Groundfish*** ---------------------------------------------------------
 groundfish_closed <- closed_means %>% filter(Species == "Other Groundfish")
 groundfish_before <- before_means %>% filter(Species == "Other Groundfish")
 groundfish_after <- after_means %>% filter(Species == "Other Groundfish")
@@ -277,10 +278,10 @@ groundfish_salmonclosure <- ggplot(groundfish, aes(x = observation, y = value, f
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-ggsave(filename = "DFW pdf data/Figures/Salmon closure/groundfish_salmonclosure.pdf", 
+ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/groundfish_salmonclosure.pdf", 
        plot = groundfish_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
-# Pacific Whiting -------------------------------------------------------------
+# Pacific Whiting*** ----------------------------------------------------------
 whiting_closed <- closed_means %>% filter(Species == "Pacific Whiting")
 whiting_before <- before_means %>% filter(Species == "Pacific Whiting")
 whiting_after <- after_means %>% filter(Species == "Pacific Whiting")
@@ -302,10 +303,10 @@ whiting_salmonclosure <- ggplot(whiting, aes(x = observation, y = value, fill = 
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-ggsave(filename = "DFW pdf data/Figures/Salmon closure/whiting_salmonclosure.pdf", 
+ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/whiting_salmonclosure.pdf", 
        plot = whiting_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
-# Dover Sole / Thornyhead / Sablefish -----------------------------------------
+# Dover Sole / Thornyhead / Sablefish* ----------------------------------------
 dsts_closed <- closed_means %>% filter(Species == "Dover Sole_Thornyhead_Sablefish")
 dsts_before <- before_means %>% filter(Species == "Dover Sole_Thornyhead_Sablefish")
 dsts_after <- after_means %>% filter(Species == "Dover Sole_Thornyhead_Sablefish")
@@ -327,10 +328,10 @@ dsts_salmonclosure <- ggplot(dsts, aes(x = observation, y = value, fill = period
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-ggsave(filename = "DFW pdf data/Figures/Salmon closure/dsts_salmonclosure.pdf", 
+ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/dsts_salmonclosure.pdf", 
        plot = dsts_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
-# Coastal Pelagics ------------------------------------------------------------
+# Coastal Pelagics* -----------------------------------------------------------
 pelagics_closed <- closed_means %>% filter(Species == "Pelagics")
 pelagics_before <- before_means %>% filter(Species == "Pelagics")
 pelagics_after <- after_means %>% filter(Species == "Pelagics")
@@ -352,10 +353,10 @@ pelagics_salmonclosure <- ggplot(pelagics, aes(x = observation, y = value, fill 
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-ggsave(filename = "DFW pdf data/Figures/Salmon closure/pelagics_salmonclosure.pdf", 
+ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/pelagics_salmonclosure.pdf", 
        plot = pelagics_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
-# Market Squid ----------------------------------------------------------------
+# Market Squid*** -------------------------------------------------------------
 squid_closed <- closed_means %>% filter(Species == "Market Squid")
 squid_before <- before_means %>% filter(Species == "Market Squid")
 squid_after <- after_means %>% filter(Species == "Market Squid")
@@ -377,5 +378,10 @@ squid_salmonclosure <- ggplot(squid, aes(x = observation, y = value, fill = peri
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-ggsave(filename = "DFW pdf data/Figures/Salmon closure/squid_salmonclosure.pdf", 
+ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/squid_salmonclosure.pdf", 
        plot = squid_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
+
+
+# Timeseries of mean landings per year for each fishery of interest -----------
+
+

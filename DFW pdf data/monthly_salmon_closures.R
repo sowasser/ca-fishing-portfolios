@@ -86,6 +86,31 @@ after_all <- after_all %>%
   summarise_at(vars(Landings),
                list(landings = mean))
 
+# Standard deviation of total landings across all years & areas
+closed_sd <- all_soi_original %>%
+  filter(year %in% closed_years)
+closed_sd <- closed_sd[, c("Species", "Landings")]
+closed_sd <- closed_sd %>%
+  group_by(Species) %>%
+  summarise_at(vars(Landings),
+               list(stdev = sd))
+
+before_sd <- all_soi_original %>%
+  filter(year %in% before_years)
+before_sd <- before_sd[, c("Species", "Landings")]
+before_sd <- before_sd %>%
+  group_by(Species) %>%
+  summarise_at(vars(Landings),
+               list(stdev = sd))
+
+after_sd <- all_soi_original %>%
+  filter(year %in% after_years)
+after_sd <- after_sd[, c("Species", "Landings")]
+after_sd <- after_sd %>%
+  group_by(Species) %>%
+  summarise_at(vars(Landings),
+               list(stdev = sd))
+
 
 # Diversity for species across all areas and years ----------------------------
 # Shannon index is unitless, so hard to compare. See:
@@ -109,10 +134,16 @@ all_long <- cbind(before_all, closed_all, after_all)  # combine all to check spe
 all_long <- all_long[, -c(3, 5)]  # remove extra species columns
 colnames(all_long) <- c("species", "before", "closed", "after")
 all_long <- melt(all_long, id.vars = "species")
-colnames(all_long) <- c("species", "period", "landings")
+
+# Add standard deviations for error bars
+sd_all <- rbind(before_sd, closed_sd, after_sd)
+all_long <- cbind(all_long, sd_all$stdev)
+colnames(all_long) <- c("species", "period", "landings", "stdev")
 
 all_species <- ggplot(all_long, aes(x = species, y = landings)) +
   geom_bar(position = "dodge", stat = "identity") +
+  geom_errorbar(aes(ymin = landings-stdev, ymax = landings+stdev), 
+                width = .2, position = position_dodge(.9)) +
   ylab("mean landings (lbs)") + xlab("fisheries of interest") +
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
@@ -348,5 +379,3 @@ squid_salmonclosure <- ggplot(squid, aes(x = observation, y = value, fill = peri
 
 ggsave(filename = "DFW pdf data/Figures/Salmon closure/squid_salmonclosure.pdf", 
        plot = squid_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
-
-

@@ -21,7 +21,7 @@ salmon_areas <- all_soi %>%
 # Find sum across all areas - represents all of California
 salmon_all <- salmon_areas %>%
   group_by(Species, year) %>%
-  summarize(across(January:Landings, sum))
+  summarize(across(January:Landings, sum, na.rm = TRUE))
 
 # Separate closed & open years ------------------------------------------------
 closed_years <- c(2008, 2009)
@@ -245,7 +245,7 @@ groundfish <- cbind(groundfish_closed[, 3], groundfish_before[, 3], groundfish_a
 colnames(groundfish) <- c("closed", "before", "after")
 groundfish <- melt(groundfish, varnames = c("observation", "period"))
 
-kruskal.test(groundfish$value ~ groundfish$period)  # p = 9.482e-05***
+kruskal.test(groundfish$value ~ groundfish$period)  # p = 0.0001326***
 kwAllPairsNemenyiTest(groundfish$value ~ groundfish$period)
 
 groundfish_salmonclosure <- ggplot(groundfish, aes(x = observation, y = value, fill = period)) +
@@ -295,7 +295,7 @@ dsts <- cbind(dsts_closed[, 3], dsts_before[, 3], dsts_after[, 3])
 colnames(dsts) <- c("closed", "before", "after")
 dsts <- melt(dsts, varnames = c("observation", "period"))
 
-kruskal.test(dsts$value ~ dsts$period)  # p = 0.02937*
+kruskal.test(dsts$value ~ dsts$period)  # p = 0.0265*
 kwAllPairsNemenyiTest(dsts$value ~ dsts$period)
 
 dsts_salmonclosure <- ggplot(dsts, aes(x = observation, y = value, fill = period)) +
@@ -363,7 +363,7 @@ ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/squ
 
 
 # Timeseries of mean landings per year for each fishery of interest -----------
-years_mean <- salmon_all[, c("Species", "year", "Landings")]
+years_mean <- all_ca[, c("Species", "year", "Landings")]
 
 # Filter by specific fisheries of interest
 soi <- c("Herring Roe", "Ocean Shrimp", "Red Sea Urchin", "Dungeness Crab",

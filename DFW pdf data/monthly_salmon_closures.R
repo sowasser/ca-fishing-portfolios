@@ -18,51 +18,37 @@ all_soi <- read.csv("Data/dfw_areas_all_soi.csv")
 salmon_areas <- all_soi %>% 
   filter(!area %in% c("Santa Barbara", "Los Angeles", "San Diego"))
 
+# Find sum across all areas - represents all of California
+salmon_all <- salmon_areas %>%
+  group_by(Species, year) %>%
+  summarize(across(January:Landings, sum))
+
 # Separate closed & open years ------------------------------------------------
 closed_years <- c(2008, 2009)
 before_years <- c(2000:2007)
 after_years <- c(2010:2019)
 
-# Find mean across years in each period, but maintain areas
-closed <- salmon_areas[, -14] %>%  # remove total landings column
-  filter(year %in% closed_years) %>%
-  group_by(Species, area) %>% 
-  summarize(across(January:December, mean, na.rm = TRUE))
-closed <- melt(closed, id.vars = c("Species", "area"))
-
-before <- salmon_areas[, -14] %>%  # remove total landings column 
-  filter(year %in% before_years) %>%
-  group_by(Species, area) %>% 
-  summarize(across(January:December, mean, na.rm = TRUE))
-before <- melt(before, id.vars = c("Species", "area"))
-
-after <- ssalmon_areas[, -14] %>%  # remove total landings column 
-  filter(year %in% after_years) %>%
-  group_by(Species, area) %>% 
-  summarize(across(January:December, mean, na.rm = TRUE))
-after <- melt(after, id.vars = c("Species", "area"))
-
 # Find mean across all years and areas
-closed_means <- salmon_areas[, -14] %>%  # remove total landings column %>%
+closed_means <- salmon_all[, -15] %>%  # remove total landings column %>%
   filter(year %in% closed_years) %>%
   group_by(Species) %>% 
   summarize(across(January:December, mean, na.rm = TRUE))
 closed_means <- melt(closed_means, id.vars = c("Species"))
 
-before_means <- salmon_areas[, -14] %>%  # remove total landings column
+before_means <- salmon_all[, -15] %>%  # remove total landings column
   filter(year %in% before_years) %>%
   group_by(Species) %>% 
   summarize(across(January:December, mean, na.rm = TRUE))
 before_means <- melt(before_means, id.vars = c("Species"))
 
-after_means <- salmon_areas[, -14] %>%  # remove total landings column
+after_means <- salmon_all[, -15] %>%  # remove total landings column
   filter(year %in% after_years) %>%
   group_by(Species) %>% 
   summarize(across(January:December, mean, na.rm = TRUE))
 after_means <- melt(after_means, id.vars = c("Species"))
 
 # Mean of total landings across all years & areas
-closed_all <- salmon_areas %>%
+closed_all <- salmon_all %>%
   filter(year %in% closed_years)
 closed_all <- closed_all[, c("Species", "Landings")]
 closed_all <- closed_all %>%
@@ -72,7 +58,7 @@ closed_all <- closed_all %>%
 closed_all <- cbind(rep("closed", length(closed_all$Species)), closed_all)
 colnames(closed_all) <- c("period", "species", "landings")
 
-before_all <- salmon_areas %>%
+before_all <- salmon_all %>%
   filter(year %in% before_years)
 before_all <- before_all[, c("Species", "Landings")]
 before_all <- before_all %>%
@@ -82,7 +68,7 @@ before_all <- before_all %>%
 before_all <- cbind(rep("before", length(before_all$Species)), before_all)
 colnames(before_all) <- c("period", "species", "landings")
 
-after_all <- salmon_areas %>%
+after_all <- salmon_all %>%
   filter(year %in% after_years)
 after_all <- after_all[, c("Species", "Landings")]
 after_all <- after_all %>%
@@ -93,7 +79,7 @@ after_all <- cbind(rep("after", length(after_all$Species)), after_all)
 colnames(after_all) <- c("period", "species", "landings")
 
 # Standard deviation of total landings across all years & areas
-closed_sd <- salmon_areas %>%
+closed_sd <- salmon_all %>%
   filter(year %in% closed_years)
 closed_sd <- closed_sd[, c("Species", "Landings")]
 closed_sd <- closed_sd %>%
@@ -101,7 +87,7 @@ closed_sd <- closed_sd %>%
   summarise_at(vars(Landings),
                list(stdev = sd))
 
-before_sd <- salmon_areas %>%
+before_sd <- salmon_all %>%
   filter(year %in% before_years)
 before_sd <- before_sd[, c("Species", "Landings")]
 before_sd <- before_sd %>%
@@ -109,7 +95,7 @@ before_sd <- before_sd %>%
   summarise_at(vars(Landings),
                list(stdev = sd))
 
-after_sd <- salmon_areas %>%
+after_sd <- salmon_all %>%
   filter(year %in% after_years)
 after_sd <- after_sd[, c("Species", "Landings")]
 after_sd <- after_sd %>%
@@ -159,7 +145,7 @@ roe <- cbind(roe_closed[, 3], roe_before[, 3], roe_after[, 3])
 colnames(roe) <- c("closed", "before", "after")
 roe <- melt(roe, varnames = c("observation", "period"))
 
-kruskal.test(roe$value ~ roe$period)  # p = 0.2519
+kruskal.test(roe$value ~ roe$period)  # p = 0.2196
 kwAllPairsNemenyiTest(roe$value ~ roe$period)
 
 roe_salmonclosure <- ggplot(roe, aes(x = observation, y = value, fill = period)) +
@@ -184,7 +170,7 @@ shrimp <- cbind(shrimp_closed[, 3], shrimp_before[, 3], shrimp_after[, 3])
 colnames(shrimp) <- c("closed", "before", "after")
 shrimp <- melt(shrimp, varnames = c("observation", "period"))
 
-kruskal.test(shrimp$value ~ shrimp$period)  # p = 0.2536
+kruskal.test(shrimp$value ~ shrimp$period)  # p = 0.2462
 kwAllPairsNemenyiTest(shrimp$value ~ shrimp$period)
 
 shrimp_salmonclosure <- ggplot(shrimp, aes(x = observation, y = value, fill = period)) +
@@ -209,7 +195,7 @@ urchin <- cbind(urchin_closed[, 3], urchin_before[, 3], urchin_after[, 3])
 colnames(urchin) <- c("closed", "before", "after")
 urchin <- melt(urchin, varnames = c("observation", "period"))
 
-kruskal.test(urchin$value ~ urchin$period)  # p = 3.752e-06****
+kruskal.test(urchin$value ~ urchin$period)  # p = 0.0007889****
 kwAllPairsNemenyiTest(urchin$value ~ urchin$period)
 
 urchin_salmonclosure <- ggplot(urchin, aes(x = observation, y = value, fill = period)) +
@@ -234,7 +220,7 @@ crab <- cbind(crab_closed[, 3], crab_before[, 3], crab_after[, 3])
 colnames(crab) <- c("closed", "before", "after")
 crab <- melt(crab, varnames = c("observation", "period"))
 
-kruskal.test(crab$value ~ crab$period)  # p = 0.4638
+kruskal.test(crab$value ~ crab$period)  # p = 0.4504
 kwAllPairsNemenyiTest(crab$value ~ crab$period)
 
 crab_salmonclosure <- ggplot(crab, aes(x = observation, y = value, fill = period)) +
@@ -259,7 +245,7 @@ groundfish <- cbind(groundfish_closed[, 3], groundfish_before[, 3], groundfish_a
 colnames(groundfish) <- c("closed", "before", "after")
 groundfish <- melt(groundfish, varnames = c("observation", "period"))
 
-kruskal.test(groundfish$value ~ groundfish$period)  # p = 0.000138***
+kruskal.test(groundfish$value ~ groundfish$period)  # p = 9.482e-05***
 kwAllPairsNemenyiTest(groundfish$value ~ groundfish$period)
 
 groundfish_salmonclosure <- ggplot(groundfish, aes(x = observation, y = value, fill = period)) +
@@ -284,7 +270,7 @@ whiting <- cbind(whiting_closed[, 3], whiting_before[, 3], whiting_after[, 3])
 colnames(whiting) <- c("closed", "before", "after")
 whiting <- melt(whiting, varnames = c("observation", "period"))
 
-kruskal.test(whiting$value ~ whiting$period)  # p = 0.005707***
+kruskal.test(whiting$value ~ whiting$period)  # p = 0.005646***
 kwAllPairsNemenyiTest(whiting$value ~ whiting$period)
 
 whiting_salmonclosure <- ggplot(whiting, aes(x = observation, y = value, fill = period)) +
@@ -309,7 +295,7 @@ dsts <- cbind(dsts_closed[, 3], dsts_before[, 3], dsts_after[, 3])
 colnames(dsts) <- c("closed", "before", "after")
 dsts <- melt(dsts, varnames = c("observation", "period"))
 
-kruskal.test(dsts$value ~ dsts$period)  # p = 0.0265*
+kruskal.test(dsts$value ~ dsts$period)  # p = 0.02937*
 kwAllPairsNemenyiTest(dsts$value ~ dsts$period)
 
 dsts_salmonclosure <- ggplot(dsts, aes(x = observation, y = value, fill = period)) +
@@ -334,7 +320,7 @@ pelagics <- cbind(pelagics_closed[, 3], pelagics_before[, 3], pelagics_after[, 3
 colnames(pelagics) <- c("closed", "before", "after")
 pelagics <- melt(pelagics, varnames = c("observation", "period"))
 
-kruskal.test(pelagics$value ~ pelagics$period)  # p = 0.01297*
+kruskal.test(pelagics$value ~ pelagics$period)  # p = 0.02973*
 kwAllPairsNemenyiTest(pelagics$value ~ pelagics$period)
 
 pelagics_salmonclosure <- ggplot(pelagics, aes(x = observation, y = value, fill = period)) +
@@ -359,7 +345,7 @@ squid <- cbind(squid_closed[, 3], squid_before[, 3], squid_after[, 3])
 colnames(squid) <- c("closed", "before", "after")
 squid <- melt(squid, varnames = c("observation", "period"))
 
-kruskal.test(squid$value ~ squid$period)  # p = 0.007092***
+kruskal.test(squid$value ~ squid$period)  # p = 0.005244***
 kwAllPairsNemenyiTest(squid$value ~ squid$period)
 
 squid_salmonclosure <- ggplot(squid, aes(x = observation, y = value, fill = period)) +
@@ -377,21 +363,19 @@ ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/squ
 
 
 # Timeseries of mean landings per year for each fishery of interest -----------
-years_mean <- salmon_areas[, c("Species", "year", "Landings")]
-years_mean <- years_mean %>%
-  group_by(Species, year) %>%
-  summarise_at(vars(Landings),
-               list(landings = mean))
+years_mean <- salmon_all[, c("Species", "year", "Landings")]
 
+# Filter by specific fisheries of interest
 soi <- c("Herring Roe", "Ocean Shrimp", "Red Sea Urchin", "Dungeness Crab",
          "Other Groundfish", "Pacific Whiting", 
          "Dover Sole_Thornyhead_Sablefish", "Pelagics", "Market Squid")
-
 years_mean_soi <- years_mean %>% filter(Species %in% soi)
 years_mean_soi$year <- as.factor(years_mean_soi$year)
 
-years_mean_plot <- ggplot(years_mean_soi, aes(x = year, y = landings, 
-                                              fill = factor(ifelse(year==2008 | year==2009, "closed", "open")))) +
+# Create faceted plot with 
+years_mean_plot <- ggplot(years_mean_soi, aes(x = year, y = Landings, 
+                                              fill = factor(ifelse(year==2008 | year==2009, 
+                                                                   "closed", "open")))) +
   geom_bar(position = "dodge", stat = "identity") +
   scale_fill_manual(name = "salmon fishery", values = c("black", "grey50")) +
   ylab("mean landings (lbs)") +

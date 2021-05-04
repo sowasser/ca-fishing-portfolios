@@ -13,11 +13,18 @@ library(viridis)
 
 # Read in cleaned data with only the fisheries of interest & new year ranges
 fishyears <- read.csv("Data/DFW areas/fisheries_year_soi.csv")
+fishyears$month <- factor(fishyears$month, levels = c("Nov", "Dec", "Jan", 
+                                                      "Feb", "Mar", "Apr", 
+                                                      "May", "Jun", "Jul",
+                                                      "Aug", "Sep", "Oct"))
 
 # Find sum across all areas - represents all of California
 all_ca <- fishyears %>%
   group_by(species, year, month) %>%
   summarize(landings = sum(landings, na.rm = TRUE))
+
+month_order <- c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
+                 "Aug", "Sep", "Oct")
 
 # Separate closed & open years ------------------------------------------------
 closed_years <- c("2007-2008", "2008-2009")
@@ -115,24 +122,28 @@ ggsave(filename = "DFW pdf data/Figures/Salmon closure/all_species.pdf",
 
 # Compare fisheries of interest correlated with salmon across periods 
 # Herring Roe -----------------------------------------------------------------
-roe_closed <- closed_means %>% filter(Species == "Herring Roe")
-roe_before <- before_means %>% filter(Species == "Herring Roe")
-roe_after <- after_means %>% filter(Species == "Herring Roe")
+roe_closed <- closed_means %>% filter(species == "Herring Roe")
+roe_closed <- cbind(rep("closed", length(roe_closed$species)), roe_closed[, 2:3])
+colnames(roe_closed) <- c("period", "month", "landings")
 
-roe <- cbind(roe_closed[, 3], roe_before[, 3], roe_after[, 3])
-colnames(roe) <- c("closed", "before", "after")
-roe <- melt(roe, varnames = c("observation", "period"))
+roe_before <- before_means %>% filter(species == "Herring Roe")
+roe_before <- cbind(rep("before", length(roe_before$species)), roe_before[, 2:3])
+colnames(roe_before) <- c("period", "month", "landings")
 
-kruskal.test(roe$value ~ roe$period)  # p = 0.2196
-kwAllPairsNemenyiTest(roe$value ~ roe$period)
+roe_after <- after_means %>% filter(species == "Herring Roe")
+roe_after <- cbind(rep("after", length(roe_after$species)), roe_after[, 2:3])
+colnames(roe_after) <- c("period", "month", "landings")
 
-roe_salmonclosure <- ggplot(roe, aes(x = observation, y = value, fill = period)) +
+roe <- rbind(roe_before, roe_closed, roe_after)
+roe$period <- factor(roe$period, levels = c("before", "closed", "after"))
+
+kruskal.test(roe$landings ~ roe$period)  # p = 0.1802
+kwAllPairsNemenyiTest(roe$landings ~ roe$period)
+
+roe_salmonclosure <- ggplot(roe, aes(x = month, y = landings, fill = period)) +
   theme_bw() +
-  geom_area(position = "identity", alpha = 0.6) +
+  geom_bar(stat = "identity", position = "dodge") +
   scale_fill_viridis(discrete = TRUE) +
-  #scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7 ,8 ,9, 10, 11, 12), 
-  #                   labels = c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", 
-  #                              "May", "Jun", "Jul", "Aug", "Sep", "Oct")) +
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
@@ -140,24 +151,28 @@ ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/roe
        plot = roe_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
 # Ocean Shrimp ----------------------------------------------------------------
-shrimp_closed <- closed_means %>% filter(Species == "Ocean Shrimp")
-shrimp_before <- before_means %>% filter(Species == "Ocean Shrimp")
-shrimp_after <- after_means %>% filter(Species == "Ocean Shrimp")
+shrimp_closed <- closed_means %>% filter(species == "Ocean Shrimp")
+shrimp_closed <- cbind(rep("closed", length(shrimp_closed$species)), shrimp_closed[, 2:3])
+colnames(shrimp_closed) <- c("period", "month", "landings")
 
-shrimp <- cbind(shrimp_closed[, 3], shrimp_before[, 3], shrimp_after[, 3])
-colnames(shrimp) <- c("closed", "before", "after")
-shrimp <- melt(shrimp, varnames = c("observation", "period"))
+shrimp_before <- before_means %>% filter(species == "Ocean Shrimp")
+shrimp_before <- cbind(rep("before", length(shrimp_before$species)), shrimp_before[, 2:3])
+colnames(shrimp_before) <- c("period", "month", "landings")
 
-kruskal.test(shrimp$value ~ shrimp$period)  # p = 0.2462
-kwAllPairsNemenyiTest(shrimp$value ~ shrimp$period)
+shrimp_after <- after_means %>% filter(species == "Ocean Shrimp")
+shrimp_after <- cbind(rep("after", length(shrimp_after$species)), shrimp_after[, 2:3])
+colnames(shrimp_after) <- c("period", "month", "landings")
 
-shrimp_salmonclosure <- ggplot(shrimp, aes(x = observation, y = value, fill = period)) +
+shrimp <- rbind(shrimp_before, shrimp_closed, shrimp_after)
+shrimp$period <- factor(shrimp$period, levels = c("before", "closed", "after"))
+
+kruskal.test(shrimp$landings ~ shrimp$period)  # p = 0.2145
+kwAllPairsNemenyiTest(shrimp$landings ~ shrimp$period)
+
+shrimp_salmonclosure <- ggplot(shrimp, aes(x = month, y = landings, fill = period)) +
   theme_bw() +
-  geom_area(position = "identity", alpha = 0.6) +
+  geom_bar(stat = "identity", position = "dodge") +
   scale_fill_viridis(discrete = TRUE) +
-  #scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7 ,8 ,9, 10, 11, 12), 
-  #                   labels = c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", 
-  #                              "May", "Jun", "Jul", "Aug", "Sep", "Oct")) +
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
@@ -165,24 +180,28 @@ ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/shr
        plot = shrimp_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
 # Red Sea Urchin*** -----------------------------------------------------------
-urchin_closed <- closed_means %>% filter(Species == "Red Sea Urchin")
-urchin_before <- before_means %>% filter(Species == "Red Sea Urchin")
-urchin_after <- after_means %>% filter(Species == "Red Sea Urchin")
+urchin_closed <- closed_means %>% filter(species == "Red Sea Urchin")
+urchin_closed <- cbind(rep("closed", length(urchin_closed$species)), urchin_closed[, 2:3])
+colnames(urchin_closed) <- c("period", "month", "landings")
 
-urchin <- cbind(urchin_closed[, 3], urchin_before[, 3], urchin_after[, 3])
-colnames(urchin) <- c("closed", "before", "after")
-urchin <- melt(urchin, varnames = c("observation", "period"))
+urchin_before <- before_means %>% filter(species == "Red Sea Urchin")
+urchin_before <- cbind(rep("before", length(urchin_before$species)), urchin_before[, 2:3])
+colnames(urchin_before) <- c("period", "month", "landings")
 
-kruskal.test(urchin$value ~ urchin$period)  # p = 0.0007889****
-kwAllPairsNemenyiTest(urchin$value ~ urchin$period)
+urchin_after <- after_means %>% filter(species == "Red Sea Urchin")
+urchin_after <- cbind(rep("after", length(urchin_after$species)), urchin_after[, 2:3])
+colnames(urchin_after) <- c("period", "month", "landings")
 
-urchin_salmonclosure <- ggplot(urchin, aes(x = observation, y = value, fill = period)) +
+urchin <- rbind(urchin_before, urchin_closed, urchin_after)
+urchin$period <- factor(urchin$period, levels = c("before", "closed", "after"))
+
+kruskal.test(urchin$landings ~ urchin$period)  # p = 0.0001412***
+kwAllPairsNemenyiTest(urchin$landings ~ urchin$period)
+
+urchin_salmonclosure <- ggplot(urchin, aes(x = month, y = landings, fill = period)) +
   theme_bw() +
-  geom_area(position = "identity", alpha = 0.6) +
+  geom_bar(stat = "identity", position = "dodge") +
   scale_fill_viridis(discrete = TRUE) +
-  #scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7 ,8 ,9, 10, 11, 12), 
-  #                   labels = c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", 
-  #                              "May", "Jun", "Jul", "Aug", "Sep", "Oct")) +
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
@@ -190,24 +209,28 @@ ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/urc
        plot = urchin_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
 # Dungeness Crab --------------------------------------------------------------
-crab_closed <- closed_means %>% filter(Species == "Dungeness Crab")
-crab_before <- before_means %>% filter(Species == "Dungeness Crab")
-crab_after <- after_means %>% filter(Species == "Dungeness Crab")
+crab_closed <- closed_means %>% filter(species == "Dungeness Crab")
+crab_closed <- cbind(rep("closed", length(crab_closed$species)), crab_closed[, 2:3])
+colnames(crab_closed) <- c("period", "month", "landings")
 
-crab <- cbind(crab_closed[, 3], crab_before[, 3], crab_after[, 3])
-colnames(crab) <- c("closed", "before", "after")
-crab <- melt(crab, varnames = c("observation", "period"))
+crab_before <- before_means %>% filter(species == "Dungeness Crab")
+crab_before <- cbind(rep("before", length(crab_before$species)), crab_before[, 2:3])
+colnames(crab_before) <- c("period", "month", "landings")
 
-kruskal.test(crab$value ~ crab$period)  # p = 0.4504
-kwAllPairsNemenyiTest(crab$value ~ crab$period)
+crab_after <- after_means %>% filter(species == "Dungeness Crab")
+crab_after <- cbind(rep("after", length(crab_after$species)), crab_after[, 2:3])
+colnames(crab_after) <- c("period", "month", "landings")
 
-crab_salmonclosure <- ggplot(crab, aes(x = observation, y = value, fill = period)) +
+crab <- rbind(crab_before, crab_closed, crab_after)
+crab$period <- factor(crab$period, levels = c("before", "closed", "after"))
+
+kruskal.test(crab$landings ~ crab$period)  # p = 0.3162
+kwAllPairsNemenyiTest(crab$landings ~ crab$period)
+
+crab_salmonclosure <- ggplot(crab, aes(x = month, y = landings, fill = period)) +
   theme_bw() +
-  geom_area(position = "identity", alpha = 0.6) +
+  geom_bar(stat = "identity", position = "dodge") +
   scale_fill_viridis(discrete = TRUE) +
-  #scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7 ,8 ,9, 10, 11, 12), 
-  #                   labels = c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", 
-  #                              "May", "Jun", "Jul", "Aug", "Sep", "Oct")) +
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
@@ -215,49 +238,57 @@ ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/cra
        plot = crab_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
 # Other Groundfish*** ---------------------------------------------------------
-groundfish_closed <- closed_means %>% filter(Species == "Other Groundfish")
-groundfish_before <- before_means %>% filter(Species == "Other Groundfish")
-groundfish_after <- after_means %>% filter(Species == "Other Groundfish")
+groundfish_closed <- closed_means %>% filter(species == "Other Groundfish")
+groundfish_closed <- cbind(rep("closed", length(groundfish_closed$species)), groundfish_closed[, 2:3])
+colnames(groundfish_closed) <- c("period", "month", "landings")
 
-groundfish <- cbind(groundfish_closed[, 3], groundfish_before[, 3], groundfish_after[, 3])
-colnames(groundfish) <- c("closed", "before", "after")
-groundfish <- melt(groundfish, varnames = c("observation", "period"))
+groundfish_before <- before_means %>% filter(species == "Other Groundfish")
+groundfish_before <- cbind(rep("before", length(groundfish_before$species)), groundfish_before[, 2:3])
+colnames(groundfish_before) <- c("period", "month", "landings")
 
-kruskal.test(groundfish$value ~ groundfish$period)  # p = 0.0001326***
-kwAllPairsNemenyiTest(groundfish$value ~ groundfish$period)
+groundfish_after <- after_means %>% filter(species == "Other Groundfish")
+groundfish_after <- cbind(rep("after", length(groundfish_after$species)), groundfish_after[, 2:3])
+colnames(groundfish_after) <- c("period", "month", "landings")
 
-groundfish_salmonclosure <- ggplot(groundfish, aes(x = observation, y = value, fill = period)) +
+groundfish <- rbind(groundfish_before, groundfish_closed, groundfish_after)
+groundfish$period <- factor(groundfish$period, levels = c("before", "closed", "after"))
+
+kruskal.test(groundfish$landings ~ groundfish$period)  # p = 0.0001226***
+kwAllPairsNemenyiTest(groundfish$landings ~ groundfish$period)
+
+groundfish_salmonclosure <- ggplot(groundfish, aes(x = month, y = landings, fill = period)) +
   theme_bw() +
-  geom_area(position = "identity", alpha = 0.6) +
+  geom_bar(stat = "identity", position = "dodge") +
   scale_fill_viridis(discrete = TRUE) +
-  #scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7 ,8 ,9, 10, 11, 12), 
-  #                   labels = c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", 
-  #                              "May", "Jun", "Jul", "Aug", "Sep", "Oct")) +
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
 ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/groundfish_salmonclosure.pdf", 
        plot = groundfish_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
-# Pacific Whiting*** ----------------------------------------------------------
-whiting_closed <- closed_means %>% filter(Species == "Pacific Whiting")
-whiting_before <- before_means %>% filter(Species == "Pacific Whiting")
-whiting_after <- after_means %>% filter(Species == "Pacific Whiting")
+# Pacific Whiting* ------------------------------------------------------------
+whiting_closed <- closed_means %>% filter(species == "Pacific Whiting")
+whiting_closed <- cbind(rep("closed", length(whiting_closed$species)), whiting_closed[, 2:3])
+colnames(whiting_closed) <- c("period", "month", "landings")
 
-whiting <- cbind(whiting_closed[, 3], whiting_before[, 3], whiting_after[, 3])
-colnames(whiting) <- c("closed", "before", "after")
-whiting <- melt(whiting, varnames = c("observation", "period"))
+whiting_before <- before_means %>% filter(species == "Pacific Whiting")
+whiting_before <- cbind(rep("before", length(whiting_before$species)), whiting_before[, 2:3])
+colnames(whiting_before) <- c("period", "month", "landings")
 
-kruskal.test(whiting$value ~ whiting$period)  # p = 0.005646***
-kwAllPairsNemenyiTest(whiting$value ~ whiting$period)
+whiting_after <- after_means %>% filter(species == "Pacific Whiting")
+whiting_after <- cbind(rep("after", length(whiting_after$species)), whiting_after[, 2:3])
+colnames(whiting_after) <- c("period", "month", "landings")
 
-whiting_salmonclosure <- ggplot(whiting, aes(x = observation, y = value, fill = period)) +
+whiting <- rbind(whiting_before, whiting_closed, whiting_after)
+whiting$period <- factor(whiting$period, levels = c("before", "closed", "after"))
+
+kruskal.test(whiting$landings ~ whiting$period)  # p = 0.0295*
+kwAllPairsNemenyiTest(whiting$landings ~ whiting$period)
+
+whiting_salmonclosure <- ggplot(whiting, aes(x = month, y = landings, fill = period)) +
   theme_bw() +
-  geom_area(position = "identity", alpha = 0.6) +
+  geom_bar(stat = "identity", position = "dodge") +
   scale_fill_viridis(discrete = TRUE) +
-  #scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7 ,8 ,9, 10, 11, 12), 
-  #                   labels = c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", 
-  #                              "May", "Jun", "Jul", "Aug", "Sep", "Oct")) +
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
@@ -265,74 +296,86 @@ ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/whi
        plot = whiting_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
 # Dover Sole / Thornyhead / Sablefish* ----------------------------------------
-dsts_closed <- closed_means %>% filter(Species == "Dover Sole_Thornyhead_Sablefish")
-dsts_before <- before_means %>% filter(Species == "Dover Sole_Thornyhead_Sablefish")
-dsts_after <- after_means %>% filter(Species == "Dover Sole_Thornyhead_Sablefish")
+dsts_closed <- closed_means %>% filter(species == "Dover Sole_Thornyhead_Sablefish")
+dsts_closed <- cbind(rep("closed", length(dsts_closed$species)), dsts_closed[, 2:3])
+colnames(dsts_closed) <- c("period", "month", "landings")
 
-dsts <- cbind(dsts_closed[, 3], dsts_before[, 3], dsts_after[, 3])
-colnames(dsts) <- c("closed", "before", "after")
-dsts <- melt(dsts, varnames = c("observation", "period"))
+dsts_before <- before_means %>% filter(species == "Dover Sole_Thornyhead_Sablefish")
+dsts_before <- cbind(rep("before", length(dsts_before$species)), dsts_before[, 2:3])
+colnames(dsts_before) <- c("period", "month", "landings")
 
-kruskal.test(dsts$value ~ dsts$period)  # p = 0.0265*
-kwAllPairsNemenyiTest(dsts$value ~ dsts$period)
+dsts_after <- after_means %>% filter(species == "Dover Sole_Thornyhead_Sablefish")
+dsts_after <- cbind(rep("after", length(dsts_after$species)), dsts_after[, 2:3])
+colnames(dsts_after) <- c("period", "month", "landings")
 
-dsts_salmonclosure <- ggplot(dsts, aes(x = observation, y = value, fill = period)) +
+dsts <- rbind(dsts_before, dsts_closed, dsts_after)
+dsts$period <- factor(dsts$period, levels = c("before", "closed", "after"))
+
+kruskal.test(dsts$landings ~ dsts$period)  # p = 0.02973*
+kwAllPairsNemenyiTest(dsts$landings ~ dsts$period)
+
+dsts_salmonclosure <- ggplot(dsts, aes(x = month, y = landings, fill = period)) +
   theme_bw() +
-  geom_area(position = "identity", alpha = 0.6) +
+  geom_bar(stat = "identity", position = "dodge") +
   scale_fill_viridis(discrete = TRUE) +
-  #scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7 ,8 ,9, 10, 11, 12), 
-  #                   labels = c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", 
-  #                              "May", "Jun", "Jul", "Aug", "Sep", "Oct")) +
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
 ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/dsts_salmonclosure.pdf", 
        plot = dsts_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
-# Coastal Pelagics* -----------------------------------------------------------
-pelagics_closed <- closed_means %>% filter(Species == "Pelagics")
-pelagics_before <- before_means %>% filter(Species == "Pelagics")
-pelagics_after <- after_means %>% filter(Species == "Pelagics")
+# Coastal Pelagics**** --------------------------------------------------------
+pelagics_closed <- closed_means %>% filter(species == "Pelagics")
+pelagics_closed <- cbind(rep("closed", length(pelagics_closed$species)), pelagics_closed[, 2:3])
+colnames(pelagics_closed) <- c("period", "month", "landings")
 
-pelagics <- cbind(pelagics_closed[, 3], pelagics_before[, 3], pelagics_after[, 3])
-colnames(pelagics) <- c("closed", "before", "after")
-pelagics <- melt(pelagics, varnames = c("observation", "period"))
+pelagics_before <- before_means %>% filter(species == "Pelagics")
+pelagics_before <- cbind(rep("before", length(pelagics_before$species)), pelagics_before[, 2:3])
+colnames(pelagics_before) <- c("period", "month", "landings")
 
-kruskal.test(pelagics$value ~ pelagics$period)  # p = 0.02973*
-kwAllPairsNemenyiTest(pelagics$value ~ pelagics$period)
+pelagics_after <- after_means %>% filter(species == "Pelagics")
+pelagics_after <- cbind(rep("after", length(pelagics_after$species)), pelagics_after[, 2:3])
+colnames(pelagics_after) <- c("period", "month", "landings")
 
-pelagics_salmonclosure <- ggplot(pelagics, aes(x = observation, y = value, fill = period)) +
+pelagics <- rbind(pelagics_before, pelagics_closed, pelagics_after)
+pelagics$period <- factor(pelagics$period, levels = c("before", "closed", "after"))
+
+kruskal.test(pelagics$landings ~ pelagics$period)  # p = 6.408e-05****
+kwAllPairsNemenyiTest(pelagics$landings ~ pelagics$period)
+
+pelagics_salmonclosure <- ggplot(pelagics, aes(x = month, y = landings, fill = period)) +
   theme_bw() +
-  geom_area(position = "identity", alpha = 0.6) +
+  geom_bar(stat = "identity", position = "dodge") +
   scale_fill_viridis(discrete = TRUE) +
-  #scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7 ,8 ,9, 10, 11, 12), 
-  #                   labels = c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", 
-  #                              "May", "Jun", "Jul", "Aug", "Sep", "Oct")) +
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
 ggsave(filename = "DFW pdf data/Figures/Salmon closure/Species distributions/pelagics_salmonclosure.pdf", 
        plot = pelagics_salmonclosure, width = 200, height = 130, units = "mm", dpi = 300)
 
-# Market Squid*** -------------------------------------------------------------
-squid_closed <- closed_means %>% filter(Species == "Market Squid")
-squid_before <- before_means %>% filter(Species == "Market Squid")
-squid_after <- after_means %>% filter(Species == "Market Squid")
+# Market Squid ----------------------------------------------------------------
+squid_closed <- closed_means %>% filter(species == "Market Squid")
+squid_closed <- cbind(rep("closed", length(squid_closed$species)), squid_closed[, 2:3])
+colnames(squid_closed) <- c("period", "month", "landings")
 
-squid <- cbind(squid_closed[, 3], squid_before[, 3], squid_after[, 3])
-colnames(squid) <- c("closed", "before", "after")
-squid <- melt(squid, varnames = c("observation", "period"))
+squid_before <- before_means %>% filter(species == "Market Squid")
+squid_before <- cbind(rep("before", length(squid_before$species)), squid_before[, 2:3])
+colnames(squid_before) <- c("period", "month", "landings")
 
-kruskal.test(squid$value ~ squid$period)  # p = 0.005244***
-kwAllPairsNemenyiTest(squid$value ~ squid$period)
+squid_after <- after_means %>% filter(species == "Market Squid")
+squid_after <- cbind(rep("after", length(squid_after$species)), squid_after[, 2:3])
+colnames(squid_after) <- c("period", "month", "landings")
 
-squid_salmonclosure <- ggplot(squid, aes(x = observation, y = value, fill = period)) +
+squid <- rbind(squid_before, squid_closed, squid_after)
+squid$period <- factor(squid$period, levels = c("before", "closed", "after"))
+
+kruskal.test(squid$landings ~ squid$period)  # p = 0.8848
+kwAllPairsNemenyiTest(squid$landings ~ squid$period)
+
+squid_salmonclosure <- ggplot(squid, aes(x = month, y = landings, fill = period)) +
   theme_bw() +
-  geom_area(position = "identity", alpha = 0.6) +
+  geom_bar(stat = "identity", position = "dodge") +
   scale_fill_viridis(discrete = TRUE) +
-  #scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7 ,8 ,9, 10, 11, 12), 
-  #                   labels = c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", 
-  #                              "May", "Jun", "Jul", "Aug", "Sep", "Oct")) +
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 

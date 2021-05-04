@@ -116,7 +116,7 @@ all_species <- ggplot(all_long, aes(x = species, y = landings)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~period, ncol = 1)
 
-ggsave(filename = "DFW pdf data/Figures/Salmon closure/all_species.pdf", 
+ggsave(filename = "DFW pdf data/Figures/Closures/salmon_all_species.pdf", 
        plot = all_species, width = 200, height = 320, units = "mm", dpi = 300)
 
 
@@ -303,23 +303,25 @@ dist_plots <- ggplot(all_period_dist, aes(x = month, y = landings, fill = period
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~species, ncol = 3, scale = "free")
 
-ggsave(filename = "DFW pdf data/Figures/Salmon closure/monthly_periods.pdf", 
+ggsave(filename = "DFW pdf data/Figures/Closures/salmon_monthly_periods.pdf", 
        plot = dist_plots, width = 300, height = 200, units = "mm", dpi = 300)
 
 
 # Timeseries of mean landings per year for each fishery of interest -----------
-years_mean <- all_ca[, c("Species", "year", "Landings")]
-
 # Filter by specific fisheries of interest
 soi <- c("Herring Roe", "Ocean Shrimp", "Red Sea Urchin", "Dungeness Crab",
          "Other Groundfish", "Pacific Whiting", 
          "Dover Sole_Thornyhead_Sablefish", "Pelagics", "Market Squid")
-years_mean_soi <- years_mean %>% filter(Species %in% soi)
+
+years_mean_soi <- fishyears %>% filter(species %in% soi) %>%
+  group_by(species, year) %>%
+  summarize(landings = mean(landings, na.rm = TRUE))
+
 years_mean_soi$year <- as.factor(years_mean_soi$year)
 
 # Create faceted plot with 
-years_mean_plot <- ggplot(years_mean_soi, aes(x = year, y = Landings, 
-                                              fill = factor(ifelse(year==2008 | year==2009, 
+years_mean_plot <- ggplot(years_mean_soi, aes(x = year, y = landings, 
+                                              fill = factor(ifelse(year=="2007-2008" | year=="2008-2009", 
                                                                    "closed", "open")))) +
   geom_bar(position = "dodge", stat = "identity") +
   scale_fill_manual(name = "salmon fishery", values = c("black", "grey50")) +
@@ -327,7 +329,7 @@ years_mean_plot <- ggplot(years_mean_soi, aes(x = year, y = Landings,
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  facet_wrap(~Species, scale = "free", ncol = 3)
+  facet_wrap(~species, scale = "free", ncol = 3)
 
-ggsave(filename = "DFW pdf data/Figures/Salmon closure/years_mean.pdf", 
-       plot = years_mean_plot, width = 300, height = 200, units = "mm", dpi = 300)
+ggsave(filename = "DFW pdf data/Figures/Closures/salmon_years_mean.pdf", 
+       plot = years_mean_plot, width = 400, height = 300, units = "mm", dpi = 300)

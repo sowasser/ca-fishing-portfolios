@@ -36,7 +36,7 @@ summary_plot <- ggplot(summary_long, aes(x = year, y = value)) +
   facet_wrap(~variable, scale="free", ncol = 1)
 # summary_plot  # view plot
 
-ggsave(filename="Figures/summary_timeseries.pdf", plot=summary_plot,
+ggsave(filename="yearly port data/Figures/summary_timeseries.pdf", plot=summary_plot,
        width=150, height=250, units="mm", dpi=300)
 
 # Fisheries revenue vs. pounds landed -----------------------------------------
@@ -85,5 +85,5 @@ summary(lm(ca_summary$pounds ~ ca_summary$fishers))
 all <- pounds_revenue + fishers_revenue + fishers_pounds + 
   plot_layout(guides="collect")
 
-ggsave(filename="Figures/summary_all.pdf", plot=all,
+ggsave(filename="Yearly port data/Figures/summary_all.pdf", plot=all,
        width=350, height=100, units="mm", dpi=300)

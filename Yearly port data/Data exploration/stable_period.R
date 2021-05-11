@@ -2,6 +2,7 @@
 # from 2009-2014
 
 library(dplyr)
+library(tidyr)
 library(reshape2)
 library(ggplot2)
 library(viridis)
@@ -24,5 +25,5 @@ fish_revenue_sum <- ggplot(fish_sums2, aes(x = year, y = revenue)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~fishery, ncol = 6)
 
-ggsave(filename="Figures/Stable period/allfisheries_revenue_stable.pdf", 
+ggsave(filename="Yearly port data/Figures/Stable period/allfisheries_revenue_stable.pdf", 
        plot=fish_revenue_sum, width=600, height=500, units="mm", dpi=300)

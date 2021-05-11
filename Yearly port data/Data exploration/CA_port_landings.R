@@ -40,7 +40,7 @@ all_ports <- ggplot(pl_species, aes(x = year, y = revenue, color = fishery)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port, scale="free", ncol = 5)
 
-ggsave(filename="Figures/all_ports.pdf", plot=all_ports,
+ggsave(filename="Yearly port data/Figures/all_ports.pdf", plot=all_ports,
        width=600, height=500, units="mm", dpi=300)
 
 # Combine fishery & gear columns together to maintain all differences in fishery
@@ -63,7 +63,7 @@ top_revenue <- ggplot(pl_highest, aes(x = year, y = ex.vessel_revenue, color = f
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port, scale="free", ncol = 5)
 
-ggsave(filename="Figures/top_revenue.pdf", plot=top_revenue,
+ggsave(filename="Yearly port data/Figures/top_revenue.pdf", plot=top_revenue,
        width=600, height=500, units="mm", dpi=300)
 
 # Most revenue-producing species per port per year
@@ -82,7 +82,7 @@ max_revenue <- ggplot(pl_max, aes(y = ex.vessel_revenue, x = year, fill = fishge
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port) 
 
-ggsave(filename="Figures/max_revenue.pdf", max_revenue,
+ggsave(filename="Yearly port data/Figures/max_revenue.pdf", max_revenue,
        width=600, height=500, units="mm", dpi=300)
 
 # Most revenue-producing species per year
@@ -97,7 +97,7 @@ max_revenue_yr <- ggplot(pl_max_yr, aes(y = ex.vessel_revenue, x = year, fill = 
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-ggsave(filename="Figures/max_revenue_yr.pdf", max_revenue_yr,
+ggsave(filename="Yearly port data/Figures/max_revenue_yr.pdf", max_revenue_yr,
        width=200, height=100, units="mm", dpi=300)
 
 # General timeseries by port --------------------------------------------------
@@ -112,7 +112,7 @@ total_revenue <- ggplot(pl_revenue, aes(x = year, y = revenue)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port, ncol = 5)
 
-ggsave(filename="Figures/total_revenue.pdf", plot=total_revenue,
+ggsave(filename="Yearly port data/Figures/total_revenue.pdf", plot=total_revenue,
        width=600, height=500, units="mm", dpi=300)
 
 # Count of fisheries (species and gear) per port per year
@@ -125,5 +125,5 @@ fisheries_number <- ggplot(pl_count, aes(x = year, y = n)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port, ncol = 5)
 
-ggsave(filename="Figures/fisheries_number.pdf", plot=fisheries_number,
+ggsave(filename="Yearly port data/Figures/fisheries_number.pdf", plot=fisheries_number,
        width=600, height=500, units="mm", dpi=300)

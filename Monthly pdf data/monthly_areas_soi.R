@@ -255,7 +255,7 @@ total_plot <- ggplot(total_landings, aes(y = landings, x = reorder(Species, -lan
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 
-ggsave(filename="DFW pdf data/Figures/all_soi_landings.pdf", total_plot,
+ggsave(filename="Monthly pdf data/Figures/all_soi_landings.pdf", total_plot,
        width=300, height=150, units="mm", dpi=300)
 
 # Calculate what percentage 'other' represents

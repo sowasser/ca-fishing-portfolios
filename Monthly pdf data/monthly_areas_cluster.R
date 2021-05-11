@@ -61,4 +61,3 @@ tsne_df <- tsne_object$Y %>%
 
 ggplot(aes(x = X, y = Y), data = tsne_df) +
   geom_point(aes(color = cluster))
-

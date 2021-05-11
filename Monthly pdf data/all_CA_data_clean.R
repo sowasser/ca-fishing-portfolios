@@ -10,7 +10,7 @@ names <- c("00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
 
 for(n in names) {
   name <- paste("m", n, sep = "")
-  assign(name, read.csv(paste("DFW pdf data/updated/all CA/month", n, ".csv", sep = "")))
+  assign(name, read.csv(paste("Monthly pdf data/updated/all CA/month", n, ".csv", sep = "")))
 }
 
 # Remove weird periods from the species name list

@@ -1,16 +1,17 @@
-# Script for examining response in monthly landings around the delay in the 
-# Dungeness crab season caused by domoic acid levels in 2015-2016 using the
-# CDFW dataset downloaded from here: 
+# Script for examining response in monthly landings around the salmon closures
+# in 2008 & 2009, using the CDFW dataset downloaded from here: 
 # https://wildlife.ca.gov/Fishing/Commercial/Landings
 
 library(stringr)
 library(dplyr)
 library(reshape2)
 library(PMCMRplus)
+library(vegan)
+library(iNEXT)
 library(ggplot2)
 library(viridis)
 
-# Read in cleaned data with only the fisheries of interest
+# Read in cleaned data with only the fisheries of interest & new year ranges
 fishyears <- read.csv("Data/DFW areas/fisheries_year_soi.csv")
 fishyears$month <- factor(fishyears$month, levels = c("Nov", "Dec", "Jan", 
                                                       "Feb", "Mar", "Apr", 
@@ -26,16 +27,16 @@ month_order <- c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
                  "Aug", "Sep", "Oct")
 
 # Separate closed & open years ------------------------------------------------
-closed_year <- c("2015-2016")
+closed_years <- c("2007-2008", "2008-2009")
 before_years <- c("1999-2000", "2000-2001", "2001-2002", "2002-2003", 
-                  "2004-2005", "2005-2006", "2006-2007", "2007-2008",
-                  "2008-2009", "2009-2010", "2010-2011", "2011-2012",
-                  "2012-2013", "2013-2014", "2014-2015")
-after_years <- c("2016-2017", "2017-2018", "2018-2019", "2019-2020")
+                  "2004-2005", "2005-2006", "2006-2007")
+after_years <- c("2010-2011", "2011-2012", "2012-2013", "2013-2014", 
+                 "2014-2015", "2015-2016", "2016-2017", "2017-2018", 
+                 "2018-2019", "2019-2020")
 
 # Find mean across all years and areas
 closed_means <- all_ca %>% 
-  filter(year %in% closed_year) %>%
+  filter(year %in% closed_years) %>%
   group_by(species, month) %>% 
   summarize(landings = mean(landings, na.rm = TRUE))
 
@@ -51,7 +52,7 @@ after_means <- all_ca %>%
 
 # Mean of total landings across all years, areas, and months
 closed_all <- all_ca %>%
-  filter(year %in% closed_year) %>%
+  filter(year %in% closed_years) %>%
   group_by(species) %>%
   summarize(landings = mean(landings, na.rm = TRUE))
 closed_all <- cbind(rep("closed", length(closed_all$species)), closed_all)
@@ -73,7 +74,7 @@ colnames(after_all) <- c("period", "species", "landings")
 
 # Standard deviation of total landings across all years, areas, and months
 closed_sd <- all_ca %>%
-  filter(year %in% closed_year) %>%
+  filter(year %in% closed_years) %>%
   group_by(species) %>%
   summarize(stdev = sd(landings, na.rm = TRUE))
 
@@ -115,12 +116,12 @@ all_species <- ggplot(all_long, aes(x = species, y = landings)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~period, ncol = 1)
 
-ggsave(filename = "DFW pdf data/Figures/Closures/domoic_all_species.pdf", 
+ggsave(filename = "Monthly pdf data/Figures/Closures/salmon_all_species.pdf", 
        plot = all_species, width = 200, height = 320, units = "mm", dpi = 300)
 
 
 # Compare fisheries of interest correlated with salmon across periods ---------
-# Herring Roe*
+# Herring Roe
 roe_closed <- closed_means %>% filter(species == "Herring Roe")
 roe_closed <- cbind(rep("closed", length(roe_closed$species)), roe_closed)
 colnames(roe_closed) <- c("period", "species", "month", "landings")
@@ -136,7 +137,7 @@ colnames(roe_after) <- c("period", "species", "month", "landings")
 roe <- rbind(roe_before, roe_closed, roe_after)
 roe$period <- factor(roe$period, levels = c("before", "closed", "after"))
 
-kruskal.test(roe$landings ~ roe$period)  # p = 0.01229
+kruskal.test(roe$landings ~ roe$period)  # p = 0.1802
 kwAllPairsNemenyiTest(roe$landings ~ roe$period)
 
 # Ocean Shrimp
@@ -155,10 +156,10 @@ colnames(shrimp_after) <- c("period", "species", "month", "landings")
 shrimp <- rbind(shrimp_before, shrimp_closed, shrimp_after)
 shrimp$period <- factor(shrimp$period, levels = c("before", "closed", "after"))
 
-kruskal.test(shrimp$landings ~ shrimp$period)  # p = 0.5314
+kruskal.test(shrimp$landings ~ shrimp$period)  # p = 0.2145
 kwAllPairsNemenyiTest(shrimp$landings ~ shrimp$period)
 
-# Red Sea Urchin**** 
+# Red Sea Urchin*** 
 urchin_closed <- closed_means %>% filter(species == "Red Sea Urchin")
 urchin_closed <- cbind(rep("closed", length(urchin_closed$species)), urchin_closed)
 colnames(urchin_closed) <- c("period", "species", "month", "landings")
@@ -174,27 +175,27 @@ colnames(urchin_after) <- c("period", "species", "month", "landings")
 urchin <- rbind(urchin_before, urchin_closed, urchin_after)
 urchin$period <- factor(urchin$period, levels = c("before", "closed", "after"))
 
-kruskal.test(urchin$landings ~ urchin$period)  # p = 3.229e-07
+kruskal.test(urchin$landings ~ urchin$period)  # p = 0.0001412***
 kwAllPairsNemenyiTest(urchin$landings ~ urchin$period)
 
-# Salmon
-salmon_closed <- closed_means %>% filter(species == "Salmon")
-salmon_closed <- cbind(rep("closed", length(salmon_closed$species)), salmon_closed)
-colnames(salmon_closed) <- c("period", "species", "month", "landings")
+# Dungeness Crab 
+crab_closed <- closed_means %>% filter(species == "Dungeness Crab")
+crab_closed <- cbind(rep("closed", length(crab_closed$species)), crab_closed)
+colnames(crab_closed) <- c("period", "species", "month", "landings")
 
-salmon_before <- before_means %>% filter(species == "Salmon")
-salmon_before <- cbind(rep("before", length(salmon_before$species)), salmon_before)
-colnames(salmon_before) <- c("period", "species", "month", "landings")
+crab_before <- before_means %>% filter(species == "Dungeness Crab")
+crab_before <- cbind(rep("before", length(crab_before$species)), crab_before)
+colnames(crab_before) <- c("period", "species", "month", "landings")
 
-salmon_after <- after_means %>% filter(species == "Salmon")
-salmon_after <- cbind(rep("after", length(salmon_after$species)), salmon_after)
-colnames(salmon_after) <- c("period", "species", "month", "landings")
+crab_after <- after_means %>% filter(species == "Dungeness Crab")
+crab_after <- cbind(rep("after", length(crab_after$species)), crab_after)
+colnames(crab_after) <- c("period", "species", "month", "landings")
 
-salmon <- rbind(salmon_before, salmon_closed, salmon_after)
-salmon$period <- factor(salmon$period, levels = c("before", "closed", "after"))
+crab <- rbind(crab_before, crab_closed, crab_after)
+crab$period <- factor(crab$period, levels = c("before", "closed", "after"))
 
-kruskal.test(salmon$landings ~ salmon$period)  # p = 0.2266
-kwAllPairsNemenyiTest(salmon$landings ~ salmon$period)
+kruskal.test(crab$landings ~ crab$period)  # p = 0.3162
+kwAllPairsNemenyiTest(crab$landings ~ crab$period)
 
 # Other Groundfish*** 
 groundfish_closed <- closed_means %>% filter(species == "Other Groundfish")
@@ -212,7 +213,7 @@ colnames(groundfish_after) <- c("period", "species", "month", "landings")
 groundfish <- rbind(groundfish_before, groundfish_closed, groundfish_after)
 groundfish$period <- factor(groundfish$period, levels = c("before", "closed", "after"))
 
-kruskal.test(groundfish$landings ~ groundfish$period)  # p = 0.002564***
+kruskal.test(groundfish$landings ~ groundfish$period)  # p = 0.0001226***
 kwAllPairsNemenyiTest(groundfish$landings ~ groundfish$period)
 
 # Pacific Whiting* 
@@ -231,7 +232,7 @@ colnames(whiting_after) <- c("period", "species", "month", "landings")
 whiting <- rbind(whiting_before, whiting_closed, whiting_after)
 whiting$period <- factor(whiting$period, levels = c("before", "closed", "after"))
 
-kruskal.test(whiting$landings ~ whiting$period)  # p = 0.04692*
+kruskal.test(whiting$landings ~ whiting$period)  # p = 0.0295*
 kwAllPairsNemenyiTest(whiting$landings ~ whiting$period)
 
 # Dover Sole / Thornyhead / Sablefish* 
@@ -250,7 +251,7 @@ colnames(dsts_after) <- c("period", "species", "month", "landings")
 dsts <- rbind(dsts_before, dsts_closed, dsts_after)
 dsts$period <- factor(dsts$period, levels = c("before", "closed", "after"))
 
-kruskal.test(dsts$landings ~ dsts$period)  # p = 0.01461*
+kruskal.test(dsts$landings ~ dsts$period)  # p = 0.02973*
 kwAllPairsNemenyiTest(dsts$landings ~ dsts$period)
 
 # Coastal Pelagics**** 
@@ -269,10 +270,10 @@ colnames(pelagics_after) <- c("period", "species", "month", "landings")
 pelagics <- rbind(pelagics_before, pelagics_closed, pelagics_after)
 pelagics$period <- factor(pelagics$period, levels = c("before", "closed", "after"))
 
-kruskal.test(pelagics$landings ~ pelagics$period)  # p = 7.937e-06****
+kruskal.test(pelagics$landings ~ pelagics$period)  # p = 6.408e-05****
 kwAllPairsNemenyiTest(pelagics$landings ~ pelagics$period)
 
-# Market Squid*
+# Market Squid 
 squid_closed <- closed_means %>% filter(species == "Market Squid")
 squid_closed <- cbind(rep("closed", length(squid_closed$species)), squid_closed)
 colnames(squid_closed) <- c("period", "species", "month", "landings")
@@ -288,12 +289,12 @@ colnames(squid_after) <- c("period", "species", "month", "landings")
 squid <- rbind(squid_before, squid_closed, squid_after)
 squid$period <- factor(squid$period, levels = c("before", "closed", "after"))
 
-kruskal.test(squid$landings ~ squid$period)  # p = 0.02893*
+kruskal.test(squid$landings ~ squid$period)  # p = 0.8848
 kwAllPairsNemenyiTest(squid$landings ~ squid$period)
 
 
 # Plot species distributions across periods -----------------------------------
-all_period_dist <- rbind(roe, shrimp, urchin, salmon, groundfish, whiting, dsts, pelagics, squid)
+all_period_dist <- rbind(roe, shrimp, urchin, crab, groundfish, whiting, dsts, pelagics, squid)
 dist_plots <- ggplot(all_period_dist, aes(x = month, y = landings, fill = period)) +
   theme_bw() +
   geom_bar(stat = "identity", position = "dodge") +
@@ -302,12 +303,13 @@ dist_plots <- ggplot(all_period_dist, aes(x = month, y = landings, fill = period
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~species, ncol = 3, scale = "free")
 
-ggsave(filename = "DFW pdf data/Figures/Closures/domoic_monthly_periods.pdf", 
+ggsave(filename = "Monthly pdf data/Figures/Closures/salmon_monthly_periods.pdf", 
        plot = dist_plots, width = 300, height = 200, units = "mm", dpi = 300)
 
 
+# Timeseries of mean landings per year for each fishery of interest -----------
 # Filter by specific fisheries of interest
-soi <- c("Herring Roe", "Ocean Shrimp", "Red Sea Urchin", "Salmon",
+soi <- c("Herring Roe", "Ocean Shrimp", "Red Sea Urchin", "Dungeness Crab",
          "Other Groundfish", "Pacific Whiting", 
          "Dover Sole_Thornyhead_Sablefish", "Pelagics", "Market Squid")
 
@@ -319,15 +321,15 @@ years_mean_soi$year <- as.factor(years_mean_soi$year)
 
 # Create faceted plot with 
 years_mean_plot <- ggplot(years_mean_soi, aes(x = year, y = landings, 
-                                              fill = factor(ifelse(year=="2015-2016", 
-                                                                   "fishery delayed", "no change")))) +
+                                              fill = factor(ifelse(year=="2007-2008" | year=="2008-2009", 
+                                                                   "closed", "open")))) +
   geom_bar(position = "dodge", stat = "identity") +
-  scale_fill_manual(name = "domoic acid", values = c("black", "grey50")) +
+  scale_fill_manual(name = "salmon fishery", values = c("black", "grey50")) +
   ylab("mean landings (lbs)") +
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~species, scale = "free", ncol = 3)
 
-ggsave(filename = "DFW pdf data/Figures/Closures/domoic_years_mean.pdf", 
+ggsave(filename = "Monthly pdf data/Figures/Closures/salmon_years_mean.pdf", 
        plot = years_mean_plot, width = 400, height = 300, units = "mm", dpi = 300)

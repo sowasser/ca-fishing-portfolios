@@ -18,10 +18,10 @@ read_and_clean <- function(area) {
   # 2. Remove all unnecessary punctuation from the "Species" column
   # 3. Add a column with the year of each dataframe, 
   # 4. Combine all years together & add a column with the area name
-  files <- list.files(path = paste("DFW pdf data/updated/areas/", area, "/", sep = ""), 
+  files <- list.files(path = paste("Monthly pdf data/updated/areas/", area, "/", sep = ""), 
                      pattern = "*.csv")
   df <- lapply(files, function(x) 
-    read.csv(paste("DFW pdf data/updated/areas/", area, "/", x, sep = "")))
+    read.csv(paste("Monthly pdf data/updated/areas/", area, "/", x, sep = "")))
   
   data_clean <- function(file) {
     file$Species <- str_replace_all(file$Species, "[[:punct:]]", "")
@@ -38,10 +38,10 @@ read_and_clean <- function(area) {
 # For debugging messed up .csv files ------------------------------------------
 debug_csv <- function(area) {
   # Just read in the files to check for number of columns, etc.
-  files <- list.files(path = paste("DFW pdf data/updated/areas/", area, "/", sep = ""), 
+  files <- list.files(path = paste("Monthly pdf data/updated/areas/", area, "/", sep = ""), 
                       pattern = "*.csv")
   df <- lapply(files, function(x) 
-    read.csv(paste("DFW pdf data/updated/areas/", area, "/", x, sep = "")))
+    read.csv(paste("Monthly pdf data/updated/areas/", area, "/", x, sep = "")))
   return(df)
 }
 

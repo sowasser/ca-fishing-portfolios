@@ -298,12 +298,13 @@ species_cor_plot <- ggplot(melt(species_cor), aes(x = Var1, y = Var2, fill = val
         axis.text.y = element_text(margin = margin(0, -3, 0, 0)),
         panel.grid.major = element_blank())
 
-ggsave(filename = "DFW pdf data/Figures/species_correlations.pdf", k
+ggsave(filename = "Monthly pdf data/Figures/species_correlations.pdf", 
        plot = species_cor_plot, width = 195, height = 160, units = "mm", dpi = 300)
 
 
 # Density plot of top species of interest
-total_means_long <- total_means2[c(11, 12, 1:10), ]  # re-order months
+# TODO: FIX THIS
+total_means_long <- total_means[c(11, 12, 1:10), ]  # re-order months
 row.names(total_means_long) <- NULL  # Re-set row-names for plotting
 total_means_long <- melt(total_means_long)
 colnames(total_means_long) <- c("month", "species", "landings")
@@ -321,5 +322,5 @@ species_overlap <- ggplot(total_means_long, aes(x = month, y = landings, fill = 
   xlab(" ") + ylab("mean landings") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-ggsave(filename = "DFW pdf data/Figures/species_overlap.pdf", 
+ggsave(filename = "Monthly pdf data/Figures/species_overlap.pdf", 
        plot = species_overlap, width = 200, height = 130, units = "mm", dpi = 300)

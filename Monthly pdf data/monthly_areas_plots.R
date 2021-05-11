@@ -60,7 +60,7 @@ all_mean_landings <- ggplot(all_means, aes(y = landings, x = month)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~area, ncol = 3, scale = "free")
 
-ggsave(filename="DFW pdf data/Figures/all_landings.pdf", all_mean_landings,
+ggsave(filename="Monthly pdf data/Figures/all_landings.pdf", all_mean_landings,
        width=400, height=250, units="mm", dpi=300)
 
 
@@ -92,7 +92,7 @@ monthly_areas <- ggplot(top_soi_means, aes(y = landings, x = month, fill = speci
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~area, ncol = 3, scale = "free")
 
-ggsave(filename="DFW pdf data/Figures/area_monthly_landings.pdf", monthly_areas,
+ggsave(filename="Monthly pdf data/Figures/area_monthly_landings.pdf", monthly_areas,
        width=400, height=250, units="mm", dpi=300)
 
 
@@ -116,5 +116,5 @@ monthly_species <- ggplot(overall_means, aes(y = landings, x = month)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~species, ncol = 4, scale = "free")
 
-ggsave(filename="DFW pdf data/Figures/monthly_species.pdf", monthly_species,
+ggsave(filename="Monthly pdf data/Figures/monthly_species.pdf", monthly_species,
        width=400, height=300, units="mm", dpi=300)

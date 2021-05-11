@@ -89,7 +89,7 @@ species_timeseries <- function(fishery) {
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
     facet_wrap(~year, ncol = 4, scale = "free")
   
-  ggsave(filename=paste("DFW pdf data/Figures/Species timeseries/", fishery, "_landings.pdf", 
+  ggsave(filename=paste("Monthly pdf data/Figures/Species timeseries/", fishery, "_landings.pdf", 
                         sep=""), 
          plot=plt, width=400, height=250, units="mm", dpi=300)
 }

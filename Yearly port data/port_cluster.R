@@ -5,6 +5,7 @@
 # Specifically, the "Landing Receipt Records: Landings Data By Port 1992-2014"
 
 library(dplyr)
+library(tidyr)
 library(cluster)
 library(factoextra)
 library(ggplot2)
@@ -42,7 +43,7 @@ revenue_count <- ggplot(rev_count, aes(x = count, y = revenue, color = port)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~year, ncol = 5)
 
-ggsave(filename="Figures/revenue_count.pdf", plot=revenue_count,
+ggsave(filename="Yearly port data/Figures/revenue_count.pdf", plot=revenue_count,
        width=600, height=500, units="mm", dpi=300)
 
 
@@ -76,7 +77,7 @@ occur_matrix <- plot(co)  # create a species co-occurrence matrix plot
 occur_matrix
 # TODO: figure out how to customize this ggplot object
 
-ggsave(filename="Figures/occurrence_matrix.pdf", plot=occur_matrix, 
+ggsave(filename="Yearly port data/Figures/occurrence_matrix.pdf", plot=occur_matrix, 
        width=200, height=200, units="mm", dpi=300)
 
 # Subset of co-occurrence output where the probability of co-occurrence is at a
@@ -107,10 +108,12 @@ co_occur <- function(yr) {
 }
 
 # Call function for all years & merge into one dataframe
+# TODO: Fix this!!!!! 
+co_all <- list()
 co_years <- list()  # empty list
 
 for (y in years) {
-  data <- co_occur(y)
+  data <- co_occur(y) 
   co_all[[y]] <- data
 }
 

@@ -129,5 +129,5 @@ monthly_stable <- ggplot(soi_means_long, aes(y = landings, x = month)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~species, ncol = 4, scale = "free")
 
-ggsave(filename="Figures/Monthly data/monthly_landings_stable.pdf", monthly_stable,
+ggsave(filename="Monthly pdf data/Figures/monthly_landings_stable.pdf", monthly_stable,
        width=400, height=250, units="mm", dpi=300)

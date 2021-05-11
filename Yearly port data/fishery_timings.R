@@ -112,6 +112,6 @@ timeline <- ggplot(tasks.long, aes(x=Task, y=task.date, colour=Project)) +
 timeline
 
 # TODO: Change units to make plot display well.
-ggsave(timeline, filename = "Figures/fisheries_gantt.png", 
+ggsave(timeline, filename = "Yearly port data/Figures/fisheries_gantt.png", 
        width = 250, height = 120, units = "mm", 
        dpi = 300, bg = "transparent")

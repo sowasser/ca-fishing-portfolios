@@ -254,11 +254,11 @@ total_means_kw <- rbind(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
                         c(colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE)),
                         c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
                         c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
-rownames(total_means_kw) <- c("Market Squid", "Coastal Pelagics", 
-                              "Dover Sole/Thornyhead/Sablefish", 
-                              "Pacific Whiting", "Other Groundfish", 
-                              "Dungeness Crab", "Red Sea Urchin", 
-                              "Ocean Shrimp", "Herring Roe", "Salmon")
+species <- c("Market Squid", "Coastal Pelagics", 
+             "Dover Sole/Thornyhead/Sablefish", "Pacific Whiting", 
+             "Other Groundfish", "Dungeness Crab", "Red Sea Urchin", 
+             "Ocean Shrimp", "Herring Roe", "Salmon")
+rownames(total_means_kw) <- species
 total_means_kw <- melt(total_means_kw)
 colnames(total_means_kw) <- c("species", "month", "landings")
 total_means_kw$species <- as.factor(total_means_kw$species)
@@ -278,11 +278,7 @@ total_means_cr <- cbind(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
                         c(colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE)),
                         c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
                         c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
-colnames(total_means_cr) <- c("Market Squid", "Coastal Pelagics", 
-                              "Dover Sole/Thornyhead/Sablefish", 
-                              "Pacific Whiting", "Other Groundfish", 
-                              "Dungeness Crab", "Red Sea Urchin", 
-                              "Ocean Shrimp", "Herring Roe", "Salmon")
+colnames(total_means_cr) <- species
 
 # Get correlation & round to 2 decimal places for plot
 species_cor <- round(cor(total_means_cr, method = "spearman"), 2)
@@ -304,15 +300,12 @@ ggsave(filename = "Monthly pdf data/Figures/species_correlations.pdf",
 
 # Density plot of top species of interest
 # TODO: FIX THIS
-total_means_long <- total_means[c(11, 12, 1:10), ]  # re-order months
-row.names(total_means_long) <- NULL  # Re-set row-names for plotting
-total_means_long <- melt(total_means_long)
-colnames(total_means_long) <- c("month", "species", "landings")
+total_means_den <- total_means_kw[, c(11, 12, 1:10) ]  # re-order months
+colnames(total_means_den) <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+total_means_den <- melt(total_means_den)
+colnames(total_means_den) <- c("species", "month", "landings")
 
-months <- c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", 
-            "Aug", "Sep", "Oct")
-
-species_overlap <- ggplot(total_means_long, aes(x = month, y = landings, fill = species)) +
+species_overlap <- ggplot(total_means_den, aes(x = month, y = landings, fill = species)) +
   theme_bw() +
   geom_area(position = "identity", alpha = 0.6) +
   scale_fill_viridis(discrete = TRUE) +

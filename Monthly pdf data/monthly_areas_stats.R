@@ -15,6 +15,11 @@ library(viridis)
 all_soi <- read.csv("Data/dfw_areas_all_soi.csv")
 top_soi <- read.csv("Data/dfw_areas_top_soi.csv")
 
+species <- c("Market Squid", "Coastal Pelagics", 
+             "Dover Sole/Thornyhead/Sablefish", "Pacific Whiting", 
+             "Other Groundfish", "Dungeness Crab", "Red Sea Urchin", 
+             "Ocean Shrimp", "Herring Roe", "Salmon")
+
 # Kruskal-Wallis test for the mean by year for top SOI ------------------------
 year_means <- all_soi %>% 
   group_by(Species, year) %>% 
@@ -254,10 +259,6 @@ total_means_kw <- rbind(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
                         c(colMeans(shrimp_means[, -c(1, 2)], na.rm = TRUE)),
                         c(colMeans(roe_means[, -c(1, 2)], na.rm = TRUE)),
                         c(colMeans(salmon_means[, -c(1, 2)], na.rm = TRUE)))
-species <- c("Market Squid", "Coastal Pelagics", 
-             "Dover Sole/Thornyhead/Sablefish", "Pacific Whiting", 
-             "Other Groundfish", "Dungeness Crab", "Red Sea Urchin", 
-             "Ocean Shrimp", "Herring Roe", "Salmon")
 rownames(total_means_kw) <- species
 total_means_kw <- melt(total_means_kw)
 colnames(total_means_kw) <- c("species", "month", "landings")

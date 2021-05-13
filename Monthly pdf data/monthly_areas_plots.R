@@ -25,16 +25,18 @@ months_abbrev <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
                    "Sep", "Oct", "Nov", "Dec")
 
 # Species of interest ordered by highest landings 
-species_order <- c("Market Squid", "Pelagics", "Groundfish", "Dungeness Crab",
-                   "Red Sea Urchin", "Ocean Shrimp", "Herring Roe", "Salmon", 
-                   "Yellowfin_Skipjack", "Spiny Lobster", "Hagfish", 
-                   "Pacific Bonito", "Rock Crab", "Swordfish", 
-                   "Ridgeback Prawn", "Albacore Tuna", "Bigeye Tuna", 
-                   "Spot Prawn", "Opah", "other")
+species_order <- c("Market Squid", "Pelagics", "Dungeness Crab",
+                   "Red Sea Urchin", "Ocean Shrimp", "Herring Roe", 
+                   "Dover Sole_Thornyhead_Sablefish", "Pacific Whiting",
+                   "Other Groundfish", "Salmon", "Yellowfin_Skipjack", 
+                   "Spiny Lobster", "Hagfish", "Pacific Bonito", "Rock Crab", 
+                   "Swordfish", "Ridgeback Prawn", "Albacore Tuna", 
+                   "Bigeye Tuna", "Halibut", "Spot Prawn", "Opah", "other")
 # Top species of interest ordered by highest landings
-top_species_order <- c("Market Squid", "Pelagics", "Groundfish", 
-                       "Dungeness Crab","Red Sea Urchin", "Ocean Shrimp",
-                       "Herring Roe", "Salmon")
+top_species_order <- c("Market Squid", "Pelagics", "Dungeness Crab", 
+                       "Red Sea Urchin", "Ocean Shrimp", "Herring Roe", 
+                       "Dover Sole_Thornyhead_Sablefish", "Pacific Whiting",
+                       "Other Groundfish", "Salmon")
 
 
 # All landings ----------------------------------------------------------------
@@ -45,7 +47,7 @@ all_landings <- all_landings[, -2]  # remove year column
 
 all_means <- all_landings %>%
   group_by(area) %>%
-  summarize(across(January:Landings, mean))
+  summarize(across(January:Landings, mean, na.rm = TRUE))
 
 colnames(all_means) <- c("species", months_abbrev)
 all_means <- all_means[, c(1, 12, 13, 2:11)]  # Year starts in Nov.
@@ -117,4 +119,4 @@ monthly_species <- ggplot(overall_means, aes(y = landings, x = month)) +
   facet_wrap(~species, ncol = 4, scale = "free")
 
 ggsave(filename="Monthly pdf data/Figures/monthly_species.pdf", monthly_species,
-       width=400, height=300, units="mm", dpi=300)
+       width=400, height=350, units="mm", dpi=300)

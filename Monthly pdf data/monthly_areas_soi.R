@@ -266,5 +266,5 @@ ggsave(filename="Monthly pdf data/Figures/all_soi_landings.pdf", total_plot,
 write.csv(all_soi, "Data/dfw_areas_all_soi.csv", row.names = FALSE)
 
 top_soi <- all_soi %>% filter(str_detect(Species, 
-                                         "Market Squid|Pelagics|Groundfish|Dungeness Crab|Red Sea Urchin|Ocean Shrimp|Herring Roe|Salmon"))
+                                         "Market Squid|Pelagics|Dungeness Crab|Red Sea Urchin|Ocean Shrimp|Herring Roe|Dover Sole_Thornyhead_Sablefish|Pacific Whiting|Other Groundfish|Salmon"))
 write.csv(top_soi, "Data/dfw_areas_top_soi.csv", row.names = FALSE)

@@ -282,7 +282,6 @@ total_means_cr <- cbind(c(colMeans(squid_means[, -c(1, 2)], na.rm = TRUE)),
 colnames(total_means_cr) <- species
 
 # Get correlation & round to 2 decimal places for plot
-cor(total_means_cr, method = "spearman")
 species_cor <- round(cor(total_means_cr, method = "spearman"), 2)
 
 species_cor_plot <- ggplot(melt(species_cor), aes(x = Var1, y = Var2, fill = value)) +

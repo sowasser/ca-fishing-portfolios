@@ -19,11 +19,11 @@ fishyears$month <- factor(fishyears$month, levels = c("Nov", "Dec", "Jan",
                                                       "May", "Jun", "Jul",
                                                       "Aug", "Sep", "Oct"))
 
-original_foi <- c("Market Squid", "Pelagics", "Dover Sole_Thornyhead_Sablefish",
-                  "Pacific Whiting", "Other Groundfish", "Dungeness Crab", 
-                  "Red Sea Urchin", "Ocean Shrimp", "Herring Roe", "Salmon")
-new_foi <- c("squid", "pelagics", "DSTS", "whiting", "groundfish", 
-             "dungeness crab", "urchin", "shrimp", "herring roe", "salmon")
+original_foi <- c("Market Squid", "Pelagics", "Dungeness Crab", "Red Sea Urchin",
+                  "Ocean Shrimp", "Herring Roe", "Dover Sole_Thornyhead_Sablefish",
+                  "Pacific Whiting", "Other Groundfish", "Salmon")
+new_foi <- c("squid", "pelagics", "dungneness crab", "urchin", "shrimp", 
+             "herring roe", "DSTS", "whiting", "groundfish", "salmon")
 
 
 # Kruskal-Wallis test for the mean by year for top SOI ------------------------
@@ -188,7 +188,7 @@ kwAllPairsNemenyiTest(allCA_foi_means$landings ~ allCA_foi_means$species)
 allCA_means_cr <- dcast(allCA_foi_means, month ~ species)
 colnames(allCA_means_cr) <- c("month", "DSTS", "dungeness crab", "herring roe", 
                               "market squid", "ocean shrimp", 
-                              "other grounfish", "Pacific whiting", "pelagics",
+                              "other groundfish", "Pacific whiting", "pelagics",
                               "red sea urchin", "salmon")
 
 species_cor <- round(cor(allCA_means_cr[, -1], method = "spearman"), 2)

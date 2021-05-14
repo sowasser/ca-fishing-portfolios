@@ -8,11 +8,11 @@ library(reshape2)
 library(ggplot2)
 library(viridis)
 
-
-# Import datasets for all areas and for species of interest
-all_areas <- read.csv("Data/DFW areas/all_areas.csv")
-all_soi <- read.csv("Data/dfw_areas_all_soi.csv")
-top_soi <- read.csv("Data/dfw_areas_top_soi.csv")
+fishyears <- read.csv("Data/DFW areas/fisheries_year_soi.csv")
+fishyears$month <- factor(fishyears$month, levels = c("Nov", "Dec", "Jan", 
+                                                      "Feb", "Mar", "Apr", 
+                                                      "May", "Jun", "Jul",
+                                                      "Aug", "Sep", "Oct"))
 
 
 # Order of areas from North -> South
@@ -23,6 +23,12 @@ area_order <- c("Eureka", "Fort Bragg", "Bodega Bay", "San Francisco",
 # Abbreviation of months for nice plots
 months_abbrev <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", 
                    "Sep", "Oct", "Nov", "Dec")
+
+original_foi <- c("Market Squid", "Pelagics", "Dungeness Crab", "Red Sea Urchin",
+                  "Ocean Shrimp", "Herring Roe", "Dover Sole_Thornyhead_Sablefish",
+                  "Pacific Whiting", "Other Groundfish", "Salmon")
+new_foi <- c("squid", "pelagics", "dungneness crab", "urchin", "shrimp", 
+             "herring roe", "DSTS", "whiting", "groundfish", "salmon")
 
 # Species of interest ordered by highest landings 
 species_order <- c("Market Squid", "Pelagics", "Dungeness Crab",
@@ -40,53 +46,35 @@ top_species_order <- c("Market Squid", "Pelagics", "Dungeness Crab",
 
 
 # All landings ----------------------------------------------------------------
-all_landings <- all_areas %>% group_by(area, year) %>% 
-  summarize(across(January:Landings, sum))
+area_means <- fishyears %>%
+  group_by(area, month) %>%
+  summarize(landings = mean(landings, na.rm = TRUE))
 
-all_landings <- all_landings[, -2]  # remove year column
+area_means$area <- factor(area_means$area, levels = area_order)
 
-all_means <- all_landings %>%
-  group_by(area) %>%
-  summarize(across(January:Landings, mean, na.rm = TRUE))
-
-colnames(all_means) <- c("species", months_abbrev)
-all_means <- all_means[, c(1, 12, 13, 2:11)]  # Year starts in Nov.
-all_means <- melt(all_means, id_vars = c("area"))
-colnames(all_means) <- c("area", "month", "landings")
-all_means$area <- factor(all_means$area, levels = area_order)
-
-all_mean_landings <- ggplot(all_means, aes(y = landings, x = month)) +
+area_mean_landings <- ggplot(area_means, aes(y = landings, x = month)) +
   geom_bar(stat = "identity") +
   ylab("mean landings (lbs)") + xlab(" ") +
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~area, ncol = 3, scale = "free")
 
-ggsave(filename="Monthly pdf data/Figures/all_landings.pdf", all_mean_landings,
+ggsave(filename="Monthly pdf data/Figures/all_landings.pdf", area_mean_landings,
        width=400, height=250, units="mm", dpi=300)
 
 
 # Find monthly mean for each year for the top species of interest -------------
-top_soi2 <- top_soi[, -15]  # remove year column
-top_soi2$Species <- str_trim(top_soi2$Species, side = "both")  # Remove extra white spaces
+top_foi <- fishyears %>%
+  filter(str_detect(species, "Market Squid|Pelagics|Dover Sole_Thornyhead_Sablefish|Pacific Whiting|Other Groundfish|Dungeness Crab|Red Sea Urchin|Ocean Shrimp|Herring Roe|Salmon"))
 
-top_soi_means <- top_soi2 %>% 
-  group_by(Species, area) %>% 
-  summarize(across(January:Landings, mean, na.rm = TRUE))
-
-top_soi_means <- top_soi_means[, -15]  # Remove total landings
-
-colnames(top_soi_means) <- c("species", "area", months_abbrev)  # Update to abbreviated months
-
-# Change column & row order to match analyses
-top_soi_means <- top_soi_means[, c(1, 2, 13, 14, 3:12)]  # Year starts in Nov.
-top_soi_means <- melt(top_soi_means, id_vars = c("area", "species"))
-colnames(top_soi_means) <- c("species", "area", "month", "landings")
-top_soi_means$area <- factor(top_soi_means$area, levels = area_order)
-top_soi_means$species <- factor(top_soi_means$species, levels = top_species_order)
+top_means <- top_foi %>% 
+  group_by(species, area, month) %>%
+  summarize(landings = mean(landings, na.rm = TRUE))
+top_means$species <- factor(top_means$species, levels = original_foi, labels = new_foi)
+top_means$area <- factor(top_means$area, levels = area_order)
 
 # Plot monthly means for stable period
-monthly_areas <- ggplot(top_soi_means, aes(y = landings, x = month, fill = species)) +
+monthly_areas <- ggplot(top_means, aes(y = landings, x = month, fill = species)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("mean landings (lbs)") + xlab(" ") +
   theme_bw() +
@@ -95,20 +83,31 @@ monthly_areas <- ggplot(top_soi_means, aes(y = landings, x = month, fill = speci
   facet_wrap(~area, ncol = 3, scale = "free")
 
 ggsave(filename="Monthly pdf data/Figures/area_monthly_landings.pdf", monthly_areas,
-       width=400, height=250, units="mm", dpi=300)
+       width=350, height=220, units="mm", dpi=300)
 
 
 # Overall monthly trends for species of interest ------------------------------
-overall_means <- all_soi %>% 
-  group_by(Species) %>% 
-  summarize(across(January:Landings, mean, na.rm = TRUE))
+overall_means <- fishyears %>%
+  group_by(species, year, month) %>%
+  summarize(landings = sum(landings, na.rm = TRUE)) %>%
+  group_by(species, month) %>%
+  summarize(landings = mean(landings, na.rm = TRUE))
 
-# Reorder columns & remove total landings
-colnames(overall_means) <- c("species", months_abbrev)
-overall_means <- overall_means[, c(1, 12, 13, 2:11)]
-overall_means <- melt(overall_means, id_vars = c("species"))
-colnames(overall_means) <- c("species", "month", "landings")
-overall_means$species <- factor(overall_means$species, levels = species_order)
+overall_means$species <- factor(overall_means$species, 
+                                levels = c("Market Squid", "Pelagics", "Dungeness Crab",
+                                           "Red Sea Urchin", "Ocean Shrimp", "Herring Roe", 
+                                           "Dover Sole_Thornyhead_Sablefish", "Pacific Whiting",
+                                           "Other Groundfish", "Salmon", "Yellowfin_Skipjack", 
+                                           "Spiny Lobster", "Hagfish", "Pacific Bonito", "Rock Crab", 
+                                           "Swordfish", "Ridgeback Prawn", "Albacore Tuna", 
+                                           "Bigeye Tuna", "Halibut", "Spot Prawn", "Opah", "other"),
+                                labels = c("Market Squid", "Pelagics", "Dungeness Crab",
+                                           "Red Sea Urchin", "Ocean Shrimp", "Herring Roe", 
+                                           "Dover Sole/Thornyhead/Sablefish", "Pacific Whiting",
+                                           "Other Groundfish", "Salmon", "Yellowfin/Skipjack", 
+                                           "Spiny Lobster", "Hagfish", "Pacific Bonito", "Rock Crab", 
+                                           "Swordfish", "Ridgeback Prawn", "Albacore Tuna", 
+                                           "Bigeye Tuna", "Halibut", "Spot Prawn", "Opah", "other"))
 
 monthly_species <- ggplot(overall_means, aes(y = landings, x = month)) +
   geom_bar(position = "stack", stat = "identity") +

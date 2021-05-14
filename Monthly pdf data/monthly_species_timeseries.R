@@ -73,7 +73,14 @@ write.csv(soi_plots, "Data/DFW areas/fisheries_year_soi.csv", row.names = FALSE)
 
 
 # Create plots in a function --------------------------------------------------
-soi_fisheries <- levels(factor(soi_plots$species))
+soi_fisheries_original <- levels(factor(soi_plots$species))
+soi_fisheries_new <- c("Albacore Tuna", "Bigeye Tuna", "Dover Sole-Thornyhead-Sablefish",
+                       "Dungeness Crab", "Hagfish", "Halibut", "Herring Roe", 
+                       "Market Squid", "Ocean Shrimp", "Opah", "other", 
+                       "Other Groundfish", "Pacific Bonito", "Pacific Whiting", 
+                       "Coastal Pelagics", "Red Sea Urchin", "Ridgeback Prawn", 
+                       "Rock Crab", "Salmon", "Spiny Lobster", "Spot Prawn", 
+                       "Swordfish", "Yellowfin-Skipjack Tuna")
 
 species_timeseries <- function(fishery) {
   # Function creates an plot for each of the species of interest with a unique

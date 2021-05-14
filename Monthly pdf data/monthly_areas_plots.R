@@ -14,35 +14,16 @@ fishyears$month <- factor(fishyears$month, levels = c("Nov", "Dec", "Jan",
                                                       "May", "Jun", "Jul",
                                                       "Aug", "Sep", "Oct"))
 
-
 # Order of areas from North -> South
 area_order <- c("Eureka", "Fort Bragg", "Bodega Bay", "San Francisco", 
                 "Monterey", "Morro Bay", "Santa Barbara", "Los Angeles",
                 "San Diego")
-
-# Abbreviation of months for nice plots
-months_abbrev <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", 
-                   "Sep", "Oct", "Nov", "Dec")
 
 original_foi <- c("Market Squid", "Pelagics", "Dungeness Crab", "Red Sea Urchin",
                   "Ocean Shrimp", "Herring Roe", "Dover Sole_Thornyhead_Sablefish",
                   "Pacific Whiting", "Other Groundfish", "Salmon")
 new_foi <- c("squid", "pelagics", "dungneness crab", "urchin", "shrimp", 
              "herring roe", "DSTS", "whiting", "groundfish", "salmon")
-
-# Species of interest ordered by highest landings 
-species_order <- c("Market Squid", "Pelagics", "Dungeness Crab",
-                   "Red Sea Urchin", "Ocean Shrimp", "Herring Roe", 
-                   "Dover Sole_Thornyhead_Sablefish", "Pacific Whiting",
-                   "Other Groundfish", "Salmon", "Yellowfin_Skipjack", 
-                   "Spiny Lobster", "Hagfish", "Pacific Bonito", "Rock Crab", 
-                   "Swordfish", "Ridgeback Prawn", "Albacore Tuna", 
-                   "Bigeye Tuna", "Halibut", "Spot Prawn", "Opah", "other")
-# Top species of interest ordered by highest landings
-top_species_order <- c("Market Squid", "Pelagics", "Dungeness Crab", 
-                       "Red Sea Urchin", "Ocean Shrimp", "Herring Roe", 
-                       "Dover Sole_Thornyhead_Sablefish", "Pacific Whiting",
-                       "Other Groundfish", "Salmon")
 
 
 # All landings ----------------------------------------------------------------

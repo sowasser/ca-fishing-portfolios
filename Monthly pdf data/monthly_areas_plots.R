@@ -104,7 +104,7 @@ overall_means$species <- factor(overall_means$species,
                                 labels = c("Market Squid", "Pelagics", "Dungeness Crab",
                                            "Red Sea Urchin", "Ocean Shrimp", "Herring Roe", 
                                            "Dover Sole/Thornyhead/Sablefish", "Pacific Whiting",
-                                           "Other Groundfish", "Salmon", "Yellowfin/Skipjack", 
+                                           "Other Groundfish", "Salmon", "Yellowfin/Skipjack Tuna", 
                                            "Spiny Lobster", "Hagfish", "Pacific Bonito", "Rock Crab", 
                                            "Swordfish", "Ridgeback Prawn", "Albacore Tuna", 
                                            "Bigeye Tuna", "Halibut", "Spot Prawn", "Opah", "other"))

@@ -248,7 +248,18 @@ total_landings <- all_soi[, c(1, 14:16)]
 total_landings <- total_landings %>% group_by(Species) %>% 
   summarize(landings = mean(Landings)) 
 
-total_plot <- ggplot(total_landings, aes(y = landings, x = reorder(Species, -landings))) +
+# Update species names for a nice plot
+tl_plot <- cbind(c("Albacore Tuna", "Bigeye Tuna", "Dover Sole/Thornyhead/Sablefish",
+                   "Dungeness Crab", "Hagfish", "Halibut", "Herring Roe", 
+                   "Market Squid", "Ocean Shrimp", "Opah", "other", 
+                   "Other Groundfish", "Pacific Bonito", "Pacific Whiting", 
+                   "Coastal Pelagics", "Red Sea Urchin", "Ridgeback Prawn", 
+                   "Rock Crab", "Salmon", "Spiny Lobster", "Spot Prawn", 
+                   "Swordfish", "Yellowfin/Skipjack Tuna"), 
+                 total_landings[, 2])
+colnames(tl_plot) <- c("Species", "landings")
+
+total_plot <- ggplot(tl_plot, aes(y = landings, x = reorder(Species, -landings))) +
   geom_bar(position = "dodge", stat = "identity") +
   ylab("mean landings (lbs)") + xlab("high-landings species/fisheries") +
   theme_bw() +

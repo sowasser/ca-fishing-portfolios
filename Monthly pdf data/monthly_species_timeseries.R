@@ -82,6 +82,8 @@ soi_fisheries_new <- c("Albacore Tuna", "Bigeye Tuna", "Dover Sole-Thornyhead-Sa
                        "Rock Crab", "Salmon", "Spiny Lobster", "Spot Prawn", 
                        "Swordfish", "Yellowfin-Skipjack Tuna")
 
+soi_plots$species <- factor(soi_plots$species, labels = soi_fisheries_new)
+
 species_timeseries <- function(fishery) {
   # Function creates an plot for each of the species of interest with a unique
   # title and saves them all to one folder with unique name.
@@ -102,6 +104,6 @@ species_timeseries <- function(fishery) {
 }
 
 # Function call for each species 
-for (s in soi_fisheries) {
+for (s in soi_fisheries_new) {
   species_timeseries(s)
 }

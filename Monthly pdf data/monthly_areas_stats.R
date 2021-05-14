@@ -19,6 +19,13 @@ fishyears$month <- factor(fishyears$month, levels = c("Nov", "Dec", "Jan",
                                                       "May", "Jun", "Jul",
                                                       "Aug", "Sep", "Oct"))
 
+original_foi <- c("Market Squid", "Pelagics", "Dover Sole_Thornyhead_Sablefish",
+                  "Pacific Whiting", "Other Groundfish", "Dungeness Crab", 
+                  "Red Sea Urchin", "Ocean Shrimp", "Herring Roe", "Salmon")
+new_foi <- c("squid", "pelagics", "DSTS", "whiting", "groundfish", 
+             "dungeness crab", "urchin", "shrimp", "herring roe", "salmon")
+
+
 # Kruskal-Wallis test for the mean by year for top SOI ------------------------
 all_ca <- fishyears %>%
   group_by(species, year, month) %>%
@@ -118,7 +125,7 @@ top_foi <- fishyears %>%
 top_means <- top_foi %>% 
   group_by(species, area, month) %>%
   summarize(landings = mean(landings, na.rm = TRUE))
-top_means$species <- as.factor(top_means$species)
+top_means$species <- factor(top_means$species, levels = original_foi, labels = new_foi)
 
 # Eureka
 e_means <- top_means %>% filter(area == "Eureka")
@@ -205,12 +212,7 @@ ggsave(filename = "Monthly pdf data/Figures/species_correlations.pdf",
 den_allCA_foi <- allCA_foi_means
 levels(den_allCA_foi$month) <- 1:12
 den_allCA_foi$month <- as.numeric(den_allCA_foi$month)
-den_allCA_foi$species <- factor(den_allCA_foi$species, 
-                                levels = c("Market Squid", "Pelagics", 
-                                           "Dover Sole_Thornyhead_Sablefish", 
-                                           "Pacific Whiting", "Other Groundfish", 
-                                           "Dungeness Crab", "Red Sea Urchin", 
-                                           "Ocean Shrimp", "Herring Roe", "Salmon"))
+den_allCA_foi$species <- factor(den_allCA_foi$species, levels = original_foi, labels = new_foi)
 
 species_overlap <- ggplot(den_allCA_foi, aes(x = month, y = landings, fill = species)) +
   theme_bw() +

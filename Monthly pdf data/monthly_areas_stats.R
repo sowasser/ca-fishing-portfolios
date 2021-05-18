@@ -31,45 +31,14 @@ all_ca <- fishyears %>%
   group_by(species, year, month) %>%
   summarize(landings = sum(landings, na.rm = TRUE))
 
-# Squid
-squid_allCA <- all_ca %>% filter(str_detect(species, "Squid"))
-kruskal.test(squid_allCA$landings ~ squid_allCA$year)  # p = 0.03507*
+kw_test_byyear <- function(sp_name) {
+  df <- all_ca %>% filter(str_detect(species, sp_name))
+  kw <- kruskal.test(df$landings ~ df$year)
+  return(kw$p.value)
+}
 
-# Pelagics 
-pelagics_allCA <- all_ca %>% filter(str_detect(species, "Pelagics"))
-kruskal.test(pelagics_allCA$landings ~ pelagics_allCA$year)  # p = 7.226e-16*
-
-# Dover Sole / Thornyhead / Sablefish 
-dsts_allCA <- all_ca %>% filter(str_detect(species, "Dover Sole_Thornyhead_Sablefish"))
-kruskal.test(dsts_allCA$landings ~ dsts_allCA$year)  # p = 2.218e-05****
-
-# Pacific Whiting
-whiting_allCA <- all_ca %>% filter(str_detect(species, "Whiting"))
-kruskal.test(whiting_allCA$landings ~ whiting_allCA$year)  # p = 0.02513*
-
-# Other Groundfish
-groundfish_allCA <- all_ca %>% filter(str_detect(species, "Other Groundfish"))
-kruskal.test(groundfish_allCA$landings ~ groundfish_allCA$year)  # p = 4.45e-15****
-
-# Dungeness Crab
-crab_allCA <- all_ca %>% filter(str_detect(species, "Dungeness"))
-kruskal.test(crab_allCA$landings ~ crab_allCA$year)  # p = 0.7351
-
-# Red Sea Urchin
-urchin_allCA <- all_ca %>% filter(str_detect(species, "Urchin"))
-kruskal.test(urchin_allCA$landings ~ urchin_allCA$year)  # p < 2.2e-16****
-
-# Ocean Shrimp
-shrimp_allCA <- all_ca %>% filter(str_detect(species, "Ocean Shrimp"))
-kruskal.test(shrimp_allCA$landings ~ shrimp_allCA$year)  # p = 0.2094
-
-# Herring Roe
-roe_allCA <- all_ca %>% filter(str_detect(species, "Roe"))
-kruskal.test(roe_allCA$landings ~ roe_allCA$year)  # p = 0.5101
-
-# Salmon
-salmon_allCA <- all_ca %>% filter(str_detect(species, "Salmon"))
-kruskal.test(salmon_allCA$landings ~ salmon_allCA$year)  # p = 0.01609*
+p_byyear <- sapply(original_foi, kw_test_species)
+# print(p_byyear)
 
 
 # Kruskal-Wallis test for the mean for each area across the stable period ----
@@ -77,45 +46,14 @@ area_means <- fishyears %>%
   group_by(species, area, month) %>%
   summarize(landings = mean(landings, na.rm = TRUE))
 
-# Squid
-squid_area_means <- area_means %>% filter(str_detect(species, "Squid"))
-kruskal.test(squid_area_means$landings ~ squid_area_means$area)  # p = 1.032e-13****
+kw_test_byarea <- function(sp_name) {
+  df <- area_means %>% filter(str_detect(species, sp_name))
+  kw <- kruskal.test(df$landings ~ df$area)
+  return(kw$p.value)
+}
 
-# Pelagics 
-pelagics_area_means <- area_means %>% filter(str_detect(species, "Pelagics"))
-kruskal.test(pelagics_area_means$landings ~ pelagics_area_means$area)  # p = 2.385e-16****
-
-# Dover Sole / Thornyhead / Sablefish 
-dsts_area_means <- area_means %>% filter(str_detect(species, "Dover Sole_Thornyhead_Sablefish"))
-kruskal.test(dsts_area_means$landings ~ dsts_area_means$area)  # p < 2.2e-16****
-
-# Pacific Whiting
-whiting_area_means <- area_means %>% filter(str_detect(species, "Whiting"))
-kruskal.test(whiting_area_means$landings ~ whiting_area_means$area)  # p = 5.626e-10****
-
-# Other Groundfish
-groundfish_area_means <- area_means %>% filter(str_detect(species, "Other Groundfish"))
-kruskal.test(groundfish_area_means$landings ~ groundfish_area_means$area)  # p < 2.2e-16****
-
-# Dungeness Crab
-crab_area_means <- area_means %>% filter(str_detect(species, "Dungeness"))
-kruskal.test(crab_area_means$landings ~ crab_area_means$area)  # p = 2.39e-08****
-
-# Red Sea Urchin
-urchin_area_means <- area_means %>% filter(str_detect(species, "Urchin"))
-kruskal.test(urchin_area_means$landings ~ urchin_area_means$area)  # p < 2.2e-16****
-
-# Ocean Shrimp
-shrimp_area_means <- area_means %>% filter(str_detect(species, "Ocean Shrimp"))
-kruskal.test(shrimp_area_means$landings ~ shrimp_area_means$area)  # p = 0.0008066****
-
-# Herring Roe
-roe_area_means <- area_means %>% filter(str_detect(species, "Roe"))
-kruskal.test(roe_area_means$landings ~ roe_area_means$area)  # p = 0.01987*
-
-# Salmon
-salmon_area_means <- area_means %>% filter(str_detect(species, "Salmon"))
-kruskal.test(salmon_area_means$landings ~ salmon_area_means$area)  # p = 0.0005064***
+p_byarea <- sapply(original_foi, kw_test_byarea)
+# print(p_byarea)
 
 
 # Kruskal-Wallis test for the top fisheries of interest within each area ------
@@ -127,50 +65,17 @@ top_means <- top_foi %>%
   summarize(landings = mean(landings, na.rm = TRUE))
 top_means$species <- factor(top_means$species, levels = original_foi, labels = new_foi)
 
-# Eureka
-e_means <- top_means %>% filter(area == "Eureka")
-kruskal.test(e_means$landings ~ e_means$species)  # p = 8.244e-09****
-kwAllPairsNemenyiTest(e_means$landings ~ e_means$species)
+areas <- c("Eureka", "Fort Bragg", "Bodega Bay", "San Francisco", "Monterey", 
+           "Morro Bay", "Santa Barbara", "Los Angeles", "San Diego")
 
-# Fort Bragg
-fb_means <- top_means %>% filter(area == "Fort Bragg")
-kruskal.test(fb_means$landings ~ fb_means$species)  # p = 8.313e-14****
-kwAllPairsNemenyiTest(fb_means$landings ~ fb_means$species)
+kw_test_bysp <- function(area_name) {
+  df <- top_means %>% filter(area == area_name)
+  kw <- kruskal.test(df$landings ~ df$species)
+  return(kw$p.value)
+}
 
-# Bodega Bay
-bb_means <- top_means %>% filter(area == "Bodega Bay")
-kruskal.test(bb_means$landings ~ bb_means$species)  # p = 1.581e-07****
-kwAllPairsNemenyiTest(bb_means$landings ~ bb_means$species)
-
-# San Francisco
-sf_means <- top_means %>% filter(area == "San Francisco")
-kruskal.test(sf_means$landings ~ sf_means$species)  # p = 1.859e-06****
-kwAllPairsNemenyiTest(sf_means$landings ~ sf_means$species)
-
-# Monterey
-m_means <- top_means %>% filter(area == "Monterey")
-kruskal.test(m_means$landings ~ m_means$species)  # p < 2.2e-16****
-kwAllPairsNemenyiTest(m_means$landings ~ m_means$species)
-
-# Morro Bay
-mb_means <- top_means %>% filter(area == "Morro Bay")
-kruskal.test(mb_means$landings ~ mb_means$species)  # p = 4.278e-09****
-kwAllPairsNemenyiTest(mb_means$landings ~ mb_means$species)
-
-# Santa Barbara
-sb_means <- top_means %>% filter(area == "Santa Barbara")
-kruskal.test(sb_means$landings ~ sb_means$species)  # p < 2.2e-16****
-kwAllPairsNemenyiTest(sb_means$landings ~ sb_means$species)
-
-# Los Angeles
-la_means <- top_means %>% filter(area == "Los Angeles")
-kruskal.test(la_means$landings ~ la_means$species)  # p < 2.2e-16****
-kwAllPairsNemenyiTest(la_means$landings ~ la_means$species)
-
-# San Diego
-sd_means <- top_means %>% filter(area == "San Diego")
-kruskal.test(sd_means$landings ~ sd_means$species)  # p < 2.2e-16****
-kwAllPairsNemenyiTest(sd_means$landings ~ sd_means$species)
+p_bysp <- sapply(areas, kw_test_bysp)
+# print(p_bysp)
 
 
 # Species distribution across months for all areas & years --------------------

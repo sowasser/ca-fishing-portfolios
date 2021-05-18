@@ -10,50 +10,25 @@ library(ggplot2)
 # Import dataset of all areas
 all_areas <- read.csv("Data/DFW areas/all_areas.csv")
 
+
 # Find most-landed species ----------------------------------------------------
 # Isolate total landings and find mean by year
 high_landings <- all_areas[, c(1, 14:16)]
 high_landings <- high_landings %>% group_by(area, Species) %>% 
   summarize(landings = mean(Landings))  
 
-# Isolate each area & order by landings in descending order
-total_e <- high_landings %>% filter(area == "Eureka")
-total_e <- total_e[order(-total_e$landings), ]
+highest_area <- function(area_name) {
+  df <- high_landings %>% filter(area == area_name)
+  df <- df[order(-df$landings), ]
+  return(as.data.frame(df[1:11, 1:2]))
+}
 
-total_fb <- high_landings %>% filter(area == "Fort Bragg")
-total_fb <- total_fb[order(-total_fb$landings), ]
+areas <- c("Eureka", "Fort Bragg", "Bodega Bay", "San Francisco", "Monterey", 
+           "Morro Bay", "Santa Barbara", "Los Angeles", "San Diego")
 
-total_bb <- high_landings %>% filter(area == "Bodega Bay")
-total_bb <- total_bb[order(-total_bb$landings), ]
-
-total_sf <- high_landings %>% filter(area == "San Francisco")
-total_sf <- total_sf[order(-total_sf$landings), ]
-
-total_m <- high_landings %>% filter(area == "Monterey")
-total_m <- total_m[order(-total_m$landings), ]
-
-total_mb <- high_landings %>% filter(area == "Morro Bay")
-total_mb <- total_mb[order(-total_mb$landings), ]
-
-total_sb <- high_landings %>% filter(area == "Santa Barbara")
-total_sb <- total_sb[order(-total_sb$landings), ]
-
-total_la <- high_landings %>% filter(area == "Los Angeles")
-total_la <- total_la[order(-total_la$landings), ]
-
-total_sd <- high_landings %>% filter(area == "San Diego")
-total_sd <- total_sd[order(-total_sd$landings), ]
-
-# Create dataframe of highest landed species
-high_landings <- rbind(total_e[1:11, 1:2], total_fb[1:11, 1:2], 
-                       total_bb[1:11, 1:2], total_sf[1:11, 1:2], 
-                       total_m[1:11, 1:2], total_mb[1:11, 1:2],
-                       total_sb[1:11, 1:2], total_la[1:11, 1:2], 
-                       total_sd[1:11, 1:2])
-
-# Get list of unique species names (not fully unique :/ )
-high_landings <- levels(factor(high_landings$Species))
-print(high_landings)
+highest_landings <- sapply(areas, highest_area)
+highest_landings <- unique(do.call(c, highest_landings[2, ]))
+print(highest_landings)
 
 
 # Isolate species of interest -------------------------------------------------

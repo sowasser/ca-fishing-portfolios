@@ -11,6 +11,7 @@ library(PMCMRplus)
 library(kSamples)
 library(ggplot2)
 library(viridis)
+library(scales)
 
 
 fishyears <- read.csv("Data/DFW areas/fisheries_year_soi.csv")
@@ -87,7 +88,10 @@ allCA_foi_means <- all_ca %>%
 # Kruskal-Wallis for all means
 allCA_foi_means$species <- as.factor(allCA_foi_means$species)
 kruskal.test(allCA_foi_means$landings ~ allCA_foi_means$species)  # p = 2.403e-14****
-kwAllPairsNemenyiTest(allCA_foi_means$landings ~ allCA_foi_means$species)
+nemenyi <- kwAllPairsNemenyiTest(allCA_foi_means$landings ~ allCA_foi_means$species)
+
+# Calculate substitutability index (0-1) from Nemenyi p-values
+sub_index <- rescale(nemenyi$p.value)
 
 # Correlation between species
 allCA_means_cr <- dcast(allCA_foi_means, month ~ species)

@@ -92,6 +92,25 @@ nemenyi <- kwAllPairsNemenyiTest(allCA_foi_means$landings ~ allCA_foi_means$spec
 
 # Calculate substitutability index (0-1) from Nemenyi p-values
 sub_index <- rescale(nemenyi$p.value)
+colnames(sub_index) <- c("DSTS", "dungeness crab", "herring roe", 
+                         "market squid", "ocean shrimp", "other groundfish",
+                         "Pacific whiting", "pelagics", "red sea urchin")
+rownames(sub_index) <- c("dungeness crab", "herring roe", "market squid", 
+                         "ocean shrimp", "other groundfish", "Pacific whiting",
+                         "pelagics", "red sea urchin", "salmon")
+
+sub_index_plot <- ggplot(melt(sub_index, na.rm = TRUE), aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile(height = 0.8, width = 0.8) +
+  scale_fill_viridis(limits = c(0, 1)) +
+  theme_minimal() +
+  coord_equal() +
+  labs(x =" ", y = "", fill = "Substitutability Index") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, margin = margin(-3,0,0,0)),
+        axis.text.y = element_text(margin = margin(0, -3, 0, 0)),
+        panel.grid.major = element_blank())
+
+ggsave(filename = "~/Desktop/species_correlations.pdf", 
+       plot = sub_index_plot, width = 195, height = 160, units = "mm", dpi = 300)
 
 # Correlation between species
 allCA_means_cr <- dcast(allCA_foi_means, month ~ species)

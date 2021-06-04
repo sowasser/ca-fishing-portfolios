@@ -109,7 +109,7 @@ sub_index_plot <- ggplot(melt(sub_index, na.rm = TRUE), aes(x = Var1, y = Var2, 
         axis.text.y = element_text(margin = margin(0, -3, 0, 0)),
         panel.grid.major = element_blank())
 
-ggsave(filename = "~/Desktop/species_correlations.pdf", 
+ggsave(filename = "Monthly pdf data/Figures/sub_index_plot.pdf", 
        plot = sub_index_plot, width = 195, height = 160, units = "mm", dpi = 300)
 
 # Correlation between species

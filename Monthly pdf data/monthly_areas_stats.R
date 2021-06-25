@@ -12,7 +12,7 @@ library(kSamples)
 library(ggplot2)
 library(viridis)
 library(scales)
-
+library(ggsidekick)
 
 fishyears <- read.csv("Data/DFW areas/fisheries_year_soi.csv")
 fishyears$month <- factor(fishyears$month, levels = c("Nov", "Dec", "Jan", 
@@ -109,7 +109,7 @@ sub_index_plot <- ggplot(melt(sub_index, na.rm = TRUE), aes(x = Var1, y = Var2, 
         axis.text.y = element_text(margin = margin(0, -3, 0, 0)),
         panel.grid.major = element_blank())
 
-ggsave(filename = "Monthly pdf data/Figures/sub_index_plot.pdf", 
+ggsave(filename = "Monthly pdf data/Figures/sub_index_plot2.pdf", 
        plot = sub_index_plot, width = 195, height = 160, units = "mm", dpi = 300)
 
 # Correlation between species
@@ -143,14 +143,14 @@ den_allCA_foi$month <- as.numeric(den_allCA_foi$month)
 den_allCA_foi$species <- factor(den_allCA_foi$species, levels = original_foi, labels = new_foi)
 
 species_overlap <- ggplot(den_allCA_foi, aes(x = month, y = landings, fill = species)) +
-  theme_bw() +
   geom_area(position = "identity", alpha = 0.6) +
   scale_fill_viridis(discrete = TRUE) +
   scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7 ,8 ,9, 10, 11, 12), 
                      labels = c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", 
                                 "May", "Jun", "Jul", "Aug", "Sep", "Oct")) +
   xlab(" ") + ylab("mean landings") +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme_sleek()
 
 ggsave(filename = "Monthly pdf data/Figures/species_overlap.pdf", 
        plot = species_overlap, width = 200, height = 130, units = "mm", dpi = 300)

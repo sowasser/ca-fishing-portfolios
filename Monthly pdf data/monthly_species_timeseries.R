@@ -10,7 +10,7 @@ library(dplyr)
 library(reshape2)
 library(ggplot2)
 library(viridis)
-
+library(ggsidekick)
 
 # Import dataset for all species of interest
 all_soi <- read.csv("Data/dfw_areas_all_soi.csv")
@@ -94,9 +94,9 @@ species_timeseries <- function(fishery) {
     ylab("mean landings (lbs)") + xlab(" ") +
     ggtitle(fishery) + 
     scale_fill_viridis(discrete = TRUE) +
-    theme_bw() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-    facet_wrap(~year, ncol = 4, scale = "free")
+    facet_wrap(~year, ncol = 4, scale = "free") +
+    theme_sleek()
   
   ggsave(filename=paste("Monthly pdf data/Figures/Species timeseries/", fishery, "_landings.pdf", 
                         sep=""), 

@@ -7,6 +7,7 @@ library(dplyr)
 library(reshape2)
 library(ggplot2)
 library(viridis)
+library(ggsidekick)
 
 fishyears <- read.csv("Data/DFW areas/fisheries_year_soi.csv")
 fishyears$month <- factor(fishyears$month, levels = c("Nov", "Dec", "Jan", 
@@ -36,9 +37,9 @@ area_means$area <- factor(area_means$area, levels = area_order)
 area_mean_landings <- ggplot(area_means, aes(y = landings, x = month)) +
   geom_bar(stat = "identity") +
   ylab("mean landings (lbs)") + xlab(" ") +
-  theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  facet_wrap(~area, ncol = 3, scale = "free")
+  facet_wrap(~area, ncol = 3, scale = "free") +
+  theme_sleek()
 
 ggsave(filename="Monthly pdf data/Figures/all_landings.pdf", area_mean_landings,
        width=400, height=250, units="mm", dpi=300)
@@ -58,10 +59,10 @@ top_means$area <- factor(top_means$area, levels = area_order)
 monthly_areas <- ggplot(top_means, aes(y = landings, x = month, fill = species)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("mean landings (lbs)") + xlab(" ") +
-  theme_bw() +
   scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  facet_wrap(~area, ncol = 3, scale = "free")
+  facet_wrap(~area, ncol = 3, scale = "free") +
+  theme_sleek()
 
 ggsave(filename="Monthly pdf data/Figures/area_monthly_landings.pdf", monthly_areas,
        width=350, height=220, units="mm", dpi=300)
@@ -93,10 +94,10 @@ overall_means$species <- factor(overall_means$species,
 monthly_species <- ggplot(overall_means, aes(y = landings, x = month)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("mean landings (lbs)") + xlab(" ") +
-  theme_bw() +
   scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  facet_wrap(~species, ncol = 4, scale = "free")
+  facet_wrap(~species, ncol = 4, scale = "free") +
+  theme_sleek()
 
 ggsave(filename="Monthly pdf data/Figures/monthly_species.pdf", monthly_species,
        width=400, height=350, units="mm", dpi=300)

@@ -90,7 +90,8 @@ allCA_foi_means$species <- as.factor(allCA_foi_means$species)
 kruskal.test(allCA_foi_means$landings ~ allCA_foi_means$species)  # p = 2.403e-14****
 nemenyi <- kwAllPairsNemenyiTest(allCA_foi_means$landings ~ allCA_foi_means$species)
 
-# Calculate substitutability index (0-1) from Nemenyi p-values
+
+# Calculate substitutability index (0-1) from Nemenyi p-values ----------------
 sub_index <- rescale(nemenyi$p.value)
 colnames(sub_index) <- c("DSTS", "dungeness crab", "herring roe", 
                          "market squid", "ocean shrimp", "other groundfish",
@@ -109,10 +110,11 @@ sub_index_plot <- ggplot(melt(sub_index, na.rm = TRUE), aes(x = Var1, y = Var2, 
         axis.text.y = element_text(margin = margin(0, -3, 0, 0)),
         panel.grid.major = element_blank())
 
-ggsave(filename = "Monthly pdf data/Figures/sub_index_plot2.pdf", 
+ggsave(filename = "Monthly pdf data/Figures/sub_index_plot.pdf", 
        plot = sub_index_plot, width = 195, height = 160, units = "mm", dpi = 300)
 
-# Correlation between species
+
+# Correlation between species -------------------------------------------------
 allCA_means_cr <- dcast(allCA_foi_means, month ~ species)
 colnames(allCA_means_cr) <- c("month", "DSTS", "dungeness crab", "herring roe", 
                               "market squid", "ocean shrimp", 
@@ -136,7 +138,7 @@ ggsave(filename = "Monthly pdf data/Figures/species_correlations.pdf",
        plot = species_cor_plot, width = 195, height = 160, units = "mm", dpi = 300)
 
 
-# Density plot of top species of interest
+# Density plot of top species of interest -------------------------------------
 den_allCA_foi <- allCA_foi_means
 levels(den_allCA_foi$month) <- 1:12
 den_allCA_foi$month <- as.numeric(den_allCA_foi$month)

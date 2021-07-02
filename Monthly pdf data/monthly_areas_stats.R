@@ -5,7 +5,7 @@
 # https://www.rdocumentation.org/packages/PMCMR/versions/4.3/topics/posthoc.kruskal.nemenyi.test
 
 library(stringr)
-library(dplyr)
+library(tidyverse)
 library(reshape2)
 library(PMCMRplus)
 library(kSamples)
@@ -91,14 +91,39 @@ kruskal.test(allCA_foi_means$landings ~ allCA_foi_means$species)  # p = 2.403e-1
 nemenyi <- kwAllPairsNemenyiTest(allCA_foi_means$landings ~ allCA_foi_means$species)
 
 
-# Calculate substitutability index (0-1) from Nemenyi p-values ----------------
-sub_index <- rescale(nemenyi$p.value)
-colnames(sub_index) <- c("DSTS", "dungeness crab", "herring roe", 
-                         "market squid", "ocean shrimp", "other groundfish",
-                         "Pacific whiting", "pelagics", "red sea urchin")
-rownames(sub_index) <- c("dungeness crab", "herring roe", "market squid", 
-                         "ocean shrimp", "other groundfish", "Pacific whiting",
-                         "pelagics", "red sea urchin", "salmon")
+# Substitutability index & matrix plot ----------------------------------------
+# Calculate 0-1 index from Nemenyi p-values
+sub_index <- melt(rescale(nemenyi$p.value))
+
+# Replace NAs in rows with both species with 1
+sub_index$value[as.character(sub_index$Var1) == as.character(sub_index$Var2)] <- 1
+
+# Re-combine with DSTS & Salmon
+sub_index <- rbind(data.frame(Var1 = "Dover Sole_Thornyhead_Sablefish",
+                              Var2 = "Dover Sole_Thornyhead_Sablefish", 
+                              value = 1.0000),
+                   na.omit(sub_index),  # omit original NAs
+                   data.frame(Var1 = "Salmon",
+                              Var2 = "Salmon",
+                              value = 1.0000))
+
+sub_index$value[as.character(sub_index$Var1) == as.character(sub_index$Var2)] <- NA
+
+# Re-cast into wide format with value for species=species & remove species column
+sub_index <- dcast(sub_index, Var1 ~ Var2)[, -1]
+
+# Map NAs in sub_index to values from a transposed version of sub_index
+sub_index[] <- Map(function(x, y) {x[is.na(x)] <- y[is.na(x)]; x}, 
+                   sub_index, data.table::transpose(sub_index))
+
+
+# Re-name rows and columns
+short <- c("DSTS", "dungeness crab", "herring roe", "market squid", 
+           "ocean shrimp", "other groundfish", "Pacific whiting", "pelagics",
+           "red sea urchin", "salmon")
+row.names(sub_index) <- short
+colnames(sub_index) <- short
+
 
 sub_index_plot <- ggplot(melt(sub_index, na.rm = TRUE), aes(x = Var1, y = Var2, fill = value)) +
   geom_tile(height = 0.8, width = 0.8) +

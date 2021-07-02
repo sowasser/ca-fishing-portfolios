@@ -133,10 +133,10 @@ sub_index_plot <- ggcorrplot::ggcorrplot(as.matrix(sub_index), hc.order = TRUE, 
     panel.background = element_blank(),
     axis.ticks = element_blank()) +
   labs(x =" ", y = "", fill = "Substitutability Index") +
-  scale_fill_viridis(limits = c(0, 1), direction = -1) 
+  scale_fill_viridis(limits = c(0, 1), direction = -1, alpha = 0.85) 
   # does it look better with the color scale reversed?? (direction = -1)
 
-ggsave(filename = "~/Desktop/sub_index_plot.pdf", 
+ggsave(filename = "Monthly pdf data/Figures/sub_index_plot.pdf", 
        plot = sub_index_plot, width = 195, height = 160, units = "mm", dpi = 300)
 
 

@@ -93,7 +93,7 @@ nemenyi <- kwAllPairsNemenyiTest(allCA_foi_means$landings ~ allCA_foi_means$spec
 
 # Substitutability index & matrix plot ----------------------------------------
 # Calculate 0-1 index from Nemenyi p-values
-sub_index <- melt(rescale(nemenyi$p.value))
+sub_index <- melt(nemenyi$p.value)
 
 # Replace NAs in rows with both species with 1
 sub_index$value[as.character(sub_index$Var1) == as.character(sub_index$Var2)] <- 1
@@ -116,7 +116,6 @@ sub_index <- dcast(sub_index, Var1 ~ Var2)[, -1]
 sub_index[] <- Map(function(x, y) {x[is.na(x)] <- y[is.na(x)]; x}, 
                    sub_index, data.table::transpose(sub_index))
 
-
 # Re-name rows and columns
 short <- c("DSTS", "dungeness crab", "herring roe", "market squid", 
            "ocean shrimp", "other groundfish", "Pacific whiting", "pelagics",
@@ -124,18 +123,20 @@ short <- c("DSTS", "dungeness crab", "herring roe", "market squid",
 row.names(sub_index) <- short
 colnames(sub_index) <- short
 
-
-sub_index_plot <- ggplot(melt(sub_index, na.rm = TRUE), aes(x = Var1, y = Var2, fill = value)) +
-  geom_tile(height = 0.8, width = 0.8) +
-  scale_fill_viridis(limits = c(0, 1)) +
-  theme_minimal() +
-  coord_equal() +
+# Plot by re-configuring ggcorrplot
+sub_index_plot <- ggcorrplot::ggcorrplot(as.matrix(sub_index), hc.order = TRUE, lab = TRUE, type = "lower") +
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.major.x = element_blank(),  # only remove vertical grid lines
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    axis.ticks = element_blank()) +
   labs(x =" ", y = "", fill = "Substitutability Index") +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, margin = margin(-3,0,0,0)),
-        axis.text.y = element_text(margin = margin(0, -3, 0, 0)),
-        panel.grid.major = element_blank())
+  scale_fill_viridis(limits = c(0, 1), direction = -1) 
+  # does it look better with the color scale reversed?? (direction = -1)
 
-ggsave(filename = "Monthly pdf data/Figures/sub_index_plot.pdf", 
+ggsave(filename = "~/Desktop/sub_index_plot.pdf", 
        plot = sub_index_plot, width = 195, height = 160, units = "mm", dpi = 300)
 
 

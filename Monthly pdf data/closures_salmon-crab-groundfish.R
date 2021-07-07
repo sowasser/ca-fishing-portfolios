@@ -1,4 +1,5 @@
 library(tidyverse)
+library(viridis)
 
 # Read in cleaned data with only the fisheries of interest
 fishyears <- read.csv("Data/DFW areas/fisheries_year_soi.csv")
@@ -29,7 +30,8 @@ all_cgs <- cgs %>%
 # Plot mean catch over open & closed years ------------------------------------
 closures_plot <- ggplot(all_cgs, aes(x = year, y = landings, fill = factor(status))) +
   geom_bar(position = "dodge", stat = "identity") +
-  scale_fill_manual(name = "fishery status", values = c("grey50", "blue", "red")) +
+  scale_fill_viridis(name = "fishery status", discrete = TRUE) +
+  guides(fill = guide_legend(reverse = TRUE)) +  # reverse legend order
   ylab("mean landings (lbs)") +
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +

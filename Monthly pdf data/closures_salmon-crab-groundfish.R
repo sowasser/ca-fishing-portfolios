@@ -20,16 +20,16 @@ cgs <- fishyears %>%
 all_cgs <- cgs %>%
   group_by(species, year) %>%
   summarize(landings = sum(landings, na.rm = TRUE)) %>%
-  mutate(fill_col = case_when(
-    year == "2007-2008" | year == "2008-2009" ~ "blue",
-    year == "2015-2016" ~ "red",
-    TRUE ~ "grey50"  # all other years
+  mutate(status = case_when(
+    year == "2007-2008" | year == "2008-2009" ~ "salmon closure",
+    year == "2015-2016" ~ "crab closure",
+    TRUE ~ "all open"  # all other years
   ))
 
-
 # Plot mean catch over open & closed years ------------------------------------
-closures_plot <- ggplot(all_cgs, aes(x = year, y = landings)) +
-  geom_bar(position = "dodge", stat = "identity", fill = all_cgs$fill_col) +
+closures_plot <- ggplot(all_cgs, aes(x = year, y = landings, fill = factor(status))) +
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_manual(name = "fishery status", values = c("grey50", "blue", "red")) +
   ylab("mean landings (lbs)") +
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +

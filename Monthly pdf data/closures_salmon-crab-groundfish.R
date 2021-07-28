@@ -39,7 +39,7 @@ closures_plot <- ggplot(all_cgs, aes(x = year, y = landings, fill = factor(statu
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~species, scale = "free", ncol = 3)
 
-ggsave(filename = "~/Desktop/closures.pdf", 
+ggsave(filename = "Monthly pdf data/Figures/closures.pdf", 
        plot = closures_plot, width = 400, height = 130, units = "mm", dpi = 300)
 
 
@@ -68,7 +68,7 @@ plot_area_closures <- function(fishery) {
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     facet_wrap(~area, scale = "free_y", ncol = 3)  # only allow y-axis to vary
   
-  ggsave(filename=paste("~/Desktop/", fishery, " closures.pdf", 
+  ggsave(filename=paste("Monthly pdf data/Figures/", fishery, " closures.pdf", 
                         sep=""), 
          plot=plt, width=400, height=250, units="mm", dpi=300)
 }
@@ -77,5 +77,3 @@ plot_area_closures <- function(fishery) {
 plot_area_closures("Dungeness Crab")
 plot_area_closures("Groundfish")
 plot_area_closures("Salmon")
-
-

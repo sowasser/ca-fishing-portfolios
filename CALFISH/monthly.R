@@ -58,22 +58,22 @@ grouping <- function(group_string, group_name) {
     summarize(landings_lb = sum(landings_lb))
 }
 
-fish <- bind_rows(grouping(pelagic, "coastal pelagic"),
-                  grouping(flatfish, "flatfish"),
-                  grouping(migratory, "highly migratory"),
-                  grouping(other_fish, "other species"), 
-                  grouping(rockfish, "rockfish"),
-                  grouping(roundfish, "roundfish"),
-                  grouping(salmon, "salmon"))
+monthly_fish <- bind_rows(grouping(pelagic, "coastal pelagic"),
+                          grouping(flatfish, "flatfish"),
+                          grouping(migratory, "highly migratory"),
+                          grouping(other_fish, "other species"), 
+                          grouping(rockfish, "rockfish"),
+                          grouping(roundfish, "roundfish"),
+                          grouping(salmon, "salmon"))
 
-all <- bind_rows(grouping(other_species, "other"),
-                 grouping(other_invert, "other invert"),
-                 grouping(crustacean, "crustacean"),
-                 grouping(mollusk, "mollusk"),
-                 grouping(all_fish, "fish"))
+monthly_all <- bind_rows(grouping(other_species, "other"),
+                         grouping(other_invert, "other invert"),
+                         grouping(crustacean, "crustacean"),
+                         grouping(mollusk, "mollusk"),
+                         grouping(all_fish, "fish"))
 
 # Plots of monthly landings by area -------------------------------------------
-means_byarea <- all %>%
+means_byarea <- monthly_all %>%
   group_by(month, port_complex, group) %>%
   summarize(landings = mean(landings_lb))
 
@@ -89,7 +89,7 @@ ggsave(filename="CALFISH/Figures/monthly_areas_all.pdf", means_area_plot,
        width=300, height=140, units="mm", dpi=300)
 
 
-byarea_fish <- fish %>% 
+byarea_fish <- monthly_fish %>% 
   group_by(month, port_complex, group) %>%
   summarize(landings = mean(landings_lb))
 

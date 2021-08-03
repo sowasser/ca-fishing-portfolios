@@ -5,6 +5,8 @@
 # Also accessed through wcfish package:
 # https://github.com/cfree14/wcfish/
 library(wcfish)
+library(stringr)
+library(dplyr)
 
 # Read in annual port-level data
 port_original <- read.csv("Data/CALFISH_port.csv")
@@ -17,19 +19,19 @@ monthly_original <- swfsc
 monthly <- monthly_original[, c("year", "month", "port_complex", 
                                 "comm_name_orig", "landings_lb")]
 
-# Taxonomic group generalization column ---------------------------------------
+# Add axonomic group generalization column ------------------------------------
 # Create list of species names
 all_species <- as.data.frame(levels(factor(monthly$comm_name_orig)))
 write.csv(all_species, "~/Desktop/all_species.csv", row.names = FALSE)
 
 # Create generalized categories
 other_species <- "Frogs|Herring Roe On Kelp|Turtles"
-other_invertebrates <- "Barnacle|Chiton|Cucumber, Sea|Echinod, Unspecified|Invertebrates, Colonial|Sea Stars|Urchin|Worms"
+other_invert <- "Barnacle|Chiton|Cucumber, Sea|Echinod, Unspecified|Invertebrates, Colonial|Sea Stars|Urchin|Worms"
 crustacean <- "Crab|Crayfish|Crustacean, Unspecified|Lobster|Prawn|Shrimp"
 mollusk <- "Abalone|Clam|Limpet|Mollusk, Unspecified|Mussel|Octopus|Oyster|Scallop|Sea Hare|Sea Slug|Snail, Sea|Squid|Whelk"
 
 # Multiple groupings for fish 
-pelagics <- "Anchovy|Barracuda|Bonito|Cod|Herring,|Mackerel|Pomfret|Sardine|Whiting"
+pelagic <- "Anchovy|Barracuda|Bonito|Cod|Herring,|Mackerel|Pomfret|Sardine|Whiting"
 flatfish <- "Flounder|Halibut|Sanddab|Sole|Tonguefish|Turbot"
 migratory <- "Dolphinfish|Jack Crevalle|Jacks|Kahawai|Marlin|Mola|Opah|Sailfish|Sierra|Swordfish|Tuna|Wahoo"
 other_fish <- "Bass|Blackfish|Blacksmith|Bonefish|Butterfish|Cabrilla|Carp|Catfish|Corbina|Corvina|Croaker|Cusk-Eel|Eel|Escolar|Eulachon|Garibaldi|Goby|Grenadiers|Grouper|Grunion|Guitarfish|Hagfish|Halfmoon|Hardhead|Hitch|Kelpfishes|Killifish|Lizardfish|Louvar|Midshipman|Monkeyface Eel|Mudsucker|Mullet|Needlefish|Oilfish|Perch|Pikeminnow|Queenfish|Ratfish|Salema|Sculpin|Seabass, White|Senorita|Shad|Shark|Sheephead|Skate|Smelt|Snapper|Split-Tail|Stickleback|Stingray|Sturgeon|Sucker|Surfperch|Triggerfish|Unspecified Fish|Unspecified Trawled Fish|Whitefish|Wolf-Eel"
@@ -37,4 +39,27 @@ rockfish <- "Rockfish|Scorpionfish"
 roundfish <- "Cabezon|Cod|Greenling, Kelp|Lingcod|Sablefish|Thornyhead|Tomcod"
 salmon <- "Salmon"
 
-fish <- paste(pelagics, flatfish, migratory, other_fish, rockfish, roundfish, salmon, sep = "|")
+all_fish <- paste(pelagic, flatfish, migratory, other_fish, rockfish, roundfish, salmon, sep = "|")
+
+# Create dataframe with a column for each group & sum landings for the group
+grouping <- function(group_string, group_name) {
+  df <- monthly %>%
+    filter(str_detect(comm_name_orig, group_string)) %>%
+    mutate(group = group_name) %>%
+    group_by(year, month, port_complex, group) %>%
+    summarize(landings_lb = sum(landings_lb))
+}
+
+fish <- bind_rows(grouping(pelagic, "coastal pelagic"),
+                  grouping(flatfish, "flatfish"),
+                  grouping(migratory, "highly migratory"),
+                  grouping(other_fish, "other species"), 
+                  grouping(rockfish, "rockfish"),
+                  grouping(roundfish, "roundfish"),
+                  grouping(salmon, "salmon"))
+
+all <- bind_rows(grouping(other_species, "other"),
+                 grouping(other_invert, "other invert"),
+                 grouping(crustacean, "crustacean"),
+                 grouping(mollusk, "mollusk"),
+                 grouping(all_fish, "fish"))

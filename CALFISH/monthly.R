@@ -5,16 +5,33 @@
 # Also accessed through wcfish package:
 # https://github.com/cfree14/wcfish/
 library(wcfish)
+library(stringr)
+library(dplyr)
+library(ggplot2)
+library(viridis)
+library(ggsidekick)
 
 # Import monthly landings data by port complex from wcfish --------------------
 monthly_original <- swfsc
 monthly <- monthly_original[, c("year", "month", "port_complex", 
                                 "comm_name_orig", "landings_lb")]
 
+# Update labels & specify order of months for better plots
+monthly$month <- str_replace_all(monthly$month,
+                                 c("January" = "Jan", "February" = "Feb", 
+                                   "March" = "Mar", "April" = "Apr", 
+                                   "June" = "Jun", "July" = "Jul", 
+                                   "August" = "Aug", "September" = "Sep", 
+                                   "October" = "Oct", "November" = "Nov", 
+                                   "December" = "Dec"))
+monthly$month <- factor(monthly$month, 
+                        levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+
 # Add axonomic group generalization column ------------------------------------
-# Create list of species names
-all_species <- as.data.frame(levels(factor(monthly$comm_name_orig)))
-write.csv(all_species, "~/Desktop/all_species.csv", row.names = FALSE)
+# Create list of species names, if needed
+# all_species <- as.data.frame(levels(factor(monthly$comm_name_orig)))
+# write.csv(all_species, "~/Desktop/all_species.csv", row.names = FALSE)
 
 # Create generalized categories
 other_species <- "Frogs|Herring Roe On Kelp|Turtles"
@@ -55,3 +72,19 @@ all <- bind_rows(grouping(other_species, "other"),
                  grouping(crustacean, "crustacean"),
                  grouping(mollusk, "mollusk"),
                  grouping(all_fish, "fish"))
+
+# Plots of monthly data -------------------------------------------------------
+means_byarea <- all %>%
+  group_by(month, port_complex, group) %>%
+  summarize(landings = mean(landings_lb))
+
+means_area_plot <- ggplot(means_byarea, aes(y = landings, x = month, fill = group)) +
+  geom_bar(position = "stack", stat = "identity") +
+  ylab("mean landings (lbs)") + xlab(" ") +
+  scale_fill_viridis(discrete = TRUE) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~port_complex, ncol = 3, scale = "free") +
+  theme_sleek()
+
+ggsave(filename="CALFISH/Figures/monthly_areas.pdf", means_area_plot,
+       width=300, height=140, units="mm", dpi=300)

@@ -12,9 +12,8 @@ library(viridis)
 library(ggsidekick)
 
 # Import monthly landings data by port complex from wcfish --------------------
-monthly_original <- swfsc
-monthly <- monthly_original[, c("year", "month", "port_complex", 
-                                "comm_name_orig", "landings_lb")]
+monthly <- swfsc[, c("year", "month", "port_complex", "comm_name_orig", 
+                     "landings_lb")]
 
 # Update labels & specify order of months for better plots
 monthly$month <- str_replace_all(monthly$month,
@@ -28,7 +27,7 @@ monthly$month <- factor(monthly$month,
                         levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
                                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
 
-# Add axonomic group generalization column ------------------------------------
+# Add taxonomic group generalization column ------------------------------------
 # Create list of species names, if needed
 # all_species <- as.data.frame(levels(factor(monthly$comm_name_orig)))
 # write.csv(all_species, "~/Desktop/all_species.csv", row.names = FALSE)

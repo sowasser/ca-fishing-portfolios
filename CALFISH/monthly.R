@@ -73,7 +73,7 @@ all <- bind_rows(grouping(other_species, "other"),
                  grouping(mollusk, "mollusk"),
                  grouping(all_fish, "fish"))
 
-# Plots of monthly data -------------------------------------------------------
+# Plots of monthly landings by area -------------------------------------------
 means_byarea <- all %>%
   group_by(month, port_complex, group) %>%
   summarize(landings = mean(landings_lb))
@@ -86,5 +86,22 @@ means_area_plot <- ggplot(means_byarea, aes(y = landings, x = month, fill = grou
   facet_wrap(~port_complex, ncol = 3, scale = "free") +
   theme_sleek()
 
-ggsave(filename="CALFISH/Figures/monthly_areas.pdf", means_area_plot,
+ggsave(filename="CALFISH/Figures/monthly_areas_all.pdf", means_area_plot,
        width=300, height=140, units="mm", dpi=300)
+
+
+byarea_fish <- fish %>% 
+  group_by(month, port_complex, group) %>%
+  summarize(landings = mean(landings_lb))
+
+area_fish_plot <- ggplot(byarea_fish, aes(y = landings, x = month, fill = group)) +
+  geom_bar(position = "stack", stat = "identity") +
+  ylab("mean landings (lbs)") + xlab(" ") +
+  scale_fill_viridis(discrete = TRUE) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  facet_wrap(~port_complex, ncol = 3, scale = "free") +
+  theme_sleek()
+
+ggsave(filename="CALFISH/Figures/monthly_areas_fish.pdf", area_fish_plot,
+       width=300, height=140, units="mm", dpi=300)
+  

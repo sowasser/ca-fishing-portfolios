@@ -5,14 +5,27 @@
 # Also accessed through wcfish package:
 # https://github.com/cfree14/wcfish/
 library(wcfish)
+library(priceR)
+library(stringr)
+library(dplyr)
+library(ggplot2)
+library(viridis)
+library(ggsidekick)
 
 # Read in annual port-level datasets
 ports <- cdfw_ports[c("port_complex", "year", "comm_name", "value_usd")]
 
+adj_value <- adjust_for_inflation(price = ports$value_usd, 
+                                  from_date = ports$year, 
+                                  country = "US", 
+                                  to_date = 2020)
+
+ports <- cbind(ports, adj_value)
+
 # Add taxonomic group generalization column ------------------------------------
 # Create list of species names, if needed
-all_species <- as.data.frame(levels(factor(ports$comm_name)))
-write.csv(all_species, "~/Desktop/all_species_port.csv", row.names = FALSE)
+# all_species <- as.data.frame(levels(factor(ports$comm_name)))
+# write.csv(all_species, "~/Desktop/all_species_port.csv", row.names = FALSE)
 
 # Create generalized categories
 other_species <- "Frog|Giant kelp|Turtle|All other species|Kelp|algae|Miscellaneous|Terrapin"
@@ -37,7 +50,7 @@ grouping <- function(group_string, group_name) {
     filter(str_detect(comm_name, group_string)) %>%
     mutate(group = group_name) %>%
     group_by(year, port_complex, group) %>%
-    summarize(value = sum(value_usd))
+    summarize(value = sum(adj_value))
 }
 
 port_fish <- bind_rows(grouping(pelagic, "coastal pelagic"),
@@ -58,7 +71,7 @@ port_all <- bind_rows(grouping(other_species, "other"),
 # Plot yearly value (usd) -----------------------------------------------------
 yearly_value_all <- ggplot(port_all, aes(y = value, x = year, fill = group)) +
   geom_bar(position = "stack", stat = "identity") +
-  ylab("total value (USD)") + xlab(" ") +
+  ylab("inflation-adjusted total value (USD)") + xlab(" ") +
   scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port_complex, ncol = 3, scale = "free_y") +
@@ -69,7 +82,7 @@ ggsave(filename="CALFISH/Figures/yearly_value_all.pdf", yearly_value_all,
 
 yearly_value_fish <- ggplot(port_fish, aes(y = value, x = year, fill = group)) +
   geom_bar(position = "stack", stat = "identity") +
-  ylab("total value (USD)") + xlab(" ") +
+  ylab("inflation-adjusted total value (USD)") + xlab(" ") +
   scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port_complex, ncol = 3, scale = "free_y") +

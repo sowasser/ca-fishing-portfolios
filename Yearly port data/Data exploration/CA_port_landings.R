@@ -9,6 +9,7 @@ library(tidyr)
 library(reshape2)
 library(ggplot2)
 library(viridis)
+library(ggsidekick)
 
 # Read in all landings data
 port_landings <- read.csv("Data/port_landings_updated.csv")
@@ -107,23 +108,23 @@ pl_revenue <- pl_revenue %>% filter(port != "OTHER CA PORTS1")  # remove empty p
 
 total_revenue <- ggplot(pl_revenue, aes(x = year, y = revenue)) + 
   theme_bw() +
-  geom_line(size=1.5) +  
+  geom_line(size=1) +  
   ylab("overall revenue") + xlab(" ") +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme_sleek() +
   facet_wrap(~port, ncol = 5)
 
 ggsave(filename="Yearly port data/Figures/total_revenue.pdf", plot=total_revenue,
-       width=600, height=500, units="mm", dpi=300)
+       width=400, height=320, units="mm", dpi=300)
 
 # Count of fisheries (species and gear) per port per year
 pl_count <- count(pl_fishgear, year, port)
 
 fisheries_number <- ggplot(pl_count, aes(x = year, y = n)) + 
   theme_bw() +
-  geom_line(size=1.5) +  
+  geom_line(size=1) +  
   ylab("number of fisheries") + xlab(" ") +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme_sleek() +
   facet_wrap(~port, ncol = 5)
 
 ggsave(filename="Yearly port data/Figures/fisheries_number.pdf", plot=fisheries_number,
-       width=600, height=500, units="mm", dpi=300)
+       width=400, height=320, units="mm", dpi=300)

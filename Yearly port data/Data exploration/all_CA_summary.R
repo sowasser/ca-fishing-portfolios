@@ -8,6 +8,7 @@ library(reshape2)
 library(ggplot2)
 library(viridis)
 library(patchwork)
+library(ggsidekick)
 
 ca_summary <- read.csv("Data/ca_summary_92-14.csv")
 
@@ -32,12 +33,12 @@ summary_plot <- ggplot(summary_long, aes(x = year, y = value)) +
   geom_line(size = 1.5) +  
   ylab(" ") + 
   scale_x_continuous(labels=years, breaks=ca_summary$year) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  facet_wrap(~variable, scale="free", ncol = 1)
+  theme_sleek() +
+  facet_wrap(~variable, scale="free", ncol = 1) 
 # summary_plot  # view plot
 
 ggsave(filename="yearly port data/Figures/summary_timeseries.pdf", plot=summary_plot,
-       width=150, height=250, units="mm", dpi=300)
+       width=130, height=180, units="mm", dpi=300)
 
 # Fisheries revenue vs. pounds landed -----------------------------------------
 ca_summary$year <- factor(ca_summary$year)  # year as factor

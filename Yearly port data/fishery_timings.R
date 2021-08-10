@@ -3,7 +3,6 @@
 # Resources Agency:
 # https://data.cnra.ca.gov/dataset/human-uses-and-socioeconomic-dimensions-ca-north-coast-mpa-baseline-study-1992-2014
 
-library(plyr)
 library(tidyverse)
 library(lubridate)
 library(scales)
@@ -108,7 +107,9 @@ timeline <- ggplot(tasks.long, aes(x=Task, y=task.date, colour=Project)) +
   guides(colour=guide_legend(title=NULL)) +
   labs(x=NULL, y=NULL) + coord_flip() +
   scale_y_date(date_breaks="1 month", labels=date_format("%b")) +  # Change how the dates on x-axis display
-  theme_gantt() + theme(axis.text.x=element_text(angle=45, hjust=1)) 
+  theme_gantt() + theme(axis.text.x=element_text(angle=45, hjust=1)) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  scale_color_viridis(discrete=TRUE)  #color of points from viridis
 timeline
 
 # TODO: Change units to make plot display well.

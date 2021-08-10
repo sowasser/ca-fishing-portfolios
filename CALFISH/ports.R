@@ -1,8 +1,8 @@
-# Script for plotting and analysing the port-level species landings and price
-# data from the CALFISH database:
+# Script for plotting and analyzing the species landings and value data from
+# the CALFISH database:
 # https://datadryad.org/stash/landing/show?id=doi%3A10.25349%2FD9M907
 
-# Also accessed through wcfish package:
+# Accessed through wcfish package:
 # https://github.com/cfree14/wcfish/
 library(wcfish)
 library(priceR)
@@ -12,7 +12,7 @@ library(ggplot2)
 library(viridis)
 library(ggsidekick)
 
-# Read in annual port-level datasets
+# Read in annual port-level dataset
 ports <- cdfw_ports[c("port_complex", "year", "comm_name", "value_usd")]
 
 adj_value <- adjust_for_inflation(price = ports$value_usd, 
@@ -21,6 +21,7 @@ adj_value <- adjust_for_inflation(price = ports$value_usd,
                                   to_date = 2020)
 
 ports <- cbind(ports, adj_value)
+
 
 # Add taxonomic group generalization column ------------------------------------
 # Create list of species names, if needed
@@ -39,6 +40,8 @@ flatfish <- "flounder|sole|halibut|turbot|Flounder|Halibut|sanddab|Sanddab|Sole|
 migratory <- "tuna|dolphinfish|sunfish|Opah|Sailfish|spearfish|marlin|Swordfish|Tuna|Wahoo"
 other_fish <- "shad|bass|surfperch|shark|ray|skate|croaker|Blacksmith|corbina|grunion|lizardfish|eel|needlefish|sheephead|carp|catfish|Croaker|Eel|Escolar|Flyingfish|kelpfish|Grenadier|Grouper|Hagfish|Halfmoon|Hardhead|Hitch|Jack|Jacksmelt|Kelpfish|Lancelet|mudsucker|Louvar|prickleback|smelt|whitefish|Oilfish|Opaleye|hagfish|pomfret|pompano|saury|sierra|Perch-like|midshipman|Pomfret|Queenfish|trout|Ray|wrasse|blackfish|Sargo|Senorita|Shark|corvina|guitarfish|Skate|Splittail|cabrilla|cusk-eel|ratfish|sculpin|Stingray|mullet|Sturgeon|Sucker|stickleback|Trawled fish|Triggerfish|seabass|Whitebait|eel|goby|amberjack|Zebraperch"
 rockfish <- "rockfish|scorpionfish|Rockfish"
+
+rockfish <- paste(c(), sep = "|")
 roundfish <- "Cabezon|greenling|Lingcod|thornyhead|Pacific cod|tomcod|Sablefish|Thornyhead"
 salmon <- "salmon"
 

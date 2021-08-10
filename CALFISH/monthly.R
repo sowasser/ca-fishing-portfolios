@@ -1,4 +1,4 @@
-# Script for plotting and analysing the monthly species landings data from the
+# Script for plotting and analyzing the monthly species landings data from the
 # CALFISH database:
 # https://datadryad.org/stash/landing/show?id=doi%3A10.25349%2FD9M907
 

@@ -14,6 +14,23 @@ library(ggsidekick)
 # Read in all landings data
 port_landings <- read.csv("Data/port_landings_updated.csv")
 
+# Order ports from North to South
+port_landings$port <- factor(port_landings$port, 
+                             levels = c("CRESCENT CITY AREA PORTS", "TRINIDAD",
+                                        "EUREKA AREA PORTS", "SHELTER COVE",
+                                        "FORT BRAGG AREA PORTS", "ALBION",
+                                        "POINT ARENA", "BODEGA BAY AREA PORTS",
+                                        "BOLINAS", "SAN FRANCISCO AREA PORTS",
+                                        "PRINCETON-HALF MOON AREA PORTS",
+                                        "SANTA CRUZ", "MOSS LANDING", 
+                                        "MONTEREY AREA PORTS", "MORRO BAY AREA PORTS", 
+                                        "AVILA-PORT SAN LUIS", "SANTA BARBARA COUNTY PORTS",
+                                        "VENTURA", "PORT HUENEME-OXNARD",
+                                        "LOS ANGELES - LONG BEACH AREA PORTS",
+                                        "ORANGE COUNTY PORTS", "DANA POINT",
+                                        "OCEANSIDE", "SAN DIEGO AREA PORTS",
+                                        "OTHER CA PORTS"))
+
 # Isolate stable period: 2009-2014
 stable_years <- port_landings %>% filter(between(year, 2009, 2014))
 

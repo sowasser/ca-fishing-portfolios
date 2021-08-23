@@ -13,15 +13,19 @@ library(viridis)
 library(ggsidekick)
 
 # Read in annual port-level dataset
-ports <- cdfw_ports[c("port_complex", "year", "comm_name", "value_usd")]
+ports_all <- cdfw_ports[c("port_complex", "year", "comm_name", "value_usd")]
 
-adj_value <- adjust_for_inflation(price = ports$value_usd, 
-                                  from_date = ports$year, 
+adj_value <- adjust_for_inflation(price = ports_all$value_usd, 
+                                  from_date = ports_all$year, 
                                   country = "US", 
                                   to_date = 2020)
 
-ports <- cbind(ports, adj_value)
+ports_all <- cbind(ports_all, adj_value)
 
+# Remove uninformative port complexes -----------------------------------------
+ports <- ports_all %>%
+  filter(port_complex != "Inland Waters") %>%
+  filter(port_complex != "Unknown")
 
 # Add taxonomic group generalization column ------------------------------------
 # Create list of species names, if needed
@@ -77,19 +81,19 @@ yearly_value_all <- ggplot(port_all, aes(y = value, x = year, fill = group)) +
   ylab("inflation-adjusted total value (USD)") + xlab(" ") +
   scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  facet_wrap(~port_complex, ncol = 3, scale = "free_y") +
+  facet_wrap(~port_complex, ncol = 2, scale = "free_y") +
   theme_sleek()
 
 ggsave(filename="CALFISH/Figures/yearly_value_all.pdf", yearly_value_all,
-       width=300, height=220, units="mm", dpi=300)
+       width=200, height=220, units="mm", dpi=300)
 
 yearly_value_fish <- ggplot(port_fish, aes(y = value, x = year, fill = group)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("inflation-adjusted total value (USD)") + xlab(" ") +
   scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  facet_wrap(~port_complex, ncol = 3, scale = "free_y") +
+  facet_wrap(~port_complex, ncol = 2, scale = "free_y") +
   theme_sleek()
 
 ggsave(filename="CALFISH/Figures/yearly_value_fish.pdf", yearly_value_fish,
-       width=300, height=220, units="mm", dpi=300)
+       width=200, height=220, units="mm", dpi=300)

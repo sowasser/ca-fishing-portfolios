@@ -68,15 +68,36 @@ port_fish <- bind_rows(grouping(pelagic, "coastal pelagic"),
                        grouping(roundfish, "roundfish"),
                        grouping(salmon, "salmon"))
 
-port_all <- bind_rows(grouping(other_species, "other"),
+port_spp <- bind_rows(grouping(other_species, "other"),
                       grouping(other_invert, "other invert"),
                       grouping(crustacean, "crustacean"),
                       grouping(mollusk, "mollusk"),
                       grouping(all_fish, "fish"))
 
 
-# Plot yearly value (usd) -----------------------------------------------------
-yearly_value_all <- ggplot(port_all, aes(y = value, x = year, fill = group)) +
+# Plot yearly value (usd) overall and proportionally --------------------------
+yearly_value_areas <- ggplot(port_spp, aes(y = value, x = year, fill = port_complex)) +
+  geom_bar(position = "stack", stat = "identity") +
+  ylab("Total value (USD)") + xlab(" ") +
+  scale_fill_viridis(discrete = TRUE) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme_sleek()
+
+ggsave(filename="CALFISH/Figures/yearly_value_areas.pdf", yearly_value_areas,
+       width=200, height=120, units="mm", dpi=300)
+
+yearly_value_prop <- ggplot(port_spp, aes(y = value, x = year, fill = port_complex)) +
+  geom_bar(position = "fill", stat = "identity") +
+  ylab("Proportional value (USD)") + xlab(" ") +
+  scale_fill_viridis(discrete = TRUE) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme_sleek()
+
+ggsave(filename="CALFISH/Figures/yearly_value_prop.pdf", yearly_value_prop,
+       width=300, height=70, units="mm", dpi=300)
+
+# Plot value for broad taxonomic groups (all and fish) ------------------------
+yearly_value_all <- ggplot(port_spp, aes(y = value, x = year, fill = group)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("inflation-adjusted total value (USD)") + xlab(" ") +
   scale_fill_viridis(discrete = TRUE) +

@@ -23,9 +23,15 @@ adj_value <- adjust_for_inflation(price = ports_all$value_usd,
 ports_all <- cbind(ports_all, adj_value)
 
 # Remove uninformative port complexes -----------------------------------------
-ports <- ports_all %>%
+ports <- ports_all %>% 
   filter(port_complex != "Inland Waters") %>%
   filter(port_complex != "Unknown")
+
+ports$port_complex <- factor(ports$port_complex,
+                             levels = c("Eureka", "Fort Bragg", "Bodega Bay",
+                                        "Sacramento Delta", "San Francisco", 
+                                        "Monterey", "Morro Bay", "Santa Barbara", 
+                                        "Los Angeles", "San Diego"))
 
 # Add taxonomic group generalization column ------------------------------------
 # Create list of species names, if needed
@@ -79,7 +85,8 @@ port_spp <- bind_rows(grouping(other_species, "other"),
 yearly_value_areas <- ggplot(port_spp, aes(y = value, x = year, fill = port_complex)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("Total value (USD)") + xlab(" ") +
-  scale_fill_viridis(discrete = TRUE) +
+  scale_fill_discrete(name = "Port complex \n(North to South)") +
+  # scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   theme_sleek()
 
@@ -89,7 +96,8 @@ ggsave(filename="CALFISH/Figures/yearly_value_areas.pdf", yearly_value_areas,
 yearly_value_prop <- ggplot(port_spp, aes(y = value, x = year, fill = port_complex)) +
   geom_bar(position = "fill", stat = "identity") +
   ylab("Proportional value (USD)") + xlab(" ") +
-  scale_fill_viridis(discrete = TRUE) +
+  scale_fill_discrete(name = "Port complex \n(North to South)") +
+  # scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   theme_sleek()
 
@@ -99,8 +107,9 @@ ggsave(filename="CALFISH/Figures/yearly_value_prop.pdf", yearly_value_prop,
 # Plot value for broad taxonomic groups (all and fish) ------------------------
 yearly_value_all <- ggplot(port_spp, aes(y = value, x = year, fill = group)) +
   geom_bar(position = "stack", stat = "identity") +
-  ylab("inflation-adjusted total value (USD)") + xlab(" ") +
-  scale_fill_viridis(discrete = TRUE) +
+  ylab("Total value (USD)") + xlab(" ") +
+  scale_fill_discrete(name = "Port complex \n(North to South)") +
+  # scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port_complex, ncol = 2, scale = "free_y") +
   theme_sleek()
@@ -110,8 +119,8 @@ ggsave(filename="CALFISH/Figures/yearly_value_all.pdf", yearly_value_all,
 
 yearly_value_fish <- ggplot(port_fish, aes(y = value, x = year, fill = group)) +
   geom_bar(position = "stack", stat = "identity") +
-  ylab("inflation-adjusted total value (USD)") + xlab(" ") +
-  scale_fill_viridis(discrete = TRUE) +
+  ylab("Total value (USD)") + xlab(" ") +
+  # scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port_complex, ncol = 2, scale = "free_y") +
   theme_sleek()

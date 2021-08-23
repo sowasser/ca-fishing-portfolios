@@ -16,13 +16,14 @@ library(priceR)
 pl <- read.csv("Data/port_landings_92-14.csv")
 
 # Remove fisheries that won't be used in the analysis
-pl <- pl %>% filter(fishery != "MISC")
-pl <- pl %>% filter(fishery != "OTHER")
-pl <- pl %>% filter(fishery != "OTHER CRAB")
-pl <- pl %>% filter(fishery != "OTHER FLATFISH")
-pl <- pl %>% filter(fishery != "OTHER GROUNDFISH")
-pl <- pl %>% filter(fishery != "OTHER OFFSHORE PELAGICS")
-pl <- pl %>% filter(fishery != "OTHER-misc")
+pl <- pl %>% 
+  filter(fishery != "MISC") %>%
+  filter(fishery != "OTHER") %>%
+  filter(fishery != "OTHER CRAB") %>%
+  filter(fishery != "OTHER FLATFISH") %>%
+  filter(fishery != "OTHER GROUNDFISH") %>%
+  filter(fishery != "OTHER OFFSHORE PELAGICS") %>%
+  filter(fishery != "OTHER-misc")
 
 # Check to make sure all "other" or "misc" fisheries have been removed
 species <- levels(factor(pl$fishery))  # list of species

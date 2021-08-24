@@ -50,10 +50,11 @@ flatfish <- "flounder|sole|halibut|turbot|Flounder|Halibut|sanddab|Sanddab|Sole|
 migratory <- "tuna|dolphinfish|sunfish|Opah|Sailfish|spearfish|marlin|Swordfish|Tuna|Wahoo"
 other_fish <- "shad|bass|surfperch|shark|ray|skate|croaker|Blacksmith|corbina|grunion|lizardfish|eel|needlefish|sheephead|carp|catfish|Croaker|Eel|Escolar|Flyingfish|kelpfish|Grenadier|Grouper|Hagfish|Halfmoon|Hardhead|Hitch|Jack|Jacksmelt|Kelpfish|Lancelet|mudsucker|Louvar|prickleback|smelt|whitefish|Oilfish|Opaleye|hagfish|pomfret|pompano|saury|sierra|Perch-like|midshipman|Pomfret|Queenfish|trout|Ray|wrasse|blackfish|Sargo|Senorita|Shark|corvina|guitarfish|Skate|Splittail|cabrilla|cusk-eel|ratfish|sculpin|Stingray|mullet|Sturgeon|Sucker|stickleback|Trawled fish|Triggerfish|seabass|Whitebait|eel|goby|amberjack|Zebraperch"
 rockfish <- "rockfish|scorpionfish|Rockfish"
-
-rockfish <- paste(c(), sep = "|")
 roundfish <- "Cabezon|greenling|Lingcod|thornyhead|Pacific cod|tomcod|Sablefish|Thornyhead"
 salmon <- "salmon"
+
+# Todo: better way of specifying these strings!
+# rockfish <- paste(c(), sep = "|")
 
 all_fish <- paste(pelagic, flatfish, migratory, other_fish, rockfish, roundfish, salmon, sep = "|")
 

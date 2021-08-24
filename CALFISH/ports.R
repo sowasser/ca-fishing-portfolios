@@ -86,6 +86,7 @@ yearly_value_areas <- ggplot(port_spp, aes(y = value, x = year, fill = port_comp
   geom_bar(position = "stack", stat = "identity") +
   ylab("Total value (USD)") + xlab(" ") +
   scale_fill_discrete(name = "Port complex \n(North to South)") +
+  scale_x_continuous(breaks = c(1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
   # scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   theme_sleek()
@@ -97,6 +98,7 @@ yearly_value_prop <- ggplot(port_spp, aes(y = value, x = year, fill = port_compl
   geom_bar(position = "fill", stat = "identity") +
   ylab("Proportional value (USD)") + xlab(" ") +
   scale_fill_discrete(name = "Port complex \n(North to South)") +
+  scale_x_continuous(breaks = c(1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
   # scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   theme_sleek()
@@ -108,22 +110,25 @@ ggsave(filename="CALFISH/Figures/yearly_value_prop.pdf", yearly_value_prop,
 yearly_value_all <- ggplot(port_spp, aes(y = value, x = year, fill = group)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("Total value (USD)") + xlab(" ") +
-  scale_fill_discrete(name = "Port complex \n(North to South)") +
+  scale_fill_discrete(name = "Taxonomic group") +
+  scale_x_continuous(breaks = c(1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
   # scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port_complex, ncol = 2, scale = "free_y") +
   theme_sleek()
 
 ggsave(filename="CALFISH/Figures/yearly_value_all.pdf", yearly_value_all,
-       width=200, height=220, units="mm", dpi=300)
+       width=210, height=230, units="mm", dpi=300)
 
 yearly_value_fish <- ggplot(port_fish, aes(y = value, x = year, fill = group)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("Total value (USD)") + xlab(" ") +
+  scale_fill_discrete(name = "Species group") +
+  scale_x_continuous(breaks = c(1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
   # scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port_complex, ncol = 2, scale = "free_y") +
   theme_sleek()
 
 ggsave(filename="CALFISH/Figures/yearly_value_fish.pdf", yearly_value_fish,
-       width=200, height=220, units="mm", dpi=300)
+       width=210, height=230, units="mm", dpi=300)

@@ -12,7 +12,7 @@ library(ggplot2)
 library(viridis)
 library(ggsidekick)
 
-# Read in annual port-level dataset
+# Read in annual port-level dataset & adjust for inflation --------------------
 ports_all <- cdfw_ports[c("port_complex", "year", "comm_name", "value_usd")]
 
 adj_value <- adjust_for_inflation(price = ports_all$value_usd, 
@@ -22,16 +22,19 @@ adj_value <- adjust_for_inflation(price = ports_all$value_usd,
 
 ports_all <- cbind(ports_all, adj_value)
 
-# Remove uninformative port complexes -----------------------------------------
-ports <- ports_all %>% 
-  filter(port_complex != "Inland Waters") %>%
-  filter(port_complex != "Unknown")
+# Remove uninformative port complexes & condense areas ------------------------
+ports <- ports_all %>% filter(port_complex != "Unknown")
+
+ports$port_complex <- str_replace_all(ports$port_complex, 
+                                      c("Fort Bragg" = "Eureka", 
+                                        "Bodega Bay" = "San Francisco", 
+                                        "Morro Bay" = "Santa Barbara"))
+  
 
 ports$port_complex <- factor(ports$port_complex,
-                             levels = c("Eureka", "Fort Bragg", "Bodega Bay",
-                                        "Sacramento Delta", "San Francisco", 
-                                        "Monterey", "Morro Bay", "Santa Barbara", 
-                                        "Los Angeles", "San Diego"))
+                             levels = c("Eureka", "San Francisco", "Sacramento Delta",
+                                        "Monterey", "Santa Barbara", "Los Angeles", 
+                                        "San Diego", "Inland Waters"))
 
 # Add taxonomic group generalization column ------------------------------------
 # Create list of species names, if needed
@@ -97,7 +100,7 @@ ggsave(filename="CALFISH/Figures/yearly_value_areas.pdf", yearly_value_areas,
 
 yearly_value_prop <- ggplot(port_spp, aes(y = value, x = year, fill = port_complex)) +
   geom_bar(position = "fill", stat = "identity") +
-  ylab("Proportional value (USD)") + xlab(" ") +
+  ylab("Proportion \nof value (USD)") + xlab(" ") +
   scale_fill_discrete(name = "Port complex \n(North to South)") +
   scale_x_continuous(breaks = c(1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
   # scale_fill_viridis(discrete = TRUE) +
@@ -108,6 +111,11 @@ ggsave(filename="CALFISH/Figures/yearly_value_prop.pdf", yearly_value_prop,
        width=300, height=70, units="mm", dpi=300)
 
 # Plot value for broad taxonomic groups (all and fish) ------------------------
+
+# First remove inland waters to make plotting simpler
+# port_spp <- port_spp %>% filter(port_complex != "Inland Waters")
+# port_fish <- port_fish %>% filter(port_complex != "Inland Waters")
+
 yearly_value_all <- ggplot(port_spp, aes(y = value, x = year, fill = group)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("Total value (USD)") + xlab(" ") +

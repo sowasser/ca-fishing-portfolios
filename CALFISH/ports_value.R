@@ -1,5 +1,4 @@
-# Script for plotting and analyzing the species landings and value data from
-# the CALFISH database:
+# Script for plotting and analyzing the species value data from the CALFISH database:
 # https://datadryad.org/stash/landing/show?id=doi%3A10.25349%2FD9M907
 
 # Accessed through wcfish package:
@@ -29,7 +28,6 @@ ports$port_complex <- str_replace_all(ports$port_complex,
                                       c("Fort Bragg" = "Eureka", 
                                         "Bodega Bay" = "San Francisco", 
                                         "Morro Bay" = "Santa Barbara"))
-  
 
 ports$port_complex <- factor(ports$port_complex,
                              levels = c("Eureka", "San Francisco", "Sacramento Delta",

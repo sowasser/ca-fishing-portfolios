@@ -106,7 +106,7 @@ yearly_value_prop <- ggplot(port_spp, aes(y = value, x = year, fill = port_compl
   theme_sleek()
 
 ggsave(filename="CALFISH/Figures/yearly_value_prop.pdf", yearly_value_prop,
-       width=300, height=70, units="mm", dpi=300)
+       width=300, height=50, units="mm", dpi=300)
 
 # Plot value for broad taxonomic groups (all and fish) ------------------------
 
@@ -125,7 +125,7 @@ yearly_value_all <- ggplot(port_spp, aes(y = value, x = year, fill = group)) +
   theme_sleek()
 
 ggsave(filename="CALFISH/Figures/yearly_value_all.pdf", yearly_value_all,
-       width=210, height=230, units="mm", dpi=300)
+       width=200, height=210, units="mm", dpi=300)
 
 yearly_value_fish <- ggplot(port_fish, aes(y = value, x = year, fill = group)) +
   geom_bar(position = "stack", stat = "identity") +
@@ -138,4 +138,4 @@ yearly_value_fish <- ggplot(port_fish, aes(y = value, x = year, fill = group)) +
   theme_sleek()
 
 ggsave(filename="CALFISH/Figures/yearly_value_fish.pdf", yearly_value_fish,
-       width=210, height=230, units="mm", dpi=300)
+       width=200, height=210, units="mm", dpi=300)

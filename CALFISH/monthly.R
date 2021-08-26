@@ -80,7 +80,6 @@ means_byarea <- monthly_all %>%
 means_area_plot <- ggplot(means_byarea, aes(y = landings, x = month, fill = group)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("mean landings (lbs)") + xlab(" ") +
-  scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port_complex, ncol = 3, scale = "free") +
   theme_sleek()
@@ -96,7 +95,6 @@ byarea_fish <- monthly_fish %>%
 area_fish_plot <- ggplot(byarea_fish, aes(y = landings, x = month, fill = group)) +
   geom_bar(position = "stack", stat = "identity") +
   ylab("mean landings (lbs)") + xlab(" ") +
-  scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   facet_wrap(~port_complex, ncol = 3, scale = "free") +
   theme_sleek()

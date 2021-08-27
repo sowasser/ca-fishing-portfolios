@@ -91,22 +91,23 @@ yearly_value_areas <- ggplot(port_spp, aes(y = value, x = year, fill = port_comp
   scale_x_continuous(breaks = c(1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
   # scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  theme_sleek()
+  theme_sleek() +
+  theme(legend.position = c(0.87, 0.7))
 
 ggsave(filename="CALFISH/Figures/yearly_value_areas.pdf", yearly_value_areas,
-       width=200, height=120, units="mm", dpi=300)
+       width=230, height=120, units="mm", dpi=300)
 
 yearly_value_prop <- ggplot(port_spp, aes(y = value, x = year, fill = port_complex)) +
   geom_bar(position = "fill", stat = "identity") +
   ylab("Proportion \nof value (USD)") + xlab(" ") +
-  scale_fill_discrete(name = "Port complex \n(North to South)") +
   scale_x_continuous(breaks = c(1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
   # scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  theme_sleek()
+  theme_sleek() +
+  theme(legend.position = "none") 
 
 ggsave(filename="CALFISH/Figures/yearly_value_prop.pdf", yearly_value_prop,
-       width=300, height=50, units="mm", dpi=300)
+       width=230, height=40, units="mm", dpi=300)
 
 # Plot value for broad taxonomic groups (all and fish) ------------------------
 

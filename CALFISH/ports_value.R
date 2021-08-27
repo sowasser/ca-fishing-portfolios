@@ -122,11 +122,12 @@ yearly_value_all <- ggplot(port_spp, aes(y = value, x = year, fill = group)) +
   scale_x_continuous(breaks = c(1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
   # scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  facet_wrap(~port_complex, ncol = 2, scale = "free_y") +
-  theme_sleek()
+  facet_wrap(~port_complex, ncol = 4, scale = "free_y") +
+  theme_sleek() +
+  theme(axis.text.x = element_text(angle = 40, vjust = 0.5, hjust = 0.5)) 
 
 ggsave(filename="CALFISH/Figures/yearly_value_all.pdf", yearly_value_all,
-       width=200, height=210, units="mm", dpi=300)
+       width=300, height=110, units="mm", dpi=300)
 
 yearly_value_fish <- ggplot(port_fish, aes(y = value, x = year, fill = group)) +
   geom_bar(position = "stack", stat = "identity") +
@@ -135,8 +136,9 @@ yearly_value_fish <- ggplot(port_fish, aes(y = value, x = year, fill = group)) +
   scale_x_continuous(breaks = c(1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
   # scale_fill_viridis(discrete = TRUE) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  facet_wrap(~port_complex, ncol = 2, scale = "free_y") +
-  theme_sleek()
+  facet_wrap(~port_complex, ncol = 4, scale = "free_y") +
+  theme_sleek() +
+  theme(axis.text.x = element_text(angle = 40, vjust = 0.5, hjust = 0.5)) 
 
 ggsave(filename="CALFISH/Figures/yearly_value_fish.pdf", yearly_value_fish,
-       width=200, height=210, units="mm", dpi=300)
+       width=300, height=110, units="mm", dpi=300)

@@ -66,6 +66,12 @@ tabula.convert_into_by_batch("source/areas/Morro Bay",
                              area=(10, 0, 100, 100), relative_area=True,
                              output_format="csv")
 
+tabula.convert_into_by_batch("source/areas/Sacramento Delta",
+                             pages="all",
+                             stream=True,
+                             area=(10, 0, 100, 100), relative_area=True,
+                             output_format="csv")
+
 tabula.convert_into_by_batch("source/areas/San Diego",
                              pages="all",
                              stream=True,

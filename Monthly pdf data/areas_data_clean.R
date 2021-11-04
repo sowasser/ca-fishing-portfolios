@@ -3,6 +3,10 @@
 # Department of Natural Resources, accessed here: 
 # https://wildlife.ca.gov/Fishing/Commercial/Landings
 
+# Before running this code, initial clean-up needs to be done in excel to
+# verify column breaks, remove empty lines, and change data to number format
+# with no decimal places and no commas.
+
 library(stringr)
 library(tidyverse)
 
@@ -66,6 +70,9 @@ write.csv(m, "Data/DFW areas/monterey.csv", row.names = FALSE)
 mb <- read_and_clean("Morro Bay")
 write.csv(mb, "Data/DFW areas/morro_bay.csv", row.names = FALSE)
 
+sa <- read_and_clean("Sacramento Delta")
+write.csv(sa, "Data/DFW areas/sacramento_delta.csv", row.names = FALSE)
+
 sd <- read_and_clean("San Diego")
 write.csv(sd, "Data/DFW areas/san_diego.csv", row.names = FALSE)
 
@@ -75,7 +82,7 @@ write.csv(sf, "Data/DFW areas/san_francisco.csv", row.names = FALSE)
 sb <- read_and_clean("Santa Barbara")
 write.csv(sb, "Data/DFW areas/santa_barbara.csv", row.names = FALSE)
 
-all <- rbind(e, fb, bb, sf, m, mb, sb, la, sd)  # ordered north -> south
+all <- rbind(e, fb, bb, sa, sf, m, mb, sb, la, sd)  # ordered north -> south
 all <- all %>% filter(!str_detect(Species, "Total"))  # Any sum/total values
 
 
@@ -91,6 +98,17 @@ print(all_species)  # 390 species names
 all$Species <- str_replace_all(all$Species, 
                                c("Lobs ter California spiny" = "Lobster California spiny",
                                  "Anchovy  northern" = "Anchovy northern",
-                                 "Crab y ellow rock" = "Crab yellow rock"))
+                                 "Crab y ellow rock" = "Crab yellow rock",
+                                 "Rockfish s tarry" = "Rockfish starry",
+                                 "Flounder s tarry" = "Flounder starry",
+                                 "Rockfish oliv e" = "Rockfish olive", 
+                                 "Sea s tars" = "Sea stars",
+                                 "Shrimp ghos t" = "Shrimp ghost",
+                                 "Tuna y ellowfin" = "Tuna yellowfin",
+                                 "Crus tacean unspecified" = "Crustacean unspecified", 
+                                 "Rockfish v ermilion" = "Rockfish vermilion",
+                                 "Rockfish  y ellowtail" = "Rockfish yellowtail",
+                                 "Salmon  Roe Chinook and C" = "Salmon Roe Chinook and Coho",
+                                 "Snails moom" = "Snails moon"))
 
 write.csv(all, "Data/DFW areas/all_areas.csv", row.names = FALSE)

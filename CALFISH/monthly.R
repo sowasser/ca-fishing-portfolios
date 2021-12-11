@@ -4,6 +4,8 @@
 
 # Also accessed through wcfish package:
 # https://github.com/cfree14/wcfish/
+devtools::install_github("cfree14/wcfish", force=T)
+
 library(wcfish)
 library(stringr)
 library(dplyr)

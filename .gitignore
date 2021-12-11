@@ -3,10 +3,7 @@
 .RData
 .Ruserdata
 
-# Ignore data inputs (.csv, .pdf) and outputs (.pdf, Figures folder)
-*.csv
-
-*.pdf
+# Ignore figures. Can run script to re-create
 
 Figures/
 

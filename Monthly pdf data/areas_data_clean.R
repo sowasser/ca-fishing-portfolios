@@ -109,6 +109,8 @@ all$Species <- str_replace_all(all$Species,
                                  "Rockfish v ermilion" = "Rockfish vermilion",
                                  "Rockfish  y ellowtail" = "Rockfish yellowtail",
                                  "Salmon  Roe Chinook and C" = "Salmon Roe Chinook and Coho",
-                                 "Snails moom" = "Snails moon"))
+                                 "Snails moom" = "Snails moon",
+                                 "Fly ingfish" = "Flyingfish",
+                                 "Grenadier" = "Grenadiers"))
 
 write.csv(all, "Data/DFW areas/all_areas.csv", row.names = FALSE)
